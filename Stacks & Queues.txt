@@ -1,0 +1,1136 @@
+Solutions of these questions are either on GFG or LEETCODE 
+
+---------------------------------------Stacks & Queues-----------------------------------------
+*For Stack and Queues implementation see CB codes
+
+1.  Reverse a stack using recursion ->S(1)
+  private static void ReverseStack(Stack<Integer> st) {
+		if (st.isEmpty()) {
+			return;
+		}
+		int ele = st.peek();
+		st.pop();
+		ReverseStack(st);
+		InsertAtBottom(st, ele);
+	}
+
+	private static void InsertAtBottom(Stack<Integer> st, int ele) {
+		if (st.isEmpty()) {
+			st.push(ele);
+			return;
+		}
+		int temp = st.peek();
+		st.pop();
+		InsertAtBottom(st, ele);
+		st.push(temp);
+
+	}
+---------------------------------------------------------------------------------------------------
+2. Reverse a Queue using recursion
+public void ReverseQueue(Queue<Integer> q){
+        if(q.isEmpty()){
+            return;
+        }
+        
+        int ele=q.remove();
+        ReverseQueue(q);
+        q.add(ele);
+    }
+---------------------------------------------------------------------------------------------------
+3. Next Smaller Element (Stack)
+public static void nextSmaller(int[] arr) {
+
+		Stack<Integer> st = new Stack<>();
+		for (int i = 0; i < arr.length; i++) {
+
+			while (!st.isEmpty() && arr[st.peek()] > arr[i]) {
+				System.out.println(arr[st.pop()] + "," + arr[i]);
+			}
+			st.push(i);
+		}
+		while (!st.isEmpty()) {
+			System.out.println(arr[st.pop()] + ",-1");
+		}
+	}
+---------------------------------------------------------------------------------------------------
+4. Next Greater Element(Stack)
+public static void nextLarger(int[] arr) {
+
+		Stack<Integer> st = new Stack<>();
+		for (int i = 0; i < arr.length; i++) {
+
+			while (!st.isEmpty() && arr[st.peek()] < arr[i]) {
+				System.out.println(arr[st.pop()] + "," + arr[i]);
+			}
+			st.push(i);
+		}
+		while (!st.isEmpty()) {
+			System.out.println(arr[st.pop()] + ",-1");
+		}
+	}
+---------------------------------------------------------------------------------------------------
+5. Balanced Parenthesis (Stack)
+ static boolean parenthesisChecker(String str)
+    {
+       Stack<Character>st=new Stack<>();
+       int open=0;
+       int close=0;
+       for(int i=0;i<str.length();i++){
+           char ch=str.charAt(i);
+           if(ch=='{'||ch=='('||ch=='['){
+               open++;
+               st.push(ch);
+           }
+           
+           if(ch=='}'||ch==')'||ch==']'){
+               if(open>close){
+                   if(st.peek()=='{'&&ch=='}'||st.peek()=='('&&ch==')'||st.peek()=='['&&ch==']'){
+                       close++;
+                       st.pop();
+                   }else{
+                       return false;
+                   }
+                   
+               }else{
+                   return false;
+               }
+           }
+       }
+       if(!st.isEmpty()){
+           return false;
+       }
+       return true;
+    }
+---------------------------------------------------------------------------------------------------
+6. Maximum depth of balanced parenthesis(stack)
+public static int MAXDEPTH(String str) {
+		Stack<Character>ds=new Stack<>();
+		int curr_max = 0;
+		int max = 0;
+
+		for (int i = 0; i < str.length(); i++) {
+			if (str.charAt(i) == '(') {
+				ds.push('(');
+				curr_max++;
+			}
+			if (curr_max > max) {
+				max = curr_max;
+			}
+			if (str.charAt(i) == ')') {
+				if (curr_max > 0) {
+					curr_max--;
+					ds.pop();
+				} else {
+					return -1;
+				}
+			}
+		}
+		if (!ds.isEmpty()) {
+			return -1;
+		}
+
+		return max;
+	}
+---------------------------------------------------------------------------------------------------
+7. Reverse a String using Stack
+ public String reverse(String s){
+      Stack<Character>st=new Stack<>();
+      String res="";
+      for(int i=0;i<s.length();i++){
+          st.push(s.charAt(i));
+      }
+      for(int i=0;i<s.length();i++){
+          res+=st.peek();
+          st.pop();
+      }
+      return res;
+    }
+---------------------------------------------------------------------------------------------------
+8. Reverse First K elements of Queue
+public Queue<Integer> ReversefirstKQueue(Queue<Integer> q, int k)
+    {
+        ArrayList<Integer>list=new ArrayList<>();
+        for(int i=1;i<=k;i++){
+            list.add(0,q.remove());  //acting as stack here
+        }
+        while(!q.isEmpty()){
+            list.add(q.remove());
+        }
+        q.addAll(list);
+        return q;
+    }
+---------------------------------------------------------------------------------------------------
+9. Implement two stacks in an array 
+-> In this there will be two tops ->top1, top2 
+top2=size of the array and top 1 =-1 so 
+for push condition (top1<top2-1) and for stack1 we use top1 and for stack 2 we use top2 
+for pop condition top1!=-1 and top2!=size else return top of the given stack and decrement tops.
+---------------------------------------------------------------------------------------------------
+10. Delete Middle of Stack
+static void deleteMid(Stack<Character> st,int n, int curr)
+{		if (st.empty() || curr == n)
+			return;
+		
+		char x = st.pop();
+		deleteMid(st, n, curr+1);
+		
+		if (curr != n/2)
+		st.push(x);
+	}
+---------------------------------------------------------------------------------------------------
+11. Get Min of stack in O(1)Time and O(1)Space
+                 class getMin{
+	 int min;
+	public void push(int a,Stack<Integer> s){
+	    
+	    if(s.isEmpty()){
+	        min = a;
+	        s.push(a);
+	        return;
+	    }
+	    else{
+	        if(a<min){
+	            s.push( (2*a - min ) );
+	            min = a;
+	        }
+	        else{
+	            s.push(a);
+	        }
+	    }
+	}
+
+          public int pop(Stack<Integer> s){
+            if(s.isEmpty()){
+                return -1;
+            }
+            else{
+                int x = s.pop();
+                if(x<min){
+                    min = 2*min -x;
+                }
+                return x;
+            }
+	}
+
+         public int minEle(Stack<Integer> s){
+           if(!s.isEmpty())
+                return min;
+            else
+                return -1;
+            }
+}
+11.b) and if we want to use extra space then  use another stack 
+#Items to push 8 10 6 3 7
+stack->[8 10 6 3 7]     if we get smaller element than minimum element then push it in helper stack else copy(push) the previous min.
+helper->[8 8 6 3 3]
+---------------------------------------------------------------------------------------------------
+12. Stack using queue & Queue using stack (both push and pop efficient) using 2(stacks/Queues) in both
+->see CodingBlocksCodesRevision package in eclipse
+$push efficient -> stack using 1 queue 
+   Queue<Integer> q1 = new LinkedList<Integer>();
+void push(int a)
+    {
+        q1.add(a);
+    }
+    int pop()
+    {
+	    if(q1.isEmpty()){
+	        return -1;
+	    }
+	    for(int i=0;i<q1.size()-1;i++){S
+	        q1.add(q1.poll());
+	    }	    
+	    return q1.poll();
+    }
+
+---------------------------------------------------------------------------------------------------
+13. Celebrity Problem (Stack)
+       private static int CelebrityProblem(int[][] mat) {
+		Stack<Integer> st = new Stack<>();
+
+		for (int i = 0; i < mat.length; i++) {
+			st.push(i);
+		}
+		while (st.size() >= 2) {
+			int i = st.pop();
+			int j = st.pop();
+			if (mat[i][j] == 1) {
+				// i knows j hence i is not a celebrity
+				st.push(j);
+			} else {
+				// i doesn't know j hence j is not a celebrity
+				st.push(i);
+			}
+		}
+		int pot = st.pop();// potential celebrity
+
+		for (int i = 0; i < mat.length; i++) {
+			if (i != pot) {
+				if (mat[i][pot] == 0 || mat[pot][i] == 1) {
+					return -1;
+				}
+			}
+		}
+		return pot;
+	}
+
+---------------------------------------------------------------------------------------------------
+14. Sort Stack using recursion
+	public static void SortStack(Stack<Integer> st) {
+		if (st.size() == 1) {
+			return;
+		}
+		int temp = st.peek();
+		st.pop();
+		SortStack(st);
+		InsertEle(st, temp);// this inserts temp at its correct location after sorting from about call.
+	}
+	public static void InsertEle(Stack<Integer> st, int ele) {
+		if (st.size() == 0 || st.peek() <= ele) {
+			st.push(ele);
+			return;
+		}
+		int temp = st.peek();
+		st.pop();
+		InsertEle(st, ele);
+		st.push(temp);
+	}
+---------------------------------------------------------------------------------------------------
+15. Valid Substring O(n) S(1).
+public static int findMaxLen(String s) {
+		// code here
+		int n = s.length();
+		int r = 0, l = 0, maxi = 0;
+		for (int i = 0; i < n; i++) {
+			if (s.charAt(i) == '(') {
+				l++;
+			} else {
+				r++;
+			}
+			if (l == r) {
+				maxi = Math.max(maxi, 2 * r);
+			} else if (r > l) {
+				l = r = 0;
+			}
+		}
+		l = r = 0;
+		for (int i = n - 1; i >= 0; i--) {
+			if (s.charAt(i) == '(') {
+				l++;
+			} else {
+				r++;
+			}
+			if (l == r) {
+				maxi = Math.max(maxi, 2 * l);
+			} else if (l > r) {
+				l = r = 0;
+			}
+		}
+		return maxi;
+	}
+Leetcode Q.32),Using stacks->>>>
+public int longestValidParentheses(String str) {
+       Stack<Integer> st = new Stack<>();
+		int max = 0;
+		st.push(-1);
+		for (int i = 0; i < str.length(); i++) {
+			char ch = str.charAt(i);
+			if (ch == '(') {
+				st.push(i);
+			}
+
+			if (ch == ')') {
+				st.pop();
+				if (st.isEmpty()) {
+					st.push(i);
+				} else {
+					int len = i - st.peek();
+					max = Math.max(max, len);
+				}
+			}
+
+		}
+		return max;
+                     }
+---------------------------------------------------------------------------------------------------
+16. Expression contains redundant bracket or not
+public static boolean DuplicateBrackets(String str) {
+		Stack<Character> st = new Stack<>();
+		for (int i = 0; i < str.length(); i++) {
+			char ch = str.charAt(i);
+			if (ch == ')') {
+				if (st.peek() == '(') { // it means that this pair of bracket doesn't contain anything 
+						//	(mainly operand)
+					return true;
+				}
+
+				while (st.peek() != '(') {
+					st.pop();
+				}
+				st.pop();
+
+			} else if (ch == '(' || ch == '+' || ch == '-' || ch == '*' || ch == '/')
+				st.push(ch);
+		}
+		return false;
+	}
+
+---------------------------------------------------------------------------------------------------
+17. Stack Permutations (Check if an array is stack permutation of other)
+ static boolean checkStackPermutation(int ip[], 
+                                    int op[], int n) 
+    {
+        Queue<Integer> input = new LinkedList<>();
+  
+        // Input queue
+        for (int i = 0; i < n; i++) 
+        {
+            input.add(ip[i]);
+        }
+  
+        // Output queue
+        Queue<Integer> output = new LinkedList<>();
+        for (int i = 0; i < n; i++)
+        {
+            output.add(op[i]);
+        }
+  
+        // stack to be used for permutation
+        Stack<Integer> tempStack = new Stack<>();
+        while (!input.isEmpty())
+        {
+            int ele = input.poll();
+  
+            if (ele == output.peek())
+            {
+                output.poll();
+                while (!tempStack.isEmpty()) 
+                {
+                    if (tempStack.peek() == output.peek()) 
+                    {
+                        tempStack.pop();
+                        output.poll();
+                    } 
+                    else
+                        break;
+                }
+            } 
+            else
+            {
+                tempStack.push(ele);
+            }
+        }
+        // If after processing, both input queue and
+        // stack are empty then the input queue is
+        // permutable otherwise not.
+        return (input.isEmpty() && tempStack.isEmpty());
+    }
+
+---------------------------------------------------------------------------------------------------
+18. Interleave-first half queue of the queue with second half
+ Logic-> basically using stack we got able to access first half through stack and the second half using the given queue
+static void interLeaveQueue(Queue<Integer>q)
+{
+    // To check the even number of elements
+    if (q.size() % 2 != 0)
+        System.out.println("Input even number of integers." );
+  
+    // Initialize an empty stack of int type
+    Stack<Integer> s = new Stack<>();
+    int halfSize = q.size() / 2;
+  
+    // Push first half elements into the stack
+    // queue:16 17 18 19 20, stack: 15(T) 14 13 12 11
+    for (int i = 0; i < halfSize; i++)
+    {
+        s.push(q.peek());
+        q.poll();
+    }
+  
+    // enqueue back the stack elements
+    // queue: 16 17 18 19 20 15 14 13 12 11
+    while (!s.empty()) 
+    {
+        q.add(s.peek());
+        s.pop();
+    }
+  
+    // dequeue the first half elements of queue
+    // and enqueue them back
+    // queue: 15 14 13 12 11 16 17 18 19 20
+    for (int i = 0; i < halfSize; i++) 
+    {
+        q.add(q.peek());
+        q.poll();
+    }
+  
+    // Again push the first half elements into the stack
+    // queue: 16 17 18 19 20, stack: 11(T) 12 13 14 15
+    for (int i = 0; i < halfSize; i++)
+    {
+        s.push(q.peek());
+        q.poll();
+    }
+  
+    // interleave the elements of queue and stack
+    // queue: 11 16 12 17 13 18 14 19 15 20
+    while (!s.empty())
+    {
+        q.add(s.peek());
+        s.pop();
+        q.add(q.peek());
+        q.poll();
+    }
+}
+---------------------------------------------------------------------------------------------------
+19. Largest area Rectangle in histogram Using Stacks-> https://www.youtube.com/watch?v=0do2734xhnU
+Logic -> we just need to find the next smaller element in left and right for a every element in the array and using this we can find the area using base as current element and eventually the largest area rectangle.
+Intuition-> we are doing this because a height can spread the that heights which are either equal or greater than it. otherwise a gap would be there.
+
+private static long LargestAreaHistogram(long[] arr) {
+
+		long[] rb = new long[arr.length];// next smaller element index on the right
+		Stack<Integer> sr = new Stack<>();
+		for (int i = 0; i < arr.length; i++) {
+			while (!sr.isEmpty() && arr[sr.peek()] > arr[i]) {
+				rb[sr.pop()] = i;
+			}
+			sr.push(i);
+		}
+		while (!sr.isEmpty()) {
+			rb[sr.pop()] = arr.length;// since it doesn't have its next smaller element on the right
+		}
+		long[] lb = new long[arr.length]; // next smaller element index on the left
+		Stack<Integer> sl = new Stack<>();
+		for (int i = arr.length - 1; i >= 0; i--) {
+			while (!sl.isEmpty() && arr[sl.peek()] > arr[i]) {
+				lb[sl.pop()] = i;
+			}
+			sl.push(i);
+		}
+		while (!sl.isEmpty()) {
+			lb[sl.pop()] = -1;// since it doesn't have its next smaller element on the left
+		}
+		long max = 0;
+		for (int i = 0; i < arr.length; i++) {
+			long width = rb[i] - lb[i] - 1;
+			long height = arr[i];
+			long area = width * height;
+			max = Math.max(max, area);
+		}
+		return max;
+	}
+---------------------------------------------------------------------------------------------------
+20. Merge Overlapping Intervals Using (Stack)
+private static void MergeOverlappingIntervals(int[][] arr) {
+		Pair[] p = new Pair[arr.length];
+
+		for (int i = 0; i < p.length; i++) {
+			p[i] = new Pair(arr[i][0], arr[i][1]);
+		}
+		Arrays.sort(p);
+		Stack<Pair> st = new Stack<>();
+		for (int i = 0; i < p.length; i++) {
+			if (i == 0) {
+				st.push(p[i]);
+				continue;
+			}
+			if (st.peek().et < p[i].st) {
+				st.push(p[i]);
+			} else {
+				st.peek().et = Math.max(st.peek().et, p[i].et);
+			}
+		}
+		Stack<Pair> ans = new Stack<>(); // doing so that we get elements in ascending order
+		while (!st.isEmpty()) {
+			ans.push(st.pop());
+		}
+
+		while (!ans.isEmpty()) {
+			System.out.println(ans.peek().st + " " + ans.peek().et);
+			ans.pop();
+		}
+
+	}
+	public static class Pair implements Comparable<Pair> {
+		int st;// start time
+		int et;// end time
+
+		Pair(int s, int e) {
+			this.st = s;
+			this.et = e;
+		}
+		public int compareTo(Pair other) {
+			if (this.st != other.st) {
+				return this.st - other.st;
+			} else {
+				return this.et - other.et;
+			}
+		}
+	}
+---------------------------------------------------------------------------------------------------
+21. Petrol Filling Circular Tour ->https://www.youtube.com/watch?v=nTKdYm_5-ZY
+Logic-> we are taking two variables here
+(sum, diff ) sum stores how much surplus we have of petrol and diff stores how much deficit we have of petrol, basically we are storing deficit so that we do not need to traverse again for the circular path ,pet={1,2,3,4,5} | dist={3,4,5,1,2} so in this case we get our first surplus at 4th index here upto 4th index deficit was getting stored so that at last we can check whether the amount of surplus we have is more that or equal to deficit to complete the circular path upto that first surplus station here 4th index.
+private static int CircularTour(int[] pet, int[] dis) {
+		int start = 0;
+		int sum = 0; // surplus in petrol
+		int diff = 0; // deficit in petrol
+
+		for (int i = 0; i < dis.length; i++) {
+			sum += pet[i] - dis[i];
+			if (sum < 0) {
+				diff += sum; // storing -ve values
+				start = i + 1; // changing start point
+				sum = 0; // starting again from new station
+			}
+		}
+
+		return sum + diff > 0 ? start : -1;
+	}
+
+---------------------------------------------------------------------------------------------------
+22. First negative integer in every window of size k (Queue)
+public static long[] printFirstNegativeInteger(long arr[], int n, int k) {
+		ArrayList<Long> ans = new ArrayList<>();
+		Queue<Long> q = new LinkedList<>();
+
+		for (int i = 0; i < k; i++) {
+			if (arr[i] < 0) {
+				q.add(arr[i]);
+			}
+		}
+		if (q.size() == 0) {
+			ans.add((long) 0);
+		} else {
+			ans.add(q.peek());
+		}
+		int l = 0;
+		for (int r = k; r < n; r++) {
+
+			if (!q.isEmpty() && arr[l] == q.peek()) {
+				q.remove();
+			}
+			l++;
+
+			if (arr[r] < 0) {
+				q.add(arr[r]);
+			}
+
+			if (q.size() == 0) {
+				ans.add(0l);
+			} else {
+				ans.add(q.peek());
+			}
+		}
+		long[] res = new long[ans.size()];
+		for (int i = 0; i < ans.size(); i++) {
+			res[i] = ans.get(i);
+		}
+		return res;
+	}
+
+---------------------------------------------------------------------------------------------------
+23. Minimum sum of squares of character counts in a given string after removing “k” characters.
+public static long GameWithString(String str, int k) {
+
+		HashMap<Character, Integer> map = new HashMap<>();
+		PriorityQueue<Character> heap = new PriorityQueue<>((a, b) -> map.get(b) - map.get(a));
+
+		for (int i = 0; i < str.length(); i++) {
+			char ch = str.charAt(i);
+			map.put(ch, map.getOrDefault(ch, 0) + 1);
+		}
+		heap.addAll(map.keySet());
+		for (int i = 0; i < k; i++) {
+			char key = heap.remove();
+			if (map.get(key) > 1) {
+				map.put(key, map.get(key) - 1);
+				heap.add(key);
+			} else {
+				map.remove(key);
+			}
+		}
+
+		long res = 0;
+		while (!heap.isEmpty()) {
+			int key = map.get(heap.remove());
+			res += key * key;
+		}
+		return res;
+	}
+
+---------------------------------------------------------------------------------------------------
+24. Minimum time required to rot all oranges -BFS
+ public int orangesRotting(int[][] grid) {
+        Set<String>fresh=new HashSet<>();
+        Set<String>rotten=new HashSet<>();
+        
+        for(int i=0;i<grid.length;i++){
+            for(int j=0;j<grid[i].length;j++){
+                if(grid[i][j]==1){
+                    fresh.add(""+i+j);
+                }else if(grid[i][j]==2){
+                    rotten.add(""+i+j);
+                }
+            }
+        }
+        int minutes=0;
+        int[][]directions={{0,1},{1,0},{-1,0},{0,-1}};//all 4-directions
+        //Applying BFS
+        while(fresh.size()>0){
+             Set<String>infected=new HashSet<>(); 
+                
+            for(String s:rotten){
+                int i=s.charAt(0)-'0';
+                int j=s.charAt(1)-'0';
+                for(int[]direction:directions){
+                    int nextI=i+direction[0];
+                    int nextJ=j+direction[1];
+                    if(fresh.contains(""+nextI+nextJ)){
+                        //so fresh orange get infected by the spread of rotten orange
+                        infected.add(""+nextI+nextJ);
+                        fresh.remove(""+nextI+nextJ);
+                    }
+                }
+            }
+            if(infected.size()==0){
+                //means current rotten oranges are not able to infect fresh oranges.
+                return -1;
+            }
+            
+            rotten=infected;//now the next infected rotten oranges will do their job
+            minutes++;
+        }
+        return minutes;
+    }
+
+---------------------------------------------------------------------------------------------------
+25. 01 Matrix (distance of the nearest 0 for each cell) using Queue (BFS)
+
+public int[][] updateMatrix(int[][] mat) {
+        int m=mat.length;
+        int n=mat[0].length;
+        
+        Queue<int[]>q=new LinkedList<>();
+        boolean[][]visited=new boolean[m][n];
+
+        for(int i=0;i<m;i++){
+            for(int j=0;j<n;j++){
+                if(mat[i][j]==0){
+                q.offer(new int[]{i,j}); //storing indexing of 0s.
+                visited[i][j]=true;
+                }
+            }
+        }
+        int[][]directions={{1,0},{0,1},{-1,0},{0,-1}};
+        //Applying BFS
+        while(!q.isEmpty()){
+            int size=q.size(); //as we want to traverse through all zeros, and adding another index will
+            for(int i=0;i<size;i++){ //alter size.
+                int[]curr=q.poll();
+                int currX=curr[0];
+                int currY=curr[1];
+                for(int[]dir:directions){
+                    int x=currX+dir[0];
+                    int y=currY+dir[1];
+                    if(x<0||y<0||x>=m||y>=n||visited[x][y]){
+                        continue;
+                    }
+                    mat[x][y]=mat[currX][currY]+1;
+                    visited[x][y]=true;
+                    q.offer(new int[]{x,y});
+                    
+                }
+            }
+        }
+        return mat;
+    }
+
+---------------------------------------------------------------------------------------------------
+26. Sum of minimum and maximum elements of all subarrays of size k.->Using DEQUEUE
+->Dry run the code for better understanding
+arr[]={2, 5, -1, 7, -3, -1, -2} k=4 , ANS=18
+     {2, 5, -1, 7},   min + max = -1 + 7 = 6
+     {5, -1, 7, -3},  min + max = -3 + 7 = 4      
+     {-1, 7, -3, -1}, min + max = -3 + 7 = 4
+     {7, -3, -1, -2}, min + max = -3 + 7 = 4   
+     Sum of all min & max = 6 + 4 + 4 + 4 =18
+	public static int SumOfKsubArray(int arr[], int n, int k) {
+
+		// they will contain the indexes of minimum and maximum of current window
+		Deque<Integer> dq_Max = new LinkedList<Integer>();
+		Deque<Integer> dq_Min = new LinkedList<Integer>();
+		int sum = 0;
+
+		for (int i = 0; i < n; i++) {
+			// window checking condition
+			if (!dq_Max.isEmpty() && dq_Max.getFirst() == i - k) { // i-k represents first element of current window
+				dq_Max.removeFirst();
+			}
+			if (!dq_Min.isEmpty() && dq_Min.getFirst() == i - k) { // i-k represents first element of current window
+				dq_Min.removeFirst();
+			}
+			// for finding max and min
+			while (!dq_Max.isEmpty() && arr[i] > arr[dq_Max.getLast()]) {
+				dq_Max.removeLast();
+			}
+			while (!dq_Min.isEmpty() && arr[i] < arr[dq_Min.getLast()]) {
+				dq_Min.removeLast();
+			}
+			dq_Max.addLast(i);
+			dq_Min.addLast(i);
+
+			// window size equal to k and changed window size also
+			if (i >= k - 1) {
+//				System.out.println("Max->" + arr[dq_Max.getFirst()] + "  Min->" + arr[dq_Min.getFirst()]);
+				sum += arr[dq_Max.getFirst()] + arr[dq_Min.getFirst()];
+			}
+		}
+		return sum;
+	}
+---------------------------------------------------------------------------------------------------
+27. Implement N stack in an array ->https://www.youtube.com/watch?v=UmyOXVIjUoI
+
+public class KStack {
+
+	int[] data; // array to store actual content
+	int[] top; // stores indexes of top elements of stack
+	int[] next; // stores the next entry
+
+	int n, k; // n = size of array , k = number of stack to implement
+	int free; // store the current free index
+
+	// constructor to
+	KStack(int k, int n) {
+		this.k = k;
+		this.n = n;
+		data = new int[n];
+		top = new int[k];
+		next = new int[n];
+		// Initialize all stacks as empty
+		for (int i = 0; i < k; i++) {
+			top[i] = -1;
+		}
+		// Initialize all spaces as free
+		free = 0;
+		for (int i = 0; i < n - 1; i++)
+			next[i] = i + 1;
+		next[n - 1] = -1; // -1 is used to indicate end of free list
+	}
+
+	boolean isFull() {
+		return (free == -1); // indicating the last n-1th index which stores -1
+	}
+
+	// sn-> stack number
+	boolean isEmpty(int sn) {
+		return (top[sn] == -1);
+	}
+
+	void push(int item, int sn) {
+		if (isFull()) {
+			System.out.println("Stack overflow");
+			return;
+		}
+		int i = free; // store index of first free slot
+
+		free = next[i]; // next free index
+
+		// update next of top and then top for stack number 'sn'
+		next[i] = top[sn];
+		top[sn] = i;
+		// store the item
+		data[i] = item;
+	}
+
+	int pop(int sn) {
+		if (isEmpty(sn)) {
+			System.out.println("Stack Underflow");
+			return Integer.MAX_VALUE;
+		}
+		// index of top item in stack nubmer 'sn'
+		int i = top[sn];
+
+		top[sn] = next[i]; // change top to store next of previous top
+
+		// Attach the previous top to the beginning of the free list
+		next[i] = free;
+		free = i;
+
+		return data[i];
+	}
+	public static void main(String[] args) {
+		KStack stack = new KStack(3, 10);
+		stack.push(10, 1);
+		stack.push(20, 1);
+		stack.push(30, 1);
+
+		stack.push(100, 0);
+		stack.push(200, 0);
+
+		stack.push(40, 1);
+
+		stack.push(1000, 2);
+		stack.push(2000, 2);
+
+		System.out.println(stack.pop(1));
+
+		stack.push(300, 0);
+
+		System.out.println(stack.pop(0));
+
+		stack.push(3000, 2);
+		stack.push(4000, 1);
+	}
+}
+---------------------------------------------------------------------------------------------------
+28. LRU (Least recently used) cache implementation
+->O(N) Approach
+------------------------->
+class LRUCache {
+ Map<Integer, Integer> cache;
+    LinkedList<Integer> usage;
+    int capacity;
+    
+    public LRUCache(int capacity) {
+        this.cache = new HashMap<>();
+        this.usage = new LinkedList<>();
+        this.capacity = capacity;
+    }
+    
+    public int get(int key) {
+        int result = -1;
+        
+        if (cache.containsKey(key)) {
+            result = cache.get(key);
+            updateUsage(key);
+        }
+        return result;
+    }
+    
+    public void put(int key, int value) {
+        if (cache.keySet().size() == capacity && !cache.containsKey(key)) {
+            cache.remove(usage.getFirst());
+            usage.removeFirst();
+        }
+        cache.put(key,value);
+        updateUsage(key);
+    }
+    
+    private void updateUsage(int key) {
+        if (usage.contains(key)) {
+            usage.removeFirstOccurrence(key);
+        }
+        
+        usage.addLast(key);
+    }
+}
+O(1)Approach
+----------------------------------->
+public class LRUCache {
+// Most recently used cache is at front of the Dequeue and least recently used
+// is at rear
+private final int capacity;
+private int size;
+private final Map<Integer, Node> hashmap;
+private final DoublyLinkedList dq;
+
+LRUCache(int capacity) {
+	this.capacity = capacity;
+	this.size = 0;
+	this.hashmap = new HashMap<>();
+	this.dq = new DoublyLinkedList();
+}
+
+// get function
+public int get(int key) {
+	Node node = hashmap.get(key);
+	if (node == null) {
+		return -1;
+	}
+
+	dq.moveToFront(node);
+	return hashmap.get(key).value; // try changes
+
+}
+
+public void put(int key, int value) {
+	Node currnode = hashmap.get(key);
+	if (currnode != null) {
+		currnode.value = value;
+		dq.moveToFront(currnode);
+        return;
+	}
+
+	if (size == capacity) {
+		int rearNodeKey = dq.getRearKey();
+		dq.removeFromRear();
+		hashmap.remove(rearNodeKey);
+		size--;
+	}
+
+	Node Nnode = new Node(key, value);
+	dq.addToFront(Nnode);
+	hashmap.put(key, Nnode);
+	size++;
+}
+
+private class Node {
+	int key;
+	int value;
+	Node next, prev;
+
+	Node(int key, int value) {
+		this.key = key;
+		this.value = value;
+		this.prev = null;
+		this.next = null;
+	}
+}
+
+private class DoublyLinkedList {
+	Node rear, front;
+
+	DoublyLinkedList() {
+		rear = front = null;
+	}
+
+	private void addToFront(Node node) {
+		if (rear == null) { // try changes
+			front = rear = node;
+			return;
+		}
+		node.next = front;
+		front.prev = node;
+		front = node;
+	}
+
+	private void moveToFront(Node node) {
+		if (node == front) {
+			return;
+		}
+		if (node == rear) {
+			rear = rear.prev;
+			rear.next = null;
+		} else {
+			node.prev.next = node.next;
+			node.next.prev = node.prev;
+		}
+		node.prev = null;
+		node.next = front;
+		front.prev = node;
+		front = node;
+	}
+
+	private void removeFromRear() {
+		if (rear == null) {
+			return;
+		}
+		if (front == rear) {
+			front = rear = null;
+		} else {
+			rear = rear.prev;
+			rear.next = null;
+		}
+	}
+	private int getRearKey() {
+		return rear.key;
+	}
+}
+}
+---------------------------------------------------------------------------------------------------
+29.Implement k Queues in a single array
+->https://ideone.com/RXuJvU
+---------------------------------------------------------------------------------------------------
+30. Implement stack and queue Using Dequeue
+->https://www.geeksforgeeks.org/implement-stack-queue-using-deque/
+---------------------------------------------------------------------------------------------------
+31.Maximum of all subarrays of size K
+static void printMax(int arr[], int n, int k)
+    {
+        Deque<Integer> Qi = new LinkedList<Integer>();
+ 
+        int i;
+        for (i = 0; i < k; ++i)
+        {
+            
+            // For every element, the previous
+            // smaller elements are useless so
+            // remove them from Qi
+            while (!Qi.isEmpty() && arr[i] >=
+                           arr[Qi.peekLast()])
+               
+                // Remove from rear
+                Qi.removeLast();
+ 
+            // Add new element at rear of queue
+            Qi.addLast(i);
+        }
+ 
+        // Process rest of the elements,
+        // i.e., from arr[k] to arr[n-1]
+        for (; i < n; ++i)
+        {
+         
+            // The element at the front of the
+            // queue is the largest element of
+            // previous window, so print it
+            System.out.print(arr[Qi.peek()] + " ");
+ 
+            // Remove the elements which
+            // are out of this window
+            while ((!Qi.isEmpty()) && Qi.peek() <=
+                                             i - k)
+                Qi.removeFirst();
+ 
+            // Remove all elements smaller
+            // than the currently
+            // being added element (remove
+            // useless elements)
+            while ((!Qi.isEmpty()) && arr[i] >=
+                              arr[Qi.peekLast()])
+                Qi.removeLast();
+ 
+            // Add current element at the rear of Qi
+            Qi.addLast(i);
+        }
+---------------------------------------------------------------------------------------------------
+32. Evaluation of postfix Expression (Stack)
+ public static int evaluatePostFix(String str) {
+		Stack<Integer> st = new Stack<>();
+		for (int i = 0; i < str.length(); i++) {
+			char ch = str.charAt(i);
+			if (ch == '+') {
+				int a = st.pop();
+				int b = st.pop();
+				int x = a + b;
+				st.push(x);
+			} else if (ch == '-') {
+				int a = st.pop();
+				int b = st.pop();
+				int x = b - a;
+				st.push(x);
+			} else if (ch == '*') {
+				int a = st.pop();
+				int b = st.pop();
+				int x = a * b;
+				st.push(x);
+			} else if (ch == '/') {
+				int a = st.pop();
+				int b = st.pop();
+				int x = b / a;
+				st.push(x);
+			} else {
+				st.push(Integer.parseInt(ch + ""));
+			}
+		}
+		return st.pop();
+	}
+---------------------------------------------------------------------------------------------------
+## Arithmetic Expression Evaluation-> see youtube videos to learn all the conversions
+Highest: Exponentiation (^)
+Next highest: Multiplication (*) and division (/)
+Lowest: Addition (+) and Subtraction (-) 
+---------------------------------------------------------------------------------------------------
+

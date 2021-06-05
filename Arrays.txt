@@ -1,0 +1,956 @@
+SOLUTIONS OF THESE QUESTIONS ARE EITHER ON GFG OR ON LEETCODE.
+---------------------------------------ARRAYS-----------------------------------------
+
+1. Kth smallest element array in O(N) S(1)
+#Always Dry run to understand better for this question and refer to GFG article
+and for kth Largest we can pass (arr.length-k+1)instead of k
+   public static int kthSmallest(int[] arr, int l, int r, int k) 
+    { 
+        if(k>0 && k<=r-l+1){
+            int pos=randomPartition(arr,l,r);
+            
+            if(pos-l==k-1){
+                return arr[pos];
+            }
+            if(pos-l>k-1){
+                return kthSmallest(arr,l,pos-1,k);
+            }
+            return kthSmallest(arr,pos+1,r,k-pos+l-1);  //value of k is changed for this region because between that region suppose if k=5
+				//then for that region k will not be that smallest it would be less smaller. say k=1
+        }
+        return Integer.MAX_VALUE;
+           
+    }
+    public static int randomPartition(int[]arr,int l,int r){
+        int n=r-l;
+        int pivot=(int)(Math.random()*n);
+        swap(arr,l+pivot,r);
+        return partition(arr,l,r);
+    }
+        
+    public static void swap(int[]arr,int l,int r){
+        int temp=arr[l];
+        arr[l]=arr[r];
+        arr[r]=temp;
+    }
+    
+    public static int partition(int[]arr,int l,int r){
+        int x=arr[r],i=l;
+        
+        for(int j=l;j<=r-1;j++){
+            if(arr[j]<=x){
+                swap(arr,i,j);
+                i++;
+            }
+        }
+            swap(arr,i,r);
+            return i;
+    }
+----------------------------------------------
+2. Sort an array of 0s, 1s and 2s
+
+Approach-> take 3 couters c0,c1,c2 to count 0s,1s and 2s and then put in array accordingly
+or
+public void sortColors(int[]nums){
+	int lo=0;
+	int hi=nums.length-1;
+	int mid=0;
+	int temp;
+	while(mid<=hi){
+	   switch(nums[mid]){
+	   case 0:{
+	   		swap(nums[lo],nums[mid]);
+	   		lo++;
+	   		mid++;
+	   		break;
+	      }
+	   case 1:{ 
+	      mid++;
+	      break;
+	      }  
+	   case 2:{
+	    	swap(nums[mid],nums[hi]);
+	    	hi--;
+	    	break;
+	      }   
+	   }
+	}
+}
+----------------------------------------------
+3.  Kadane's Algorithm
+	
+ int maxSubarraySum(int arr[], int n){
+        
+        int maxSoFar=arr[0];
+        int maxEndHere=arr[0];
+        
+        for(int i=1;i<n;i++){
+            maxEndHere=Math.max(maxEndHere+arr[i],arr[i]);
+            maxSoFar=Math.max(maxSoFar,maxEndHere);
+        }
+        return maxSoFar;
+        
+    }	
+----------------------------------------------
+4. Minimize the heights
+
+ int getMinDiff(int[] arr, int n, int k) {
+  //here in this question we have to minimize the maximum(minmax) and maximize the minimum(maxmin) hence find miimum difference, here we don't need that any value less than (maxmin) and any value greater than (minmax)   
+
+//increase the smaller value and decrease the bigger value.  
+     Arrays.sort(arr);
+          
+      int ans=arr[n-1]-arr[0]; //max diff possible 
+      
+      int first=arr[0]+k;  //have this choice only   (maxmin)
+      int last = arr[n-1]-k; //have this choice only   (minmax)
+
+      //handling middle elements
+      for(int i=1;i<n;i++){
+          if(arr[i]>=k){   //since height should be non-negative
+              
+              int mn=Math.min(first,arr[i]-k); 
+              int mx=Math.max(last,arr[i-1]+k);
+              ans=Math.min(ans,mx-mn);         
+          }
+      }
+      return ans;      
+    }
+----------------------------------------------
+5. Minimum no. of jumps
+
+ static int minJumps(int[] arr){
+      	if (arr[0] >= arr.length - 1) {
+		return 1;
+		}
+		if (arr[0] == 0) {
+			return -1;
+		}
+		int jumps = 0;
+		int steps = arr[0] - 1;
+		int maxrange = arr[0];
+		int idx = 0; //it is the index from where i am deciding to take a new jump
+		boolean flag = false;  //to handle condition when we can't take move on '0'
+		for (int i = 1; i < arr.length; i++) {
+			if (arr[i] != 0) {
+				int range = i + arr[i];
+				if (range >= arr.length - 1) {
+					jumps += 2;
+					break;
+				}
+				if (range > maxrange) {
+					maxrange = range;
+					idx = i;
+					flag = true;
+				}
+			}
+			if (steps == 0) {
+				if (!flag && arr[i] == 0) {   
+
+//because if flag is not updated to true then we know that we didn't get a value from which we can overhead the given range. and if this happended then when we land on a value 0 then we will not be able to step further for eg)  5 4 3 2 1 0 .
+
+					return -1;
+				}
+
+//did these changes in steps because suppose we get the number where we have to select for next jump but that number's step will initiate when previous steps will become 0. and also we have to handle new steps 
+				steps = arr[idx] - (i - idx);
+				jumps++;
+				flag = false;
+			}
+			steps--;
+		}
+		return jumps;
+	}
+
+--------------------------------------------------------------------------------
+6. Find the duplicate number in array of size n+1 having elements in range [1,n] in O(n) S(1)
+FLoyd cycle detection algo----->hare and tortoise
+
+public int findDuplicate(int[] nums) {
+        int slow=nums[0];
+        int fast=nums[0];
+        
+        //used do while because slow and fast are already equal due to above code..
+         do{
+            slow=nums[slow];
+            fast=nums[nums[fast]];
+        }while(slow!=fast);
+        
+        fast=nums[0];
+        while(fast!=slow){
+            slow=nums[slow];
+            fast=nums[fast];
+        }   
+        return slow;
+    }
+--------------------------------------------------------------------------------
+7. Merge two sorted arrays without Extra space
+
+public void merge(int arr1[], int arr2[], int n, int m) {      
+       int i=n-1;
+       int j=0;
+        while(i>=0 && j<m){
+            if(arr1[i]>arr2[j]){
+                int temp=arr1[i];
+                arr1[i]=arr2[j];
+                arr2[j]=temp;
+            }
+            i--;
+            j++;
+        }   
+        Arrays.sort(arr1);
+        Arrays.sort(arr2);
+    }
+
+--------------------------------------------------------------------------------
+8. Merge intervals 
+
+    public static ArrayList<pair> overlappedInterval(ArrayList<pair> vec, int n) 
+    {  
+       Collections.sort(vec,new Comparator<pair>(){
+           public int compare(pair p1,pair p2){
+               return p1.first-p2.first;
+           }
+       });  
+
+       pair start=vec.get(0);
+       int idx=0;  //taken to maintain S(1){constant space}
+       for(int i=1;i<vec.size();i++){
+        pair list=vec.get(i);
+        if(list.first<=start.second){
+            start.second=Math.max(start.second,list.second);
+        }else{
+            idx++;
+            start=vec.get(idx);
+            start.first=list.first;
+            start.second=list.second;
+        }
+       }
+       while(vec.size()!=idx+1){
+           vec.remove(vec.size()-1);
+       } 
+       return vec;
+    }
+--------------------------------------------------------------------------------
+9. Next Permutation 
+1 3 5 4 2
+-> 1  4 2 3 5
+Approach->
+i)traverse from reverse and find the break point where arr[i]<arr[i+1] ==>for eg here it is 3 at IDX=1,
+ii) again traverse from reverse and find the idx where arr[i]>arr[idx]; here it is element '4' at index=4,
+iii) swap '3' with '4' ,   it becomes=> 1 4 5 3 2
+iv) reverse the array from IDX+1  to arr.length-1, for eg in this case 1 4 2 3 5
+
+INTUITION-> we are traversing from reverse because we always get this pattern even if there is only one element in the pattern for eg =>IN   1 2 3 only 3 participate in that pattern (step (i))pattern.
+we could replace 3 with 4 but we also want less lexicographically number and for the REVERSE PART  we did this because to get the just next permutation we want as lesser rank as possible which can be possible only when we reverse because it is already in descending order following step (i) pattern.
+
+if we couldn't find the break point just reverse the array (it get sorted).
+--------------------------------------------------------------------------------
+10. Count inversions
+static long mergeSort(long[]arr,long[]temp,long left,long right){
+    long inv_count=0;
+            if(left<right){
+            long mid=(left+right)/2;
+            inv_count+=mergeSort(arr,temp,left,mid);
+            inv_count+=mergeSort(arr,temp,mid+1,right);
+            inv_count+=merge(arr,temp,left,mid+1,right);
+        }
+        return inv_count;
+}
+static long merge(long[]arr,long[]temp,long left,long mid,long right){
+    long count=0;
+    long i=left;
+    long k=left;
+    long j=mid;
+    while(i<=(mid-1) && j<=right){
+        if(arr[(int)i]<=arr[(int)j]){
+            temp[(int)k++]=arr[(int)i++];
+        }else{
+            temp[(int)k++]=arr[(int)j++];      
+            count=count+(mid-i);  //this will give us the number of elements which 
+            //are right to the current index and already greater in value then the element present in right side tree
+            //for eg= (2) 3 5    (1) 4 -->(2,1),(3,1),(5,1)
+//we take mid here not j because cases like 5(4) has already collected.
+        }
+    }
+    while(j<=right){
+        temp[(int)k++]=arr[(int)j++];
+    }
+    while(i<=(mid-1)){
+        temp[(int)k++]=arr[(int)i++];
+    }
+    for(long idx=left;idx<=right;idx++){
+        arr[(int)idx]=temp[(int)idx];
+    }
+    return count;
+}
+--------------------------------------------------------------------------------
+11. Best time to buy and sell stock
+ public int maxProfit(int[] prices) {   
+        int max=Integer.MIN_VALUE;
+        int min=Integer.MAX_VALUE;
+        int ans=0;
+        
+        for(int i=0;i<prices.length;i++){
+            min=Math.min(prices[i],min);
+            max=Math.max(prices[i],max);
+            //----------------updating max if needed because max come after min----------------
+            if(min==prices[i]){
+                max=Integer.MIN_VALUE;
+            }else{
+                ans=Math.max(ans,max-min);
+            }
+        }       
+        return ans;        
+    }
+--------------------------------------------------------------------------------
+12. Count pairs with given sum
+int getPairsCount(int[] arr, int n, int k) {
+      int ans = 0;
+ 	//Used hashmap and add key value acc to their frequencies.  
+		for (int i = 0; i < arr.length; i++) {
+			if (map.containsKey(k - arr[i])) {
+				ans += map.get(k - arr[i]);
+			}
+// did this because suppose {1,1,1} and k=2 then if we consider i=0 here then we dont want to count its freq thrice(which includes its current element).
+			if (arr[i] == k - arr[i]) {
+				ans--;
+			}
+		}
+		//because every pair is counted twice for eg-> k=6 (1,5),(5,1).
+		return ans/2;
+    }
+--------------------------------------------------------------------------------
+13. Common Elements in three arrays
+ ArrayList<Integer> list = new ArrayList<Integer>();
+    while (i < A.length && j < B.length && k < C.length) {
+			if (A[i] == B[j] && B[j] == C[k]) {
+				if(list.size()>0) {
+					if(list.get(list.size()-1)==A[i]) {				
+					}else {
+						list.add(A[i]);
+					}
+				}else {
+				list.add(A[i]);
+				}	
+				i++;
+				j++;
+				k++;
+				continue;
+			}
+			if (A[i] < B[j]) {
+				i++;
+			} else if (B[j] < C[k]) {
+				j++;
+			} else {
+				k++;
+			}
+		}
+		return list; }
+--------------------------------------------------------------------------------
+14. Rearrange array in alternating positive & negative items with O(1) extra space
+	public static void rearrange(int[] arr) {
+		int outofplace = -1; 
+// when we have negative element at odd place and positive element at even place.
+		// so this represents that index;
+		for (int i = 0; i < arr.length; i++) {
+			if (outofplace >= 0) {
+				// rotate whenever outofplace element found.
+				if ((arr[i] >= 0 && arr[outofplace] < 0) || (arr[i] < 0 && 
+arr[outofplace] >= 0)) {
+					rightrotate(arr, outofplace, i);
+
+// it may possible that after rotating when one number shifted to correct place
+// then there are 2 or more than 2 elements present that may not be at their				// correct position. if not so we have to find outofplace index again
+					if (i - outofplace >= 2) {
+						outofplace += 2;
+					} else {
+						outofplace = -1;
+					}
+				}
+			} else {
+				if ((arr[i] >= 0 && i % 2 == 0) || (arr[i] < 0 && i % 2 != 0)) {
+					outofplace = i;
+				}
+}}}
+--------------------------------------------------------------------------------
+15. Subarray with 0 Sum in T(n),S(n)
+Approach-> we take a prefix sum array and also took a hashmap and store the prefix array according to their element's frequencies and then check if there is a key which have 2 or more than 2 frequencies or is there any key which is equal to 0 because if key is 0 ->then there must be sum 0 or if key have value 2 or more then it implies some subarray must got sum 0 in between thats why some element is repeating in prefix array.
+(***If current sum encountered previously, this means elements between previous sum and current sum makes them 0.)
+--------------------------------------------------------------------------------
+16. Factorial of a Big number
+Approach 1-> Using BigInteger
+ public static BigInteger Factorial(int n){
+		      BigInteger fact=new BigInteger("1");
+		      for(int i=2;i<=n;i++){
+		        fact=fact.multiply(BigInteger.valueOf(i));   
+		      }      
+		      return fact;
+		  }
+Approach 2-> using Array
+
+	while (t-- > 0) {
+	int n = scn.nextInt();
+			int[] arr= new int[5000];
+			int q=2;
+			int x=0,len=1,num=0;
+			arr[0]=1;
+			while(q<=n) {
+				x=0;
+				num=0;
+				while(x<len) {
+					arr[x]=arr[x]*q;
+					arr[x]=arr[x]+num;
+					num=arr[x]/10;
+					arr[x]=arr[x]%10;
+					x++;
+				}
+				while(num!=0) {
+					arr[len]=num;
+					num=num/10;
+					len++;
+				}
+				q++;
+			}
+			len--;
+			while(len>=0) {
+				System.out.print(arr[len]);
+				len--;
+			}
+			System.out.println();
+		}
+--------------------------------------------------------------------------------
+17. Maximum Product subarray  -T(N), S(1) -> https://www.youtube.com/watch?v=0d35oJyEous&t=609s
+    public int maxProduct(int[] nums) {
+        if(nums.length==1){
+            return nums[0];
+        }
+        int maxproduct=nums[0];
+        int maxPositive=nums[0];
+        int maxNegative=nums[0];
+        int choice1;
+        int choice2;
+        int current=0; 
+        for(int i=1;i<nums.length;i++){
+            current=nums[i];
+            choice1=maxPositive*current;
+            choice2=maxNegative*current;
+            
+            maxPositive=Math.max(current,Math.max(choice1,choice2));
+            maxNegative=Math.min(current,Math.min(choice1,choice2));
+            
+            maxproduct=Math.max(maxproduct,Math.max(maxPositive,maxNegative));
+        }
+        return maxproduct;
+    }
+--------------------------------------------------------------------------------
+18. Longest consecutive subsequence ->T(N),S(N)
+{2,6,9,4,5,3,10}->2,3,4,5,6 so the output is 5
+->First do Hashing
+and then do->
+                   int maxcount=0;
+	  int count=0;
+	//here max is the maximum element in the array.  
+ 	for(int i=1;i<=max;i++){
+	      if(map.containsKey(i)){
+	          count++;
+	      }else{
+	          count=0;
+	      }   
+	      maxcount=Math.max(maxcount,count);
+	  }
+//method 2 slightly different approach
+
+HashSet<Integer> S = new HashSet<Integer>();
+        int ans = 0;
+ 
+        // Hash all the array elements
+        for (int i = 0; i < n; ++i)
+            S.add(arr[i]);
+ 
+        // check each possible sequence from the start
+        // then update optimal length
+        for (int i = 0; i < n; ++i) 
+        {
+            // if current element is the starting
+            // element of a sequence
+            if (!S.contains(arr[i] - 1)) 
+            {
+                // Then check for next elements
+                // in the sequence
+                int j = arr[i];
+                while (S.contains(j))
+                    j++;
+ 
+                // update  optimal length if this
+                // length is more
+                if (ans < j - arr[i])
+                    ans = j - arr[i];
+            }
+        }
+--------------------------------------------------------------------------------
+19. Given an array of size n and a number k, find all elements that appear more than n/k times
+T(nk),S(k-1)
+-> For better understanding just see the explaination on GFG  through diagram you'll understand the intuition.
+	public static void moreThanNdK(int[] arr, int n, int k) {
+		if (k < 2)
+			return;
+
+		Tetris[] temp = new Tetris[k - 1];
+		for (int i = 0; i < k - 1; i++) {
+			temp[i] = new Tetris();
+		}
+
+		for (int i = 0; i < n; i++) {
+			int j;
+// If arr[i] is already present in the element count array, then increment its count
+			for (j = 0; j < k - 1; j++) {
+				if (temp[j].element == arr[i]) {
+					temp[j].count++;
+					break;
+				}
+			}
+			
+			if (j == temp.length) {
+				int l;
+//				 If there is position available in temp[], then place arr[i] in the first
+//				  available position and set count as 1
+				for (l = 0; l < k - 1; l++) {
+					if (temp[l].count == 0) {
+						temp[l].count = 1;
+						temp[l].element=arr[i];
+						break;
+					}
+				}
+
+// If all the position in the temp[] are filled, then decrease count of every element by 1
+				if (l == temp.length) {
+					int m;
+					for (m = 0; m < k - 1; m++) {
+						temp[m].count -= 1;
+					}
+				}
+			}
+		}
+
+		for (int i = 0; i < temp.length; i++) {
+			int actualcount = 0;
+			for (int j = 0; j < n; j++) {
+				if (temp[i].element == arr[j]) {
+					actualcount++;
+				}
+			}
+
+			if (actualcount > n / k) {
+				System.out.print(temp[i].element + " ");
+			}
+
+		}
+
+	}
+
+	static class Tetris {
+		int element;
+		int count;
+	}
+--------------------------------------------------------------------------------
+20. Leetcode #122 Best time to buy and sell stock II
+-> Since it follows Valley Peak approach , so we just have to find the pattern where it is increasing and then add the difference of it to profit which sums upto total profit 
+1,2,3,4,5  here profit=1+1+1+1=4 {(2-1)  + (3-2) +  (4-3) +  (5-4)}
+ int diff=0;
+        
+        for(int i=1;i<prices.length;i++){
+            if(prices[i]>prices[i-1]){
+                diff+=prices[i]-prices[i-1];
+            }
+        }
+        return diff;
+
+
+Leetcode #123 Best time to buy and sell stock III ->https://www.youtube.com/watch?v=37s1_xBiqH0
+Approach-> Divide and conquer
+
+int maxProfit(vector<int>& prices) {
+          // the idea is to divide the array into two parts there will be left and right parts 
+      // left part can have atmost 1 transaction and right part also
+    
+        int n=prices.size();
+        if(n==0){
+            return 0;
+        }
+        
+        vector<int>left(n),right(n);
+
+        int leftmin=prices[0];
+        for(int i=1;i<n;i++){
+            left[i]=max(left[i-1],prices[i]-leftmin);
+            leftmin=min(leftmin,prices[i]);
+        }
+        
+        int rightmax=prices[n-1];
+        for(int j=n-2;j>=0;j--){
+            right[j]=max(right[j+1],rightmax-prices[j]);
+            rightmax=max(rightmax,prices[j]);
+        }
+        
+        int profit=right[0];
+        for(int i=1;i<n;i++){
+            //left[i-1] because its the part of prices array and the other part is from i-1+1=i which is right part
+            profit=max(profit,left[i-1]+right[i]);
+        }
+        return profit;            
+    }
+--------------------------------------------------------------------------------
+21. Array Subset of another array
+Approach-> used two hashmaps an check whether elements of first hashmap are also in second hashmap with same frequency (take a size variable and whenever condition satisfies just increment the size ), at last if size is equal to the size of small hashmap then (array is subset of another subset). 
+--------------------------------------------------------------------------------
+22. Triplet Sum in Array
+Approach->
+1. Either use a hashmap and for this T(N^2), S(N)
+2. Use 3 pointers approach after sorting the array -> T(N^2),S(1) 
+--------------------------------------------------------------------------------
+23. Trapping Rain Water
+static int trappingWater(int arr[], int n) { 
+        
+       int[]leftMax= new int[n];
+       int[]rightMax= new int[n];
+       
+       leftMax[0]=arr[0];
+       for(int i=1;i<n;i++){
+           leftMax[i]=Math.max(leftMax[i-1],arr[i]);
+       }
+       
+       rightMax[n-1]=arr[n-1];
+       for(int j=n-2;j>=0;j--){
+           rightMax[j]=Math.max(rightMax[j+1],arr[j]);
+       }
+       
+       int ans=0;
+       for(int i=0;i<n;i++){
+           ans+=Math.min(leftMax[i],rightMax[i])-arr[i];
+       }
+       return ans;
+    }
+--------------------------------------------------------------------------------
+24. Chocolate Distribution Problem
+		//Sliding Window Approach
+		while (t-- > 0) {
+			int n = scn.nextInt();
+			long[] arr = new long[n];
+
+			for (int i = 0; i < n; i++) {
+				arr[i] = scn.nextLong();
+			}
+
+			int m = scn.nextInt();
+			Arrays.sort(arr);
+			long diff = Integer.MAX_VALUE;
+
+			for (int i = 0; i <= n - m; i++) {
+				long temp = (arr[i + m - 1] - arr[i]);
+				diff = Math.min(diff, temp);
+			}
+			System.out.println(diff);
+		}
+--------------------------------------------------------------------------------
+25. Smallest subarray with sum greater than x
+ 
+public static long sb(long arr[], long n, long x) {
+       // Initialize current sum and minimum length
+        long curr_sum = 0;
+        long ans = n + 1;
+        // Initialize starting and ending indexes
+        int start = 0, end = 0;
+        while (end < n) {
+            // Keep adding array elements while current sum
+            // is smaller than or equal to x
+            while (curr_sum <= x && end < n)
+                curr_sum += arr[end++];
+            // If current sum becomes greater than x.
+            while (curr_sum > x && start < n) {
+                // Update minimum length if needed
+                ans=Math.min(ans,end-start);
+                // remove starting elements
+                curr_sum -= arr[start++];
+            }
+        }
+        return ans;
+    }
+--------------------------------------------------------------------------------
+26. Three way partioning
+
+public void threeWayPartition(int arr[], int a, int b)
+    {
+        int low=0;
+        int mid=0;
+        int high=arr.length-1;
+        
+        while(mid<=high){
+            if(arr[mid]<a){
+                int temp=arr[mid];
+                arr[mid]=arr[low];
+                arr[low]=temp;
+                low++;
+                mid++;
+            }else if(arr[mid]>b){
+                 int temp=arr[high];
+                arr[high]=arr[mid];
+                arr[mid]=temp;
+                high--;
+            }else{
+                mid++;
+            }
+        }
+    }
+--------------------------------------------------------------------------------
+27. Minimum swaps and k together (Find the minimum number of swaps required to bring all the numbers less than or equal to k together.)
+
+ public static int minSwap (int arr[], int n, int k) {
+     //using sliding window approach
+     int good=0;
+     for(int i=0;i<n;i++){
+         if(arr[i]<=k){
+             good++;
+         }
+     }
+     
+// we made a window of size (good)
+     int bad=0;
+     for(int i=0;i<good;i++){
+         if(arr[i]>k){
+             bad++;
+         }
+     }
+     
+     int ans=bad;
+     for(int i=0,j=good;j<n;i++,j++){
+         if(arr[i]>k){
+             bad--;
+         }
+         
+         if(arr[j]>k){
+             bad++;
+         }
+         ans=Math.min(ans,bad);
+     }        
+      return ans;
+    }
+--------------------------------------------------------------------------------
+28. Minimum no. of operations needed to make an array palindrome
+
+int i=0;
+int j=n-1;
+int res=0;
+while(i<=j){
+	if(arr[i]==arr[j]){
+	i++;
+	j--;
+//	If left element is greater, then we merge right two elements because it increases the probability that  //                the merge part or the sum could be equal to the other right element
+	}else if(arr[i]<arr[j]){
+	i++;
+	arr[i]=arr[i]+arr[i-1];
+	res++;
+	}else{
+	j--;
+	arr[j]=arr[j]+arr[j+1];
+	res++;
+	}
+}
+return res;
+--------------------------------------------------------------------------------
+29. Median of two sorted arrays of same size->https://www.youtube.com/watch?v=MHNTl_NvOj0
+->https://www.ideserve.co.in/learn/find-median-of-two-sorted-arrays
+T(logn) S(1)
+
+
+ private static final int ERROR_INVALID_INPUT = -1; 
+
+// change value of this const as per your specific requirement
+     
+    public int max(int a, int b)
+    {
+        if (a > b) return a;
+        return b;
+    }
+      
+    public int min(int a, int b)
+    {
+        if (a < b) return a;
+        return b;
+    }
+      
+    private double findMedian(int[] array, int startIndex, int endIndex)
+    {
+        int indexDiff = (endIndex - startIndex);
+        if (indexDiff % 2 == 0) // we are looking at odd number of elements
+        {
+            return array[startIndex + (indexDiff/2)];
+        }
+        else
+        {
+            return 1.0*(array[startIndex + (indexDiff/2)] + array[startIndex + (indexDiff/2) + 1])/2;
+        }
+    }
+     
+    // a: 1,2,5,11,15  // b: 3 4 13 17 18
+    public double findMedianSortedArrays(int[] a, int[] b, int startIndexA, int endIndexA, int startIndexB, int endIndexB)
+    {
+        
+        if ((endIndexA - startIndexA < 0) || ((endIndexB - startIndexB < 0)))
+        {
+            System.out.println("Invalid Input.");
+            return ERROR_INVALID_INPUT;
+        }
+ 
+        if ((endIndexA - startIndexA == 0) && ((endIndexB - startIndexB == 0)))
+        {
+            return (a[0] + b[0])/2;
+        }
+         
+        if ((endIndexA - startIndexA == 1) && ((endIndexB - startIndexB == 1)))
+        {
+            return (1.0*(max(a[startIndexA], b[startIndexB]) + min(a[endIndexA], b[endIndexB])))/2;
+        }
+          
+        double m1 = findMedian(a, startIndexA, endIndexA);
+        double m2 = findMedian(b, startIndexB, endIndexB);
+          
+        if (m2 == m1)
+        {
+            return m2;
+        }
+          
+        // since m1 <= median <= m2 narrow down search by eliminating elements less than m1 and elements greater than m2  
+        if (m1 < m2)
+        {
+            if ((endIndexA - startIndexA) % 2 == 0) // we are looking at odd number of elements
+            {
+                startIndexA = startIndexA + (endIndexA - startIndexA) / 2;
+                endIndexB = startIndexB + (endIndexB - startIndexB) / 2;
+            }
+            else
+            {
+                startIndexA = startIndexA + (endIndexA - startIndexA) / 2;
+                endIndexB = startIndexB + (endIndexB - startIndexB) / 2 + 1;                
+            }
+        }
+          
+        // since m2 <= median <= m1 narrow down search by eliminating elements less than m2 and elements greater than m1
+        else // m2 < m1
+        {
+            if ((endIndexB - startIndexB) % 2 == 0) // we are looking at odd number of elements
+            {
+                startIndexB = startIndexB + (endIndexB - startIndexB) / 2;
+                endIndexA = startIndexA + (endIndexA - startIndexA) / 2;
+            }
+            else
+            {
+                startIndexB = startIndexB + (endIndexB - startIndexB) / 2;
+                endIndexA = startIndexA + (endIndexA - startIndexA) / 2 + 1;                
+            }
+        }
+        return findMedianSortedArrays(a, b, startIndexA, endIndexA, startIndexB, endIndexB);
+    }
+--------------------------------------------------------------------------------
+30) Median of two sorted arrays of different sizes: Expert level question -T(logn), S(1)
+->https://www.youtube.com/watch?v=ws98ud9uxl4
+->https://github.com/Prince-1501/Hello_world-Competiitve-Programming/blob/master/Leetcode/Median%20of%20Two%20sorted%20arrays.pdf
+
+Approach used->Binary search
+
+Here we need to separate the parts of array in left half and right half having equal elements in both
+---------AIM: Left half is smaller than Right half-----------------
+# so, i1 divides the first array by taking half of the array, the to make sure that the other half (right) have equal elements we just set i2=(n+m+1)/2-i1
+# min1=Minimum element of right side of arr[]
+   min2= Minimum element of right side of brr[]
+   max1=Maximum element of left side of arr[]
+   max2=Maximum element of left side of brr[]
+
+Dry run the code you'll get the intuition behind it.
+
+public double findMedianSortedArrays(int[] arr, int[] brr) {
+        
+        int n=arr.length;
+        int m=brr.length;
+        //here we asssume that size of array a is smaller than size of array b 
+        // i.e n<m    
+        if(n>m){
+            //because we always need that first array is smaller than the other
+            return findMedianSortedArrays(brr,arr);
+        }
+        
+        int begin1=0;
+        int end1=n;
+        
+        while(begin1<=end1){
+        
+            int i1=(begin1+end1)/2;     mid point of array a.
+            int i2=(n+m+1)/2 -i1;     // 1 is added because of zero indexing
+            
+            int min1=(i1==n)?Integer.MAX_VALUE:arr[i1];
+            int max1=(i1==0)?Integer.MIN_VALUE:arr[i1-1];
+            
+            int min2=(i2==m)?Integer.MAX_VALUE:brr[i2];
+            int max2=(i2==0)?Integer.MIN_VALUE:brr[i2-1];
+                     
+            if(max1<=min2 && max2<=min1){
+                if((n+m)%2==0){
+                    return (double)(Math.max(max1,max2)+Math.min(min1,min2))/2;
+                }else{
+                    return (double)(Math.max(max1,max2));
+                }
+            }else if(max2>min1){
+                begin1=i1+1;
+            }else{
+                end1=i1-1;
+            }   
+            
+        }
+    return 0;
+    }
+--------------------------------------------------------------------------------
+31. Search in an infinite sorted array in O(LogN)
+	public static void SearchIninfiniteArray(int[] arr, int key) {
+
+		int lo = 0;
+		int hi = 1;
+
+		while (arr[hi] < key) {
+			lo = hi;
+			hi = 2 * hi;
+		}
+
+		int ans = Arrays.binarySearch(arr, lo, hi, key);
+		System.out.println(ans);
+	}
+--------------------------------------------------------------------------------
+32. Subarrays Sums Divisible by K (Leetcode 974)->https://www.youtube.com/watch?v=QM0klnvTQzk
+Approach->
+SubA=kn+x;     x is remainder
+SubB=km+x;
+then SubB-SubA=k(m-n) means a subarray. we take remainder in hashmap, whenever we see same remainder we just increment the ans+=map.get(rem);
+If we encounter -ve element then just add k to rem because>>>kn-y=kn-y (+k-k)=kn'+(k-y).    n'=n-1
+
+public int subarraysDivByK(int[] nums, int k) {
+       int ans=0;
+       
+        HashMap<Integer,Integer>map=new HashMap<>();
+        map.put(0,1);
+        int sum=0;
+        int rem=0;
+        for(int i=0;i<nums.length;i++){
+            sum+=nums[i];
+            rem=sum%k;
+            if(rem<0){
+                rem+=k;
+            }
+            
+            if(map.containsKey(rem)){
+                ans+=map.get(rem);
+                map.put(rem,map.get(rem)+1);
+            }else
+                map.put(rem,1);           
+        }
+        return ans;       
+    }
+--------------------------------------------------------------------------------

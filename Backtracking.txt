@@ -1,0 +1,604 @@
+SOLUTIONS OF THESE QUESTIONS ARE EITHER ON GFG OR ON LEETCODE.
+---------------------------------------BACKTRACKING-----------------------------------------
+	
+1. Rat in a Maze Problem
+
+public static void RatMaze(int[][]maze,boolean[][]visited,int row,int col,String ans,ArrayList<String>list){
+      if(row==maze.length-1 && col==maze.length-1){
+          list.add(ans);
+          return;
+      }  
+      if(row<0||row>=maze.length||col<0||col>=maze.length||visited[row][col]||maze[row][col]==0){
+          return;
+      }
+      visited[row][col]=true;
+      //Down
+      RatMaze(maze,visited,row+1,col,ans+"D",list);
+      //left
+      RatMaze(maze,visited,row,col-1,ans+"L",list);
+      //right
+      RatMaze(maze,visited,row,col+1,ans+"R",list);
+      //Up
+      RatMaze(maze,visited,row-1,col,ans+"U",list);
+      
+      visited[row][col]=false;
+    }
+------------------------------------------------------------------------------------------
+2. N Queens
+static int c5 = 1;
+	public static void NQueens(boolean[][] board, int qpsf, int tq, String ans, int row, int col) {
+		if (qpsf == tq) {
+			System.out.println(c5 + ") " + ans);
+			c5++;
+			return;
+		}
+
+		if (col == board[0].length) {
+			col = 0;
+			row++;
+		}
+
+		if (row == board.length) {
+			return;
+		}
+
+		// placed
+		if (isitsafetoplace(board, row, col)) {
+			board[row][col] = true;
+			NQueens(board, qpsf + 1, tq, ans + "{" + (row + 1) + "-" + (col + 1) + "} ", row, col + 1);
+			board[row][col] = false;
+		}
+		// not placed
+		NQueens(board, qpsf, tq, ans, row, col + 1);
+
+	}
+             private static boolean isitsafetoplace(boolean[][] board, int row, int col) {
+		// vertically up
+		int r = row - 1;
+		int c = col;
+		while (r >= 0) {
+			if (board[r][c]) {
+				return false;
+			}
+			r--;
+		}
+
+		// horizontally left
+		r = row;
+		c = col - 1;
+		while (c >= 0) {
+			if (board[r][c]) {
+				return false;
+			}
+			c--;
+		}
+
+		// diagonally left
+		r = row - 1;
+		c = col - 1;
+		while (r >= 0 && c >= 0) {
+			if (board[r][c]) {
+				return false;
+			}
+			r--;
+			c--;
+		}
+		// diagonally right
+		r = row - 1;
+		c = col + 1;
+		while (r >= 0 && c < board[0].length) {
+			if (board[r][c]) {
+				return false;
+			}
+			r--;
+			c++;
+		}
+		return true;
+	}
+--------------------------------------------------------------------------------------------
+3. Sudoku Solver
+public static void Sudokusolver(int[][] arr, int row, int col) {
+
+		if (col == arr[0].length) {
+			col = 0;
+			row++;
+		}
+		if (row == arr.length) {
+			display(arr);
+			return;
+		}
+		if (arr[row][col] != 0) {
+			Sudokusolver(arr, row, col + 1);
+			return;
+		}
+		for (int i = 1; i <= 9; i++) {
+			if (isitsafe(arr, row, col, i)) {
+				arr[row][col] = i;
+				Sudokusolver(arr, row, col + 1);
+				arr[row][col] = 0;
+			}
+		}
+	}
+	private static boolean isitsafe(int[][] arr, int row, int col, int val) {
+
+		return isitsaferow(arr, row, val) && isitsafecol(arr, col, val) && isitsafecell(arr, row, col, val);
+	}
+	private static boolean isitsafecell(int[][] arr, int row, int col, int val) {
+		int sr = row - row % 3;
+		int sc = col - col % 3;
+
+		for (int r = sr; r < sr + 3; r++) {
+			for (int c = sc; c < sc + 3; c++) {
+				if (arr[r][c] == val) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	private static boolean isitsafecol(int[][] arr, int col, int val) {
+
+		for (int row = 0; row < arr.length; row++) {
+			if (arr[row][col] == val) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private static boolean isitsaferow(int[][] arr, int row, int val) {
+		for (int col = 0; col < arr[0].length; col++) {
+			if (arr[row][col] == val) {
+				return false;
+			}
+		}
+		return true;
+	}
+--------------------------------------------------------------------------------------------
+4. Permutations of a string
+ public List<String> find_permutation(String S) {
+        List<String>list=new ArrayList<>();
+        HashMap<Character,Integer>map=new HashMap<>();
+        for(int i=0;i<S.length();i++){
+            char ch=S.charAt(i);
+            map.put(ch,map.getOrDefault(ch,0)+1);
+        }
+        
+        Solve(map,list,1,S.length(),"");
+        Collections.sort(list);
+        return list;
+    }
+    public void Solve(HashMap<Character,Integer>map,List<String>list,int cs,int ts,String ans){
+        
+        if(cs>ts){
+            list.add(ans);
+            return;
+        }
+        
+        for(char key:map.keySet()){
+            if(map.get(key)>0){
+                map.put(key,map.get(key)-1);
+                Solve(map,list,cs+1,ts,ans+key);
+                map.put(key,map.get(key)+1);
+            }
+        }
+    }
+
+--------------------------------------------------------------------------------------------
+5. Knights Tour
+public static boolean KnightsMove(int[][] chessboard, int row, int col, boolean[][] visited, int count) {
+		if (count == 8 * 8) {
+			display(chessboard);
+			return true;
+		}
+
+		if (row < 0 || row >= chessboard.length || col < 0 || col >= chessboard.length || visited[row][col]) {
+			return false;
+		}
+
+		visited[row][col] = true;
+		chessboard[row][col] = count;
+
+		if (KnightsMove(chessboard, row + 2, col + 1, visited, count + 1))
+			return true;
+		if (KnightsMove(chessboard, row + 1, col + 2, visited, count + 1))
+			return true;
+
+		if (KnightsMove(chessboard, row - 1, col + 2, visited, count + 1))
+			return true;
+		if (KnightsMove(chessboard, row - 2, col + 1, visited, count + 1))
+			return true;
+
+		if (KnightsMove(chessboard, row - 2, col - 1, visited, count + 1))
+			return true;
+		if (KnightsMove(chessboard, row - 1, col - 2, visited, count + 1))
+			return true;
+
+		if (KnightsMove(chessboard, row + 1, col - 2, visited, count + 1))
+			return true;
+		if (KnightsMove(chessboard, row + 2, col - 1, visited, count + 1))
+			return true;
+
+		chessboard[row][col] = 0;
+		visited[row][col] = false;
+
+		return false;
+	}
+--------------------------------------------------------------------------------------------
+6. Combination Sum
+//Function to return a list of indexes denoting the required 
+    // UNIQUE combinations whose sum is equal to given number.
+   public static ArrayList<ArrayList<Integer>> combinationSum(ArrayList<Integer> A, int B)
+    {
+        ArrayList<ArrayList<Integer>>ans=new ArrayList<>();
+        ArrayList<Integer>list=new ArrayList<>();
+        
+        Set<Integer> set = new HashSet<>(A);
+        A.clear();
+        A.addAll(set);
+        Collections.sort(A);
+        int[]arr=new int[A.size()];
+        for(int i=0;i<arr.length;i++){
+            arr[i]=A.get(i);
+        }
+        CoinChange(B,0,ans,list,arr);
+        return ans;
+    }
+    public static void CoinChange(int amt,int lastcoinused,ArrayList<ArrayList<Integer>>ans,ArrayList<Integer>list,int[]arr){
+        
+        if(amt==0){
+            ans.add(new ArrayList<>(list));
+            return;
+        }
+        
+        for(int i=lastcoinused;i<arr.length;i++){
+            if(amt-arr[i]>=0){
+            amt=amt-arr[i];
+            list.add(arr[i]);
+            CoinChange(amt,i,ans,list,arr);
+            list.remove(list.size()-1);
+            amt=amt+arr[i];
+            }   
+        }
+        
+    }
+--------------------------------------------------------------------------------------------
+7. Print all Palindromic Partitions of a String
+	public static void PalindromicPartitions(String q, String ans) {
+		if (q.length() == 0) {
+			System.out.println(ans);
+			return;
+		}
+
+		for (int i = 1; i <= q.length(); i++) {
+			String part = q.substring(0, i);
+			String roq = q.substring(i);
+			if (ispalindrome(part)) {
+				PalindromicPartitions(roq, ans + part + " ");
+			}
+
+		}
+	}
+--------------------------------------------------------------------------------------------
+8. Maximum Integer with Atmost K Swaps
+	public static int MaximumIntegerWithAtMostKSwaps(char[] ch, int vidx, int k) {
+		int max = Integer.parseInt(new String(ch));
+
+		if (k == 0) {
+			return max;
+		}
+		for (int i = vidx; i < ch.length; i++) {
+
+			for (int j = i + 1; j < ch.length; j++) {
+				if (ch[j] > ch[i]) {
+					Swapping(ch, i, j);
+					int ans = MaximumIntegerWithAtMostKSwaps(ch, vidx + 1, k - 1);
+					max = Math.max(max, ans);
+					Swapping(ch, i, j);
+				}
+			}
+		}
+		return max;
+	}
+--------------------------------------------------------------------------------------------
+9. Work Break 
+static List<String> wordBreak(int n, List<String> dict, String s)
+    {
+        HashSet<String>set=new HashSet<>();
+        for(int i=0;i<dict.size();i++){
+            set.add(dict.get(i));
+        }
+        List<String>list=new ArrayList<>();
+        solve(set,list,"",s);
+        return list;
+    }
+    public static void solve(HashSet<String>set,List<String>list,String ans,String str){
+        if(str.length()==0){
+            list.add(ans.substring(0,ans.length()-1));
+            return;
+        }
+        for(int i=0;i<str.length();i++){
+            String left=str.substring(0,i+1);
+            String right=str.substring(i+1);
+            if(set.contains(left)){
+                solve(set,list,ans+left+" ",right);
+            }
+        }
+    }
+--------------------------------------------------------------------------------------------
+10. Partition in K subsets (non empty)-> pepcoding->https://www.youtube.com/watch?v=TvvGj1FtHIk&t=6s
+Approach-> can we take a (existing non empty set) +(new set /(first non occupy set)) <- two options 
+at last at the end of tree all those  which are not having a single empty set are the answers
+Insights:  if n-1 persons make k teams then nth person can go in any team.
+but if n-1 persons were able to make k-1 teams then nth person should make kth team
+
+public static void PartitionInKsubsets(int i, int n, int k, int nos, ArrayList<ArrayList<Integer>> ans) {
+		// nos->filled sets which were 0 initially
+		if (i > n) {
+			if (nos == k) {
+				for (ArrayList<Integer> set : ans) {
+					System.out.print(set + " ");
+				}
+				System.out.println();
+			}
+			return;
+		}
+		for (int j = 0; j < ans.size(); j++) {
+			if (ans.get(j).size() > 0) {
+				// existing non empty set-> so "nos" will not increase
+				ans.get(j).add(i);
+				PartitionInKsubsets(i + 1, n, k, nos, ans);
+				ans.get(j).remove(ans.get(j).size() - 1);
+			} else {
+				// first non occupy set
+				ans.get(j).add(i);
+				PartitionInKsubsets(i + 1, n, k, nos + 1, ans);
+				ans.get(j).remove(ans.get(j).size() - 1);
+				break;// to prevent duplicacy
+			}
+		}
+	}
+
+--------------------------------------------------------------------------------------------
+11. Equal Sum subsets partition(k)
+public static void main(String[] args) throws java.lang.Exception {
+
+		int n = scn.nextInt();
+		int[] arr = new int[n];
+		int sum = 0;
+		for (int i = 0; i < arr.length; i++) {
+			arr[i] = scn.nextInt();
+			sum += arr[i];
+		}
+		Arrays.sort(arr);
+		int k = scn.nextInt();
+		if (k == 1) {
+			System.out.println("[");
+			for (int i = 0; i < arr.length; i++) {
+				System.out.print(arr[i] + ", ");
+			}
+			System.out.println("]");
+			return;
+		}
+		if (k > n || sum % k != 0) {
+			System.out.println("-1");
+			return;
+		}
+		int[] subsetSum = new int[k];
+		ArrayList<ArrayList<Integer>> ans = new ArrayList<>();
+		for (int i = 0; i < k; i++) {
+			ans.add(new ArrayList<>());
+		}
+
+		EqualSumSubsetPartition(arr, 0, k, 0, subsetSum, ans);
+	}
+
+	public static void EqualSumSubsetPartition(int[] arr, int vidx, int k, int nos, int[] subsetSum,
+			ArrayList<ArrayList<Integer>> ans) {
+		// nos->filled sets which were 0 initially
+		if (vidx == arr.length) {
+			if (nos == k) {
+				boolean flag = true;
+				for (int i = 0; i < subsetSum.length - 1; i++) {
+					if (subsetSum[i] != subsetSum[i + 1]) {
+						flag = false;
+						break;
+					}
+				}
+				if (flag) {
+					for (ArrayList<Integer> set : ans) {
+						System.out.print(set + " ");
+					}
+					System.out.println();
+				}
+			}
+			return;
+		}
+
+		for (int j = 0; j < ans.size(); j++) {
+			if (ans.get(j).size() > 0) {
+				// existing non empty set-> so "nos" will not increase
+				ans.get(j).add(arr[vidx]);
+				subsetSum[j] += arr[vidx];
+				EqualSumSubsetPartition(arr, vidx + 1, k, nos, subsetSum, ans);
+				subsetSum[j] -= arr[vidx];
+				ans.get(j).remove(ans.get(j).size() - 1);
+			} else {
+				// first non occupy set
+
+				ans.get(j).add(arr[vidx]);
+				subsetSum[j] += arr[vidx];
+				EqualSumSubsetPartition(arr, vidx + 1, k, nos + 1, subsetSum, ans);
+				subsetSum[j] -= arr[vidx];
+				ans.get(j).remove(ans.get(j).size() - 1);
+				break;// to prevent duplicacy
+			}
+		}
+	}
+--------------------------------------------------------------------------------------------
+12. Remove Invalid Parentheses->(Leetcode 301)
+ List<String>ans=new ArrayList<>();
+    Set<String>setA= new HashSet<>();
+    
+    public List<String> removeInvalidParentheses(String s) {
+        int mra=getMinRemovals(s);
+        //minimum removals allowed
+        Set<String>set=new HashSet<>();
+        solution(mra,set,s);
+        return ans;
+    }
+    public void solution(int mra,Set<String>set,String str){
+        if(mra==0){
+            int mr=getMinRemovals(str);
+            if(mr==0){//minimum removals ==0 means stack is empty means valid parentheses
+            if(!set.contains(str)){
+                set.add(str);
+                ans.add(str);
+                }
+            }
+               return;
+        }
+        
+        for(int i=0;i<str.length();i++){
+            String left=str.substring(0,i);
+            String right=str.substring(i+1); //here we remove every element and check for validity
+              if(!setA.contains(left+right)){
+                  setA.add(left+right);
+                  solution(mra-1,set,left+right);
+              }
+        }
+        
+        
+    }
+    public int getMinRemovals(String str){
+        Stack<Character>st=new Stack<>();
+        for(int i=0;i<str.length();i++){
+            char ch=str.charAt(i);
+            if(ch=='('){
+                st.push(ch);
+            }else if(ch==')'){
+                if(!st.isEmpty() && st.peek()=='('){
+                    st.pop();
+                }else{
+                    st.push(ch);
+                }
+            }
+        }
+        return st.size();
+    }
+--------------------------------------------------------------------------------------------
+13. Tug Of War-(Minimum subset sum difference)
+	static int mindiff = Integer.MAX_VALUE;
+	static String ans = "";
+	private static void TugOfWar(int[] arr, int vidx, int sos1, int sos2, ArrayList<Integer> set1,
+			ArrayList<Integer> set2) {
+		if (vidx == arr.length) {
+			int delta = Math.abs(sos1 - sos2);
+			if (mindiff > delta) {
+				mindiff = delta;
+				ans = set1 + " " + set2;
+			}
+			return;
+		}
+		// this handles both even and odd cases.
+		if (set1.size() < (arr.length + 1) / 2) {
+			set1.add(arr[vidx]);
+			TugOfWar(arr, vidx + 1, sos1 + arr[vidx], sos2, set1, set2);
+			set1.remove(set1.size() - 1);
+		}
+		if (set2.size() < (arr.length + 1) / 2) {
+			set2.add(arr[vidx]);
+			TugOfWar(arr, vidx + 1, sos1, sos2 + arr[vidx], set1, set2);
+			set2.remove(set2.size() - 1);
+		}
+	}
+--------------------------------------------------------------------------------------------
+14. Longest Possible Route in a Matrix with Hurdles
+static int maxdis = Integer.MIN_VALUE;
+
+	private static void LongestPossiblePathInMatrix(int[][] mat, boolean[][] visited, int cr, int cc, int er, int ec,
+			int dis) {
+
+		if (cr == er && cc == ec) {
+			maxdis = Math.max(maxdis, dis);
+			return;
+		}
+		visited[cr][cc] = true;
+		if (isValid(mat, visited, cr - 1, cc))
+			LongestPossiblePathInMatrix(mat, visited, cr - 1, cc, er, ec, dis + 1);
+
+		if (isValid(mat, visited, cr, cc + 1))
+			LongestPossiblePathInMatrix(mat, visited, cr, cc + 1, er, ec, dis + 1);
+
+		if (isValid(mat, visited, cr + 1, cc))
+			LongestPossiblePathInMatrix(mat, visited, cr + 1, cc, er, ec, dis + 1);
+
+		if (isValid(mat, visited, cr, cc - 1))
+			LongestPossiblePathInMatrix(mat, visited, cr, cc - 1, er, ec, dis + 1);
+		visited[cr][cc] = false;
+
+	}
+	private static boolean isValid(int[][] mat, boolean[][] visited, int row, int col) {
+		if (row >= 0 && col >= 0 && row < mat.length && col < mat[0].length && mat[row][col] == 1
+				&& !visited[row][col]) {
+			return true;
+		}
+		return false;
+	}
+
+--------------------------------------------------------------------------------------------
+15.Print all possible paths from top left to bottom right of a mXn matrix
+private static void MatrixTraversal(int[][] mat, int r, int c, int m, int n, String ans) {
+		if (r == m - 1 && c == n - 1) {
+			System.out.println(ans + mat[r][c]);
+			return;
+		}
+		if (r > m - 1 || c > n - 1) {
+			return;
+		}
+
+		MatrixTraversal(mat, r + 1, c, m, n, ans + mat[r][c] + " ");
+		MatrixTraversal(mat, r, c + 1, m, n, ans + mat[r][c] + " ");
+
+	}
+--------------------------------------------------------------------------------------------
+16. K-th Permutation Sequence->https://www.youtube.com/watch?v=wT7gcXLYoao
+Approach-> suppose number is n= 4 ->arr[]={1,2,3,4} and k=17-1=16 (0th based indexing)
+here now 4! gives 24 permutations out of which we need 17th so here if
+1 +{[2,3,4]  => 6}
+2+{[1,3,4] =>6}
+3+{[1,2,4] =>6}
+4+{[1,2,3] =>6} Each part contains 6 permutations if one number is separated now out of this we can find the first number for our kth(16th) permutation using (k/6)means k/(n-1)! =(16/6)gives "2" which is number "3" in 0th based array. and in this , for the first number as 3 we have to find the permutation of (16%6)=4th permutation of the remaining arraylist/array=[1,2,4].
+Here our k changed to 4, and fact changes to (6/size) of arraylist which is "2".
+1 +{[2,4]=>2}
+2+{[1,4]=>2}
+4+{[1,2]=>2} Now again here we find (k/fact)th term in arraylist which is (4/2)=2 which "4" in 0th based arraylist.
+so the second number is definitely 4  and now in this four we have to find the 4%2=0th permutation and so on...
+Ans= "3412"
+
+ public String getPermutation(int n, int k) {
+        int fact=1;
+        List<Integer>list=new ArrayList<>();
+        
+        for(int i=1;i<n;i++){
+            list.add(i);
+            fact=fact*i;
+        }
+        list.add(n);
+        k=k-1;//0th based indexing
+        String ans="";
+        while(true){
+            ans=ans+list.get(k/fact);
+            list.remove(k/fact);
+            if(list.size()==0){
+                break;
+            }
+            k=k%fact;
+            fact=fact/list.size();
+        }
+        return ans;
+    }
+--------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------

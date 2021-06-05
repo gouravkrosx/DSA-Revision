@@ -1,0 +1,889 @@
+SOLUTIONS OF THESE QUESTIONS ARE EITHER ON GFG OR ON LEETCODE.
+---------------------------------------LINKED LIST-----------------------------------------
+	
+
+
+1. Reverse Linked List (both Iteratively and Recursively)
+
+-> Iteratively
+public void RPI() {
+		Node prev = head;
+		Node curr = head.next;
+		Node ahead;
+		while (curr != null) {
+			ahead = curr.next;
+			curr.next = prev;
+			prev = curr;
+			curr = ahead;
+		}
+
+		// head tail swap
+		Node temp = head;
+		head = tail;
+		tail = temp;
+		tail.next = null;
+	}
+-> Recursively
+public void RPR() {
+		RPR(head, head.next);
+		Node temp = head;
+		head = tail;
+		tail = temp;
+		tail.next = null;
+	}
+	private void RPR(Node prev, Node curr) {
+		if (curr == null) {
+			return;
+		}
+
+		// another method
+//		Node ahead = curr.next;
+//		curr.next = prev;
+//		RPR(curr, ahead);
+
+		RPR(curr, curr.next);
+		curr.next = prev;
+	}
+
+--------------------------------------------------------------------------------------------------------
+2. Detect Loop in LinkedList.->https://www.youtube.com/watch?v=LUm2ABqAs1w
+#Floyd cycle detection algorithm
+public static boolean detectLoop(Node head){
+        
+        Node slow=head;
+        Node fast=head;
+        
+        while(fast!=null && fast.next!=null){
+            slow=slow.next;
+            fast=fast.next.next;
+             if(slow==fast)
+             return true;
+        }
+        return false;
+    }
+
+--------------------------------------------------------------------------------------------------------
+3. Find first node of loop in a linked list
+ public ListNode detectCycle(ListNode head) {
+       //works for one node
+        if(head==null||head.next==null){
+            return null;
+        }  
+        
+        ListNode slow=head;
+        ListNode fast=head;
+        
+        while(fast!=null && fast.next!=null){
+            slow=slow.next;
+            fast=fast.next.next;
+             if(slow==fast)
+                break;
+        }
+         if(slow!=fast){
+             return null;
+         }
+            slow=head;
+        while(slow!=fast){
+            slow=slow.next;
+            fast=fast.next;
+        }
+        return slow;
+    }
+--------------------------------------------------------------------------------------------------------
+4. Remove loop from LinkedList 
+   public static void removeLoop(Node head){
+         if (head == null || head.next == null)
+            return;
+        Node slow=head;
+        Node fast=head;
+        
+        while(fast!=null && fast.next!=null){
+            slow=slow.next;
+            fast=fast.next.next;
+             if(slow==fast)
+                break;
+        }
+         //when first element is the starting of the loop
+         if(slow==head){
+             while(fast.next!=slow){
+                 fast=fast.next;
+             }
+             fast.next=null;
+         }else if(slow==fast){
+             
+            slow=head;
+        while(slow.next!=fast.next){
+            slow=slow.next;
+            fast=fast.next;
+           }
+         fast.next=null;     
+      } 
+    }
+--------------------------------------------------------------------------------------------------------
+5. Middle element of Linked list
+                        public int mid() {
+		Node slow = head;
+		Node fast = head;
+
+		while (fast.next != null && (fast.next).next != null) { // in even case it gives 1st mid
+			// while(fast!=null&&fast.next!=null) { // in even case it gives 2nd mid
+			slow = slow.next;
+			fast = (fast.next).next;
+		}
+		return slow.data;
+	}
+
+--------------------------------------------------------------------------------------------------------
+6.  Reverse Nodes in k-Group  O(N),S(1)
+  public ListNode reverseKGroup(ListNode head, int k) {
+       if(head==null||k==1){
+           return head;
+       }
+        ListNode dummy=new ListNode(0);
+        dummy.next=head;
+       
+        ListNode curr=dummy,pre=dummy,next=dummy;
+        int count=0;
+        while(curr.next!=null){
+            count++;
+            curr=curr.next;
+        }  
+        
+        while(count>=k){
+            curr=pre.next;
+            next=curr.next;
+            for(int i=1;i<=k-1;i++){ //as we want to change k-1 links
+                curr.next=next.next;
+                next.next=pre.next;
+                pre.next=next;
+                next=curr.next;               
+            }
+            pre=curr;
+            count-=k;
+                
+        }
+        return dummy.next;  
+    }
+
+--------------------------------------------------------------------------------------------------------
+7. Delete nodes having greater value on right
+Node DeleteNodeRightLarger(Node head){
+        //Reverse the linkedlist for easy intuition
+        head=reverseLL(head);
+    
+        Node curr=head.next;
+        Node max=head;
+        while(curr!=null){
+            if(max.data<=curr.data){
+                max=curr;
+                curr=curr.next;
+            }else{
+                curr=curr.next;
+                max.next=curr;
+            }
+        }
+        max.next=null;
+        head=reverseLL(head);
+        return head;
+    }
+
+--------------------------------------------------------------------------------------------------------
+8. Add two linked list in S(1)
+public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        
+         ListNode head=l1;  //we wil store the ans in l1
+         ListNode prev=null; //this will help to join the link if l1 is smaller than l2
+        
+        int carry=0;
+        while(l1!=null && l2!=null){
+            int sum=l1.val+l2.val+carry;
+            carry=sum/10;
+            l1.val=sum%10;
+            prev=l1;  //acts like a pointer
+            
+            l1=l1.next;
+            l2=l2.next;
+        }
+        
+        if(l2!=null){
+            prev.next=l2;  //linking as l2 is bigger than l1
+            l1=l2; //now assigning l1 as l2 because we don't want to make a new node-(using space)
+        }
+        
+        while(l1!=null){
+        int sum=l1.val+carry;
+        carry=sum/10;
+        l1.val=sum%10;
+        prev=l1;
+        l1=l1.next;            
+        }
+        
+        if(carry!=0){
+            prev.next=new ListNode(carry);
+        }
+       return head;
+    }
+# Add one to linked list
+-> firstly reverse the linked list
+->add 1 using the same method as above
+-> Again reverse the linked list
+--------------------------------------------------------------------------------------------------------
+9. Remove duplicates from sorted List O(N) S(1)
+  public ListNode deleteDuplicates(ListNode head) {
+        if(head==null||head.next==null){
+            return head;
+        }
+        ListNode prev=head;
+        ListNode curr=prev.next;
+        
+        while(curr!=null){
+            if(prev.val==curr.val){
+                curr=curr.next;
+                prev.next=curr;
+            }else{
+                prev=curr;
+                curr=curr.next;
+            }
+        }
+        return head;
+    }
+--------------------------------------------------------------------------------------------------------
+10. Remove duplicates from Unsorted List O(N) S(N)
+//Don't use Hashmap it  will give TLE
+ public Node removeDuplicates(Node head) 
+    {
+        Set<Integer>set=new HashSet<>();
+        
+        Node prev= null;
+        Node curr= head;
+        while(curr!=null){
+            if(!set.contains(curr.data)){
+                set.add(curr.data);
+                prev=curr;
+                curr=curr.next;
+            }else{
+                curr=curr.next;
+                prev.next=curr;
+            }
+        }
+        return head;
+    }
+--------------------------------------------------------------------------------------------------------
+11. Intersection point in two linked list
+ public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+       
+        ListNode first=headA;
+        ListNode second=headB;
+        while(first!=second){
+            first=(first==null)?headB:first.next;
+            second=(second==null)?headA:second.next;
+        }
+        return first;
+    }
+--------------------------------------------------------------------------------------------------------
+12. Intersection elements of 2 sorted linked list
+ public static Node findIntersection(Node head1, Node head2)
+    {
+        Node dummy = new Node(0);
+        Node head=dummy;
+        
+        while(head1!=null&&head2!=null){
+            if(head1.data<head2.data){
+                head1=head1.next;
+            }else if(head1.data>head2.data){
+                head2=head2.next;
+            }else{
+                dummy=addToLast(dummy,head1.data);
+                head1=head1.next;
+                head2=head2.next;
+            }
+        }
+        head=head.next; //as first element is 0 in dummy;
+        return head;
+    }
+    public static Node addToLast(Node head,int val){
+     Node nn=new Node(val);
+     head.next=nn;
+     return nn;
+    }
+
+--------------------------------------------------------------------------------------------------------
+13. MergeSort LinkedList O(nLogn) S(1)
+public ListNode MergeSort(ListNode head){
+        if(head==null||head.next==null){
+            return head;    
+        }
+        
+        ListNode mid=midNode(head);
+        ListNode nhead=mid.next;
+        mid.next=null;
+        
+        ListNode fh=MergeSort(head);
+        ListNode sh=MergeSort(nhead);
+    
+        return MergeLL(fh,sh);
+    }
+    
+    public ListNode midNode(ListNode head){
+        ListNode fast= head;
+        ListNode slow= head;
+        
+        while(fast.next!=null && fast.next.next!=null){
+            slow=slow.next;
+            fast=fast.next.next;
+        }
+        
+        return slow;
+    }
+    //Merge Sort in constant Space complexity
+    public ListNode MergeLL(ListNode l1,ListNode l2){
+        ListNode dummy=new ListNode(0);
+        ListNode prev=dummy;
+        while(l1!=null && l2!=null){
+            if(l1.val<l2.val){
+                prev.next=l1;
+                l1=l1.next;
+            }else{
+                prev.next=l2;
+                l2=l2.next;
+            }
+            prev=prev.next;
+        }
+        
+        prev.next=(l1!=null)?l1:l2;
+        return dummy.next;
+    }
+--------------------------------------------------------------------------------------------------------
+14. check for palindrome
+ public boolean isPalindrome(ListNode head) {        
+        if(head==null||head.next==null){
+            return true;
+        }
+       ListNode slow=head;
+       ListNode fast=head;
+       while(fast.next!=null && fast.next.next!=null){
+           slow=slow.next;
+           fast=fast.next.next;
+       }
+       //reverse the right half
+       slow.next=reverseLL(slow.next);
+       
+       slow=slow.next;
+       
+       ListNode dummy=head;
+       
+       while(slow!=null){
+           if(dummy.val!=slow.val){
+               return false;
+           }
+           slow=slow.next;
+           dummy=dummy.next;
+       }
+       return true;
+    } 
+--------------------------------------------------------------------------------------------------------
+15. Odd Even Linked List
+ public ListNode oddEvenList(ListNode head) {
+     ListNode odd=new ListNode(0);
+     ListNode even=new ListNode(0);
+     ListNode evenT=even;
+     ListNode oddT=odd;
+     ListNode curr=head; 
+        
+        int i=1;
+        while(curr!=null){
+            if(i%2==0){
+                evenT.next=curr;
+                evenT=evenT.next;
+            }else{
+                oddT.next=curr;
+                oddT=oddT.next;
+            }
+            curr=curr.next;
+            i++;
+        }
+                
+        oddT.next=even.next;
+        evenT.next=null;   
+        
+        return odd.next;           
+    }
+--------------------------------------------------------------------------------------------------------
+15. Copy List With Random Pointer.
+-> Firstly you should know about 
+Deep copy-> suppose we have some data in google drive and we gave it to someone he downloaded it and then make changes in it, these changes will not reflect in others.(New address)
+Shallow copy->suppose the person have given the link of google drive, now any of the two if make some changes then it would reflect in the original one.(Same address)
+->In this Question we have to make a deep copy of the given linked list
+
+Approach 1) O(N)-S(N)->https://www.youtube.com/watch?v=deaZgauZVco
+  public Node copyRandomList(Node head) {
+        HashMap<Node,Node>map=new HashMap<>();
+        
+        Node nHead=new Node(0);
+        Node prev=nHead;
+        
+        Node curr=head;
+        while(curr!=null){
+            Node nn=new Node(curr.val);
+            prev.next=nn;
+            map.put(curr,nn);
+            curr=curr.next;
+            prev=prev.next;
+        }
+
+        nHead=nHead.next;
+        Node c1=head;
+        Node c2=nHead;
+        while(c1!=null){
+            c2.random=(c1.random!=null)?(map.get(c1.random)):null;
+            c1=c1.next;
+            c2=c2.next;
+        }
+        return nHead;        
+    }
+
+Approach 2) O(N)-S(1)->https://www.youtube.com/watch?v=VNf6VynfpdM
+public Node copyRandomList(Node head) {
+        Node itr=head;
+        Node front=head;
+      // First round: make copy of each node,
+     // and link them together side-by-side in a single list.
+    
+        while(itr!=null){
+          front =itr.next;
+          Node nn=new Node(itr.val);
+          itr.next=nn;
+          nn.next=front;
+          itr=front;         
+        }
+        
+        // Second round: assign random pointers for the copy nodes.
+        itr=head;
+        while(itr!=null){
+            if(itr.random!=null){
+                itr.next.random=itr.random.next;
+            }
+            itr=itr.next.next;
+        }
+        
+        // Third round: restore the original list, and extract the copy list.
+        Node pseudoHead=new Node(0);
+        itr=head;
+        Node copy=pseudoHead;
+        while(itr!=null){
+           front=itr.next.next;
+            
+            //extract the copy
+            copy.next=itr.next;
+            copy=copy.next;
+            
+            //restore the original list
+            itr.next=front;
+            
+            itr=front;
+        }
+        return pseudoHead.next;
+    }
+
+--------------------------------------------------------------------------------------------------------
+16. Remove Nth Node from last
+ public ListNode removeNthFromEnd(ListNode head, int n) {
+        if(head.next==null){
+            return null;
+        }
+        
+        ListNode fast=head;
+    	for(int i=0;i<n;i++){
+    	    fast=fast.next;
+    	}
+    	
+    	ListNode dummy=new ListNode(0);
+        ListNode prev=dummy;
+        dummy.next=head;
+        ListNode slow=head;
+    	while(fast!=null){
+            prev=slow;
+    	    fast=fast.next;
+    	    slow=slow.next;
+    	}
+        prev.next=slow.next;
+    	return dummy.next;
+    }
+
+--------------------------------------------------------------------------------------------------------
+17. Split list to parts
+ public ListNode[] splitListToParts(ListNode root, int k) {
+        ListNode[]result=new ListNode[k];
+        
+        if(root==null){
+         return result;   
+        }
+        
+        int length=0;
+        ListNode temp=root;
+        while(temp!=null){
+            temp=temp.next;
+            length++;
+        }
+        
+        int eachlength=length/k;
+        int extralength=length%k;
+        
+        int index=0;
+        ListNode curr=root;
+        while(curr!=null){
+            ListNode head=curr;
+            
+            int diff=(extralength<=0)?0:1; //as we are using this extra length to divide it evenly
+                                           //so we need to give each part only 1 extra length 
+            for(int i=0;i<eachlength+diff-1;i++)
+                curr=curr.next;
+            
+            ListNode xyz=curr.next;
+            curr.next=null;
+            curr=xyz;
+            
+            result[index++]=head;
+            extralength--;
+        }
+        return result;   
+    }
+--------------------------------------------------------------------------------------------------------
+18. Flattening a Linked List
+->intuition=>we simply flatten the last two using mergeLL function and the resultant would be flatten with current second last. and so on
+ Node flatten(Node root)
+    {
+	    if(root==null||root.next==null){
+	        return root;
+	    }
+	    
+	    root.next=flatten(root.next);
+	                   //second last , last  and so on     
+	    root= mergeLL(root,root.next);
+	    return root;
+    }
+    
+    Node mergeLL(Node a,Node b){
+        
+        Node temp=new Node(0);
+        Node res=temp;
+        
+        while(a!=null && b!=null){
+            if(a.data<b.data){
+                temp.bottom=a;
+                temp=temp.bottom;
+                a=a.bottom;
+            }else{
+                temp.bottom=b;
+                temp=temp.bottom;
+                b=b.bottom;
+            }
+        }
+        if(a!=null)temp.bottom=a;
+        else temp.bottom=b;
+        
+        return res.bottom;
+    }
+--------------------------------------------------------------------------------------------------------
+19. First Non-repeating character in a stream.
+ public String FirstNonRepeating(String A)
+    {
+	    StringBuilder str=new StringBuilder();
+		Queue<Character> q = new LinkedList<>();
+		int[] arr = new int[26];
+		for (int i = 0; i < A.length(); i++) {
+			char ch = A.charAt(i);
+			q.add(ch);
+			arr[ch - 'a']++;
+			while (!q.isEmpty()) {
+				if (arr[q.peek() - 'a'] > 1)
+					q.remove();
+				else
+					break;
+			}
+			if (q.isEmpty()) {
+				str.append("#");
+			} else {
+				str.append(q.peek());
+			}
+		}
+		return str.toString();
+    }
+--------------------------------------------------------------------------------------------------------
+20. Reorder List (Fold List) in constant space
+ Node reorderlist(Node head) {
+       
+        if(head==null||head.next==null){
+            return head;
+        }
+       Node slow=head;
+       Node fast=head;
+       while(fast.next!=null && fast.next.next!=null){
+           slow=slow.next;
+           fast=fast.next.next;
+       }
+       //reverse the right half
+       Node head2=reverseLL(slow.next);
+       slow.next=null;
+       
+       Node head1=head;
+       
+       Node dummy=new Node(0);
+       Node prev=dummy;
+        int i=0;
+        while(head1!=null || head2!=null){
+            if(i%2==0){
+                if(head1!=null){
+                    prev.next=head1;
+                    head1=head1.next;
+                    prev=prev.next;
+                }
+            }else{
+                if(head2!=null){
+                    prev.next=head2;
+                    head2=head2.next;
+                    prev=prev.next;
+                }
+            }
+            i++;
+          
+        }
+       return dummy.next;
+    }
+--------------------------------------------------------------------------------------------------------
+21. Merge K sorted Lists
+Approach 1)Divide & Conquer -O(nkLogk)
+public ListNode mergeKSortedLists(ListNode[]list,int si,int ei){
+        if(si>ei){
+            return null;
+        }
+        if(si==ei){
+            return list[si];
+        }
+        int mid=(si+ei)/2;
+        
+        ListNode fh=mergeKSortedLists(list,si,mid);
+        ListNode sh=mergeKSortedLists(list,mid+1,ei);
+        
+        return merge2lists(fh,sh); 
+    }
+
+Approach 2) Priority Queue - O(nkLogk),S(K)
+  public ListNode mergeKLists(ListNode[] lists) {
+    
+        PriorityQueue<ListNode>pq=new PriorityQueue<>((a,b)->(a.val-b.val));
+        
+       for(ListNode l:lists){
+           if(l!=null)
+           pq.add(l);
+       }
+        
+        ListNode dummy=new ListNode(0);
+        ListNode prev=dummy;
+        while(!pq.isEmpty()){
+            ListNode rn=pq.remove();
+            prev.next=rn;
+             prev=prev.next;
+            rn=rn.next;
+            if(rn!=null){
+                pq.add(rn);
+            }
+           
+        }
+        prev.next=null;
+        return dummy.next;
+    }
+--------------------------------------------------------------------------------------------------------
+22. Multiply 2 LinkedLists
+
+public static ListNode multiplyTwoLL(ListNode l1, ListNode l2) {
+       l1=reverseLL(l1);
+       l2=reverseLL(l2);
+       
+       ListNode dummy=new ListNode(-1);
+       ListNode ans_itr=dummy;
+       ListNode l2_itr=l2;
+       
+       while(l2_itr!=null){
+           ListNode pro=multiplyLLwithDigit(l1,l2_itr.val);
+           l2_itr=l2_itr.next;
+           
+           addTwoLL(pro,ans_itr);   
+           ans_itr=ans_itr.next;
+       }
+       
+       return reverseLL(dummy.next);
+    }
+    
+    public static ListNode multiplyLLwithDigit(ListNode l1,int dig){
+        ListNode dummy=new ListNode(-1);
+        ListNode ac=dummy;
+        ListNode curr=l1;
+        
+        int carry=0;
+        while(curr!=null||carry!=0){
+            int sum=carry+((curr!=null)?curr.val*dig:0);
+            int rem=sum%10;
+            carry=sum/10;
+            
+            ac.next=new ListNode(rem);
+            if(curr!=null)
+              curr=curr.next;
+            ac=ac.next;
+        }
+        return dummy.next;
+    }
+    public static void addTwoLL(ListNode head,ListNode ansItr){
+        ListNode c1=head; //the list to be added with
+        ListNode c2=ansItr; //the resultant list of the previous mulitplication
+        
+        //since c1 can be greater than or equal to c2(ansItr) so just checking for c1 condition only
+        int carry=0;
+        while(c1!=null||carry!=0){
+           int sum=carry+(c1!=null?c1.val:0) + (c2.next!=null?c2.next.val:0);
+           int rem=sum%10;
+           carry=sum/10;
+           
+           if(c2.next!=null)c2.next.val=rem;
+           else c2.next=new ListNode(rem);
+           
+           if(c1!=null)c1=c1.next;
+           c2=c2.next;
+        }
+    }
+    
+     public static ListNode reverseLL(ListNode head){
+        if(head==null||head.next==null){
+            return head;
+        }
+        
+    ListNode curr=head.next;
+    ListNode prev=head;
+    ListNode ahead;
+    while(curr!=null){
+        ahead=curr.next;
+        curr.next=prev;
+        prev=curr;
+        curr=ahead;
+    }
+    
+    ListNode temp=head;
+    head=prev;
+    temp.next=null;
+        return head;
+    }
+--------------------------------------------------------------------------------------------------------
+23. Reverse a Doubly Linked List
+Logic-> just reverse the linked list using next pointers.
+and then take it as head and reverse again using prev pointers
+--------------------------------------------------------------------------------------------------------
+24. Find pairs with a given sum in a DLL 
+	static void pairSum(Node head, int x) {
+		Node first = head;
+		Node second = head;
+		while (second.next != null)
+			second = second.next;
+
+		// To track if we find a pair or not
+		boolean found = false;
+
+		while (first != second && second.next != first) {
+			if ((first.data + second.data) == x) {
+				found = true;
+				System.out.println("(" + first.data + ", " + second.data + ")");
+				first = first.next;
+				second = second.prev;
+			} else {
+				if ((first.data + second.data) < x)
+					first = first.next;
+				else
+					second = second.prev;
+			}
+		}
+		if (found == false)
+			System.out.println("No pair found");
+	}
+--------------------------------------------------------------------------------------------------------
+25. Count triplets in a sorted doubly linked list whose sum is equal to to a given value x.
+static int countTriplets(Node head, int x) {
+		if (head == null)
+			return 0;
+
+		Node current, first, last;
+		int count = 0;
+
+		last = head;
+		while (last.next != null)
+			last = last.next;
+
+		for (current = head; current != null; current = current.next) {
+			first = current.next;
+			count += countPairs(first, last, x - current.data);
+		}
+		return count;
+	}
+--------------------------------------------------------------------------------------------------------
+26. Rotate List By k places
+  public ListNode rotateRight(ListNode head, int k) {
+        if(head==null||head.next==null||k==0){
+            return head;
+        }
+        
+        int len=1;
+        ListNode curr=head;
+        while(curr.next!=null){
+            curr=curr.next;
+            len++;
+        }
+        
+        //make it circular
+        curr.next=head;
+        
+        k=len-k%len;
+        while(k-->0)curr=curr.next;
+        
+        head=curr.next;
+        curr.next=null;
+            
+        return head;        
+    }
+--------------------------------------------------------------------------------------------------------
+27. Rotate Doubly linked list by k places
+	static void rotate(int N) {
+		if (N == 0)
+			return;
+
+		Node current = head;
+
+		int count = 1;
+		while (count < N && current != null) {
+			current = current.next;
+			count++;
+		}
+		if (current == null) // means n is greater than or equal to length of list
+			return;
+
+		Node NthNode = current; // it(nth) can maximum be tail
+
+		while (current.next != null)
+			current = current.next;
+
+		current.next = head; // making list circular
+
+		(head).prev = current;
+		head = NthNode.next;
+		(head).prev = null;
+		NthNode.next = null;
+	}
+--------------------------------------------------------------------------------------------------------
+28.
+-----------------------------------------------------------------------------------------------------
+29.
+--------------------------------------------------------------------------------------------------------
+# Can we reverse a linked list in less than O(n)?
+->https://www.geeksforgeeks.org/can-we-reverse-a-linked-list-in-less-than-on/
+
+--------------------------------------------------------------------------------------------------------
+#Why Quick Sort preferred for Arrays and Merge Sort for Linked Lists?
+->https://www.geeksforgeeks.org/why-quick-sort-preferred-for-arrays-and-merge-sort-for-linked-lists/
+=> MergeSort for linked list can be done in constant space, and For Arrays QuickSort is Best as it is an inplace sorting algorithm so doesn't require extra space which kind of reduces the complexity also. 

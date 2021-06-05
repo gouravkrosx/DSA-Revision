@@ -1,0 +1,653 @@
+SOLUTIONS OF THESE QUESTIONS ARE EITHER ON GFG OR ON LEETCODE.
+---------------------------------------BINARY SEARCH TREE-----------------------------------------
+
+1. Search an item in BST
+public TreeNode searchBST(TreeNode root, int val) {
+        if(root==null){
+            return null;
+        }
+        if(val<root.val){
+            return searchBST(root.left,val);
+        }else if(val>root.val){
+            return searchBST(root.right,val);
+        }else{
+            return root;
+        }
+    }
+-------------------------------------------------------------------------------------------------
+2. Largest BST
+ static class Pair{
+        int max=Integer.MIN_VALUE;
+        int min=Integer.MAX_VALUE;
+        Node Bigbst=null;
+        int size=0;
+        boolean bst=true;
+    }
+    
+   static Pair BigBST(Node node){
+        if(node==null){
+            return new Pair();
+        }
+        
+        Pair lp=BigBST(node.left);
+        Pair rp=BigBST(node.right);
+        
+        Pair sp=new Pair();
+        
+        sp.bst=(lp.bst && rp.bst && (node.data>lp.max && node.data<rp.min));
+        if(sp.bst){
+            sp.Bigbst=node;
+            sp.size=lp.size+rp.size+1;
+        }else{
+            if(lp.size>=rp.size){
+                sp.Bigbst=lp.Bigbst;
+                sp.size=lp.size;
+            }else{
+                sp.Bigbst=rp.Bigbst;
+                sp.size=rp.size;
+            }
+        }
+        
+        sp.max=Math.max(node.data,Math.max(lp.max,rp.max));
+        sp.min=Math.min(node.data,Math.min(lp.min,rp.min));
+        
+        return sp;
+    }
+-------------------------------------------------------------------------------------------------
+3. Remove Items In BST
+TreeNode RemoveNode(TreeNode node,int key){
+        if(node==null){
+            return null;
+        }
+        if(node.val==key){
+            if(node.left==null&&node.right==null){
+                return null;
+            }else if(node.left==null){
+                return node.right;
+            }else if(node.right==null){
+                return node.left;
+            }else{
+                int temp=max(node.left);
+                node.left=RemoveNode(node.left,temp);
+                node.val=temp;
+                return node;
+              }
+           }else if(key<node.val){
+                node.left=RemoveNode(node.left,key);
+            }else{
+                node.right=RemoveNode(node.right,key);
+            }
+            return node;        
+    }
+-------------------------------------------------------------------------------------------------
+4. Add Items in BST
+
+private Node additemsreturn(Node node, int item) {
+		if (node == null) {
+			Node nn = new Node();
+			nn.data = item;
+			return nn;
+		}
+		if (item <= node.data) {
+			node.left = additemsreturn(node.left, item);
+		} else
+			node.right = additemsreturn(node.right, item);
+		
+		return node;
+	}
+-------------------------------------------------------------------------------------------------
+5. Max & Min in BST
+
+ int max(TreeNode node){
+        if(node.right==null){
+            return node.val;
+        }
+        return max(node.right);
+    }
+
+ int min(TreeNode node){
+        if(node.left==null){
+            return node.val;
+        }
+        return min(node.left);
+    }
+
+-------------------------------------------------------------------------------------------------
+6. Count BST nodes that lie in a given range
+ void RangeSumBst(Node node,int l,int h,int[]count){
+        if(node==null){
+            return;
+        }
+        
+        if(node.data<l){
+          RangeSumBst(node.right,l,h,count);   
+        }else if(node.data>h){
+            RangeSumBst(node.left,l,h,count);
+        }else if(node.data>=l && node.data<=h){
+            RangeSumBst(node.left,l,h,count);
+            count[0]++;
+            RangeSumBst(node.right,l,h,count);
+        }  
+    }
+-------------------------------------------------------------------------------------------------
+7. Inorder Sucessor and Predecessor in O(H)
+Logic for O(N)-> store inorder traversal in some list and check where the key is return its ahead value.
+
+Inorder Sucessor->
+Logic->
+case1. Node has right Subtree-> go deep to leftmost node in right subtree or find min in right subtree.
+case2. No right subtree-> go to the nearest non visited ancestor for which given node would be in left subtree.
+
+ public static void findPreSuc(Node node, Res p, Res s, int key)
+    {
+       if(node==null){
+           return;
+       }
+       if(node.data==key){
+           if(node.left!=null){  //if node if the key than its pre is the max value in left subtree
+               Node temp=node.left;
+               while(temp.right!=null){
+                   temp=temp.right;
+               }
+               p.pre=temp;
+           }
+           
+           if(node.right!=null){
+               Node temp=node.right;
+               while(temp.left!=null){
+                   temp=temp.left;
+               }
+               s.succ=temp;
+           }
+           return;
+       }
+       
+       if(node.data>key){
+           s.succ=node;
+           findPreSuc(node.left,p,s,key);
+       }else{
+           p.pre=node;
+           findPreSuc(node.right,p,s,key);
+       }
+       
+    }
+
+
+Iterative:
+ public TreeNode inorderSuccessor(TreeNode root, TreeNode p) {
+        if(root==null){
+            return null;
+        }
+        TreeNode curr=root,suc=null;
+        while(curr!=null){
+            if(curr.val>p.val){
+                suc=curr;
+                curr=curr.left;
+            }else{
+                curr=curr.right;
+            }
+        }
+                  return suc;
+    }
+
+-------------------------------------------------------------------------------------------------
+8. LCA 
+Node LCA(Node node, int n1, int n2){
+	   if(node==null){
+	        return null; 
+	   }
+	   
+	   if(node.data>n1 && node.data>n2){
+	       return LCA(node.left,n1,n2);
+	   }
+	   
+	   if(node.data<n1 && node.data<n2){
+	       return LCA(node.right,n1,n2);
+	   }
+                
+        return node;        
+    }
+-------------------------------------------------------------------------------------------------
+9. Populate Inorder Successor for all nodes
+  public static Node prev=null;
+    public static void populateNext(Node root)
+    {
+        if(root==null)
+        {
+            return;
+        }
+        populateNext(root.left);
+        if(prev!=null)
+        {
+            prev.next=root;
+        }
+        prev=root;
+        populateNext(root.right);
+    }
+-------------------------------------------------------------------------------------------------
+10.  Construct Bst from Inorder, Preorder, Postorder
+a)Inorder->
+private Node construct(int[] in, int lo, int hi) {
+		if (lo > hi) {
+			return null;
+		}
+		Node nn = new Node();
+
+		int mid = (lo + hi) / 2;
+		nn.data = in[mid];
+
+		nn.left = construct(in, lo, mid - 1);
+		nn.right = construct(in, mid + 1, hi);
+		return nn;
+	}
+b)Preorder->static int idx=0;
+    public TreeNode bstFromPreorder(int[] preorder) {
+        idx=0;
+        int lr=Integer.MIN_VALUE;
+        int rr=Integer.MAX_VALUE;
+       return  bstFrompre(preorder,lr,rr);
+    }
+    
+    public TreeNode bstFrompre(int[]preorder,int lr,int rr){
+        if(idx>=preorder.length||preorder[idx]<lr||preorder[idx]>rr){
+            return null;
+        }
+        
+        TreeNode nn=new TreeNode(preorder[idx++]);
+        
+        nn.left=bstFrompre(preorder,lr,nn.val);
+        nn.right=bstFrompre(preorder,nn.val,rr);
+        return nn;
+    }
+c)Postorder->
+public TreeNode bstFromPostorder(int[] postorder) {
+        idx=postorder.length-1;
+        return construct(postorder, Integer.MIN_VALUE, Integer.MAX_VALUE);
+    }
+    static int idx;
+    TreeNode construct(int arr[], int min, int max){
+        if(idx <0 || arr[idx] < min || arr[idx] > max){
+            return null;
+        }
+        
+        TreeNode root= new TreeNode(arr[idx--]);
+    
+        root.right= construct(arr, root.val, max);	
+        root.left = construct(arr, min, root.val);
+        
+        return root;        
+    }
+d)Levelorder->
+-------------------------------------------------------------------------------------------------
+11. Binary Tree to Bst
+Approach-> Do Any traversal of binary tree and put the elements in list, sort it then make an array copy the elements and call makeBst from inorder traversal;
+-------------------------------------------------------------------------------------------------
+12. Bst To Balanced Bst
+Approach-> Do inorder traversal of binary tree and put the elements in list, sort it then make an array copy the elements and call makeBst from inorder traversal;
+-------------------------------------------------------------------------------------------------
+13. Replace with Sum Larger
+private void ReplaceWithSumLarger(Node node, int[] sum) {
+		if (node == null) {
+			return;
+		}
+
+		ReplaceWithSumLarger(node.right, sum);
+		int temp = node.data;
+		node.data = sum[0];
+		sum[0] += temp;
+		ReplaceWithSumLarger(node.left, sum);
+	}
+OR
+Binary Search Tree to Greater Sum Tree  (LeetCode 1038)
+     int prev=0;
+    public TreeNode bstToGst(TreeNode root) {
+        dfs(root);
+        return root;
+    }
+    
+    private void dfs(TreeNode node){
+        if(node==null) return;
+        dfs(node.right);
+        node.val+=prev;
+        prev=node.val;
+        dfs(node.left);
+    }
+
+-------------------------------------------------------------------------------------------------
+14.  Morris Traversal for Inorder and Preorder in O(N) and S(1)
+	private void MorrisTraversalInorder(Node root) {
+		Node curr = root;
+		while (curr != null) {
+			if (curr.left == null) {
+				System.out.print(curr.data + " ");
+				curr = curr.right;
+			} else {
+				Node predecessor = curr.left;
+				while (predecessor.right != curr && predecessor.right != null) {
+					predecessor = predecessor.right;
+				}
+				// so taking inorder Predecessor of curr node and and link to it(curr).
+				if (predecessor.right == null) {
+					predecessor.right = curr;
+//					System.out.print(curr.data + " "); // for preorder traversal
+					curr = curr.left;
+				} else { // restoring the tree
+					predecessor.right = null;
+					System.out.print(curr.data + " "); // for inorder traversal
+					curr = curr.right;
+				}
+			}
+		}
+		System.out.println();
+	}
+-------------------------------------------------------------------------------------------------
+15. Median of BST { O(N) and S(1) }
+    static int findMedian(Node root){
+        if (root == null)
+          return 0;
+ 
+    int count = counNodes(root);  //using morris traversal
+    int currCount = 0;
+    Node current = root, pre = null, prev = null;
+ 
+    while (current != null)
+    {
+        if (current.left == null)
+        {
+            currCount++;
+ 
+            // Odd case
+            if (count % 2 != 0 && currCount == (count+1)/2)
+                return prev.data;
+ 
+            // Even case
+            else if (count % 2 == 0 && currCount == (count/2)+1)
+                return (prev.data + current.data)/2;
+ 
+            prev = current;
+ 
+            current = current.right;
+        }
+        else
+        {
+            /* Find the inorder predecessor of current */
+            pre = current.left;
+            while (pre.right != null && pre.right != current)
+                pre = pre.right;
+ 
+            if (pre.right == null)
+            {
+                pre.right = current;
+                current = current.left;
+            }else{
+                pre.right = null;
+                prev = pre;
+ 
+                currCount++;
+                if (count % 2 != 0 && currCount == (count+1)/2 )
+                    return current.data;
+ 
+                else if (count%2==0 && currCount == (count/2)+1)
+                    return (prev.data+current.data)/2;
+ 
+                prev = current;
+                current = current.right;
+            } 
+        } 
+    } 
+    return -1;
+}
+-------------------------------------------------------------------------------------------------
+16. Flatten Bst
+public static TreeNode<Integer> flatten(TreeNode<Integer> root) {
+        if(root==null){
+            return root;
+        }
+        TreeNode<Integer> dummy=new TreeNode<Integer>(-1);
+        TreeNode<Integer> prev=dummy;
+        FlattenBST(root,prev);
+        prev.right=null;
+        prev.left=null;
+        TreeNode<Integer>ans=dummy.right;
+        return ans;
+    }
+   static void FlattenBST(TreeNode<Integer> node,TreeNode<Integer> prev){
+        if(node==null)
+            return;
+        FlattenBST(node.left,prev);
+   	 	 prev.left = null;
+   		 prev.right =node;
+   		 prev=node;
+        FlattenBST(node.right,prev);    
+    }
+-------------------------------------------------------------------------------------------------
+17. Check if Bst contains Dead End or not (DeadEnd means, we are not able to insert any element after that node)
+public static boolean IsDeadEnd(Node node,int min,int max){
+        if(node==null){
+            return false;
+        }
+        if(node.left==null&&node.right==null){
+             if(node.data==min+1 && node.data==max-1)
+               return true;
+              
+             return false;
+        }
+        boolean left=IsDeadEnd(node.left,min,node.data);
+        boolean right=IsDeadEnd(node.right,node.data,max);
+        
+        return left || right;
+    }
+-------------------------------------------------------------------------------------------------
+18. Verify preorder Sequence in BST
+Approach-> suppose pre[]={42,22,11,66,55,33,77,88};
+> we first find the next greater element here for pre[0]=42 is 66 now after 66 we will find a smaller element than 42 if found then its not valid preorder because after 66(inc) there is right subtree, & all elements in right subtree should be greater than node.-> do this for all elements of preorder array
+
+ public boolean verifyPreorder(int[] preorder) {
+     int root=Integer.MIN_VALUE;
+     Stack<Integer>st=new Stack<>();
+     st.push(root);
+     for(int i=0;i<preorder.length;i++){
+         while(!st.isEmpty()&&preorder[i]>st.peek()){
+             root=st.peek();
+             st.pop();
+         }
+         if(preorder[i]<root){
+             return false;
+         }
+         st.push(preorder[i]);
+     }
+     return true;
+    }
+-------------------------------------------------------------------------------------------------
+19. Merge 2 BST's
+M1) delete elements from smaller tree , add them to other tree and store elements during inorder traversal ->O(mLog(m+n-1))
+M2) Take 2 arrays , in both Bst's do inorder traversal and store the elements in the array respectively, and apply merge two sorted array function.
+>O(m+n)
+M3) Inplace merge using DLL
+(i) convert Bst to DLL (ii) Merge two sorted LinkedList (iii) Build a Balanced Bst from merge list
+>O(m+n)
+
+M4) O(h1+h2)
+ public List<Integer> merge(Node root1,Node root2)
+    {
+        List<Integer>ans=new ArrayList<>();
+        
+        Stack<Node>s1=new Stack<>();
+        Stack<Node>s2=new Stack<>();
+        
+        insertNodes(root1,s1);
+        insertNodes(root2,s2);
+        
+        while(!s1.isEmpty()||!s2.isEmpty()){
+            int a=(!s1.isEmpty())?s1.peek().data:Integer.MAX_VALUE;
+            int b=(!s2.isEmpty())?s2.peek().data:Integer.MAX_VALUE;
+            
+            if(a<=b){
+                ans.add(a);
+                Node temp=s1.pop();
+                //add right elements and left descendants
+                insertNodes(temp.right,s1);
+            }else{
+                ans.add(b);
+                Node temp=s2.pop();
+                //add right elements and left descendants
+                insertNodes(temp.right,s2);
+            }
+        }
+        return ans;
+    }
+    void insertNodes(Node node,Stack<Node>st){
+        
+        while(node!=null){
+            st.push(node);
+            node=node.left;
+        }
+    }
+-------------------------------------------------------------------------------------------------
+20. Kth Largest element in BST
+ public int kthLargest(Node root,int K)
+    {
+       int[]arr=new int[2];
+       kthLargest(root,K,arr);
+       return arr[1];
+    }
+    void kthLargest(Node node,int K,int[]arr){
+        if(node==null){
+            return;
+        }
+        kthLargest(node.right,K,arr);
+        arr[0]++;
+        if(K==arr[0]){
+            arr[1]=node.data;
+            return;
+        }
+        kthLargest(node.left,K,arr);
+    }
+
+> Kth Smallest Element in a BST- for this just traverse normal inorder traversal
+-------------------------------------------------------------------------------------------------
+21. Target Sum Pair in BST
+M1) O(nh) and S(h)
+public void TargetSumPair(TreeNode root,TreeNode node,int k){
+        if(node==null){
+            return;
+        }
+        
+        TargetSumPair(root,root.left,k);
+        int comp=k-root.val;
+        if(comp>root.val){
+            if(find(root,comp)!=null)
+               System.out.println(node.val+" "+comp); 
+        }
+        
+        TargetSumPair(root,root.right,k); 
+    }
+M2)O(n) and S(n)
+Do inorder traversal store the elements in arraylist, now using two pointer approach find the target sum pair.
+M3)O(n) and S(h)
+
+ public static void TargetSumPair(Node node,int tar){
+     Stack<TPair>ls=new Stack<>();
+     Stack<TPair>rs=new Stack<>();
+     ls.push(new TPair(node, 1));
+     rs.push(new TPair(node, 1));
+     
+     Node left=getNextFromNormalInorder(ls);
+     Node right=getNextFromReverseInorder(rs);
+     while(left.data<right.data){
+         if(left.data+right.data<tar){
+             left=getNextFromNormalInorder(ls);
+         }else if(left.data+right.data>tar){
+             right=getNextFromReverseInorder(rs);
+         }else{
+             System.out.println(left.data+" "+right.data);
+             left=getNextFromNormalInorder(ls);
+             right=getNextFromReverseInorder(rs);
+         }
+     }
+     
+ }   
+    
+  static class TPair {
+		int state;
+		Node n;
+
+		TPair(Node nn, int s) {
+			n = nn;
+			state = s;
+		}
+	}
+    
+public static Node getNextFromNormalInorder(Stack<TPair>st) {
+		while (!st.isEmpty()) {
+			TPair top = st.peek();
+			if (top.state == 1) { // pre s++ left
+				top.state++;
+				if (top.n.left != null) {
+					TPair nlp = new TPair(top.n.left, 1);
+					st.push(nlp);
+				}
+			} else if (top.state == 2) { // in s++ right
+				top.state++;
+				if (top.n.right != null) {
+					TPair nrp = new TPair(top.n.right, 1);
+					st.push(nrp);
+				}
+                return top.n;
+			} else { // pos pop()
+				st.pop();
+			}
+		}
+    return null;
+}
+
+    public static Node getNextFromReverseInorder(Stack<TPair>st) {
+		while (!st.isEmpty()) {
+			TPair top = st.peek();
+			if (top.state == 1) { // pre s++ left
+				top.state++;
+				if (top.n.right != null) {
+					TPair nlp = new TPair(top.n.right, 1);
+					st.push(nlp);
+				}
+			} else if (top.state == 2) { // in s++ right
+				top.state++;
+				if (top.n.left != null) {
+					TPair nrp = new TPair(top.n.left, 1);
+					st.push(nrp);
+				}
+                return top.n;
+			} else { // pos pop()
+				st.pop();
+			}
+		}
+    return null;
+}
+
+-------------------------------------------------------------------------------------------------
+22. Count pairs from 2 BST whose sum is equal to given value "X"
+ public static int countPairs(Node root1, Node root2, int x)
+    {
+        ArrayList<Integer>l1=new ArrayList<>();
+        ArrayList<Integer>l2=new ArrayList<>();
+        inorder(root1,l1);
+        inorder(root2,l2);
+
+        int i=0,j=l2.size()-1,count=0;
+        
+        while(i<l1.size() && j>=0){
+            int a=l1.get(i);
+            int b=l2.get(j);
+            if(a+b<x){
+                i++;
+            }else if(a+b>x){
+                j--;
+            }else{
+                i++;
+                j--;
+                count++;
+            }
+        }
+        return count;
+    }
+-------------------------------------------------------------------------------------------------

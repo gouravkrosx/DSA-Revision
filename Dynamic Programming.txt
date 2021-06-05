@@ -1,0 +1,4 @@
+1)Do tower of hanoi problem firstly and then
+2) sort and array using recursion
+3. egg dropping problem
+4.https://www.youtube.com/watch?v=VT4bZV24QNo

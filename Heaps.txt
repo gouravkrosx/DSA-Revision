@@ -1,0 +1,492 @@
+SOLUTIONS OF THESE QUESTIONS ARE EITHER ON GFG OR ON LEETCODE.
+---------------------------------------HEAPS-----------------------------------------
+	
+
+1. Construct Heap.
+public class Heap {      //min heap
+	ArrayList<Integer> data = new ArrayList<>();
+
+	public int size() {
+		return data.size();
+	}
+	
+	public boolean isEmpty() {
+		return size() == 0;
+	}
+
+	public void display() {
+		System.out.println(data);
+	}
+
+	public int get() {
+		return data.get(0);
+	}
+
+	public void add(int item) {
+		data.add(item);
+		upheapify(data.size() - 1);
+	}
+
+	private void upheapify(int ci) {
+
+		int pi = (ci - 1) / 2;
+		if (data.get(pi) > data.get(ci)) {
+			swap(pi, ci);
+			upheapify(pi);
+		}
+		
+	}
+
+	private void swap(int i, int j) {
+		int ith = data.get(i);
+		int jth = data.get(j);
+
+		data.set(i, jth);
+		data.set(j, ith);
+	}
+
+	public int remove() {
+		swap(0, data.size() - 1);
+		int temp = data.remove(data.size() - 1);
+		downheapify(0);
+		return temp;
+	}
+
+	private void downheapify(int pi) {
+		int mini = pi;
+		int lci = 2 * pi + 1;
+		int rci = 2 * pi + 2;
+
+		if (lci < data.size() && (data.get(mini) > data.get(lci))) { 
+// checking with size saves from array index out of bound exception
+												
+			mini = lci;
+		}
+		if (rci < data.size() && (data.get(mini) > data.get(rci))) {
+			mini = rci;
+		}
+
+		if (mini != pi) { // this saves from Stackoverflow
+			swap(mini, pi);
+			downheapify(mini);
+
+		}
+	}
+}
+-------------------------------------------------------------------------------------------------
+2.
+-------------------------------------------------------------------------------------------------
+3. Merge k Sorted Lists
+ public ListNode mergeKLists(ListNode[] lists) {
+    
+        PriorityQueue<ListNode>pq=new PriorityQueue<>((a,b)->(a.val-b.val));
+        
+       for(ListNode l:lists){
+           if(l!=null)
+           pq.add(l);
+       }
+        
+        ListNode dummy=new ListNode(0);
+        ListNode prev=dummy;
+        while(!pq.isEmpty()){
+            ListNode rn=pq.remove();
+            prev.next=rn;
+             prev=prev.next;
+            rn=rn.next;
+            if(rn!=null){
+                pq.add(rn);
+            }
+           
+        }
+        prev.next=null;
+        return dummy.next;
+    }
+-------------------------------------------------------------------------------------------------
+4. K Largest Elements
+ int[] kLargest(int[] arr, int n, int k) {
+       int[]krr=new int[k];
+       PriorityQueue<Integer>pq=new PriorityQueue<>();
+       
+       for(int i=0;i<k;i++){
+           pq.add(arr[i]);
+       }
+       
+       for(int i=k;i<n;i++){
+           if(pq.peek()<arr[i]){
+               pq.remove();
+               pq.add(arr[i]);
+           }
+       }
+       int idx=krr.length-1;
+       while(!pq.isEmpty()){
+           krr[idx--]=pq.remove();
+       }
+       
+       return krr;
+    }
+-> And for K largest/Smallest Element  donot store just get the first element of heap to get ANS.
+-------------------------------------------------------------------------------------------------
+5. Merge K sorted Arrays
+
+	static class Pair {
+		int data;
+		int listno;
+		int idx;
+	}
+
+	public static ArrayList<Integer> mergeKArrays(int[][] arr, int K) {
+		PriorityQueue<Pair> hp = new PriorityQueue<>((a, b) -> a.data - b.data);
+		ArrayList<Integer> ans = new ArrayList<Integer>();
+
+		for (int i = 0; i < arr.length; i++) {
+			Pair np = new Pair();
+			np.data = arr[i][0];
+			np.listno = i;
+			np.idx = 0;
+			hp.add(np);
+		}
+
+		while (!hp.isEmpty()) {
+			Pair rp = hp.remove();
+			ans.add(rp.data);
+			rp.idx++;
+
+			if (rp.idx < arr[rp.listno].length) {
+				rp.data = arr[rp.listno][rp.idx];
+				hp.add(rp);
+			}
+		}
+		return ans;
+	}
+-------------------------------------------------------------------------------------------------
+6. Reorganize String-Leetcode 767
+public String reorganizeString(String S) {
+        HashMap<Character,Integer>map=new HashMap<>();
+        
+        for(char ch:S.toCharArray()){
+        map.put(ch,map.getOrDefault(ch,0)+1);    
+        }
+        
+        //used lambda as comparator 
+        PriorityQueue<Character>hp=new PriorityQueue<>((a,b)->map.get(b)-map.get(a));
+        hp.addAll(map.keySet());
+        
+        StringBuilder sb= new StringBuilder();
+        
+        while(hp.size()>1){
+            char first=hp.remove();
+            char second=hp.remove();
+            
+            sb.append(first);
+            sb.append(second);
+            
+            map.put(first,map.get(first)-1);
+            map.put(second,map.get(second)-1);
+            
+            if(map.get(first)>0){
+                hp.add(first);
+            }
+            if(map.get(second)>0){
+                hp.add(second);
+            }
+        }
+        
+        if(hp.size()!=0){
+            char last=hp.remove();
+            if(map.get(last)>1){
+                return "";
+            }else{
+                sb.append(last);
+            }
+        }
+        return sb.toString();        
+        
+        }
+-------------------------------------------------------------------------------------------------
+
+***Important Point-> when we build heap from array we only have to deal with internal nodes, because for heapify left subtree and right subtree should be in heap, we don't care about leaf nodes as they are already follow the heap property. 
+For Complete Binary Tree->n-1 levels completely filled, nth level: l->r
+Internal Nodes->0 to (n/2)-1;
+Leaf Nodes-> n/2 to n-1;
+---------------------------------------------------
+7. Heap Sort
+ //Function to build a Heap from array.
+    void buildHeap(int arr[], int n)
+    {
+        for(int i=n/2-1;i>=0;i--){
+            heapify(arr,n,i);
+        }
+    }
+ 
+    //Heapify function to maintain heap property.
+    void heapify(int arr[], int n, int i)
+    {
+       int max=i;
+       int lc=2*i+1;
+       int rc=2*i+2;
+       
+       if(lc<n && arr[lc]>arr[max]){
+           max=lc;
+       }
+       if(rc<n && arr[rc]>arr[max]){
+           max=rc;
+       }
+       if(max!=i){ //to avoid stackoverflow
+          int temp=arr[max];
+            arr[max]=arr[i];
+            arr[i]=temp;
+            heapify(arr,n,max);   
+       }
+       
+    }
+    
+    //Function to sort an array using Heap Sort.
+    public void heapSort(int arr[], int n)
+    {
+        buildHeap(arr,n);
+        for(int i=n-1;i>0;i--){
+            //swapping with first element to get the desired order
+            int temp=arr[i];
+            arr[i]=arr[0];
+            arr[0]=temp;
+            heapify(arr,i,0);   //heapify for the reduced heap 
+        }
+    }
+-------------------------------------------------------------------------------------------------
+8. Maximum in all subarrays of size K    (Do this question with Queue only to improve time complexity)
+public int[] maxSlidingWindow(int[] arr, int k) {
+        PriorityQueue<pair>hp=new PriorityQueue<>();
+       int[]res=new int[arr.length-k+1];
+        int i=0;
+        int j=0;
+        
+        while(j<arr.length){
+            pair p=new pair(j,arr[j]);
+            hp.add(p);
+            if(j-i+1<k){
+                j++;
+            }else{
+                res[i]=hp.peek().val;
+                while(!hp.isEmpty() && hp.peek().key<i+1)
+                    hp.remove();
+                
+                j++;
+                i++;
+            }   
+        }
+        return res;       
+    }
+    class pair implements Comparable<pair>{
+        int val;
+        int key;
+        pair(int k,int v){
+            key=k;
+            val=v;
+        }
+        
+        @Override
+        public int compareTo(pair o){
+            return o.val-this.val;
+        }
+    }
+-------------------------------------------------------------------------------------------------
+9. Kth Largest Contiguous SubarraySum )(n^2logk)
+public static void kthlargestSubarraySum(int[] arr, int k) {
+		PriorityQueue<Integer> hp = new PriorityQueue<>();
+		int[] sum = new int[arr.length + 1];
+		sum[1] = arr[0];
+		for (int i = 2; i < sum.length; i++) {
+			sum[i] = sum[i - 1] + arr[i - 1];
+		}
+
+		for (int i = 1; i < sum.length; i++) {
+			for (int j = i; j < sum.length; j++) {
+				int x = sum[j] - sum[i - 1];
+
+				if (hp.size() < k) {
+					hp.add(x);
+				} else {
+					if (hp.peek() < x) {
+						hp.remove();
+						hp.add(x);
+					}
+				}
+			}
+		}
+		System.out.println(hp.peek());
+	}
+-------------------------------------------------------------------------------------------------
+10. Merge two binary Max heaps 
+Logic-> copy both arrays in resultant array and apply heapify function .
+-------------------------------------------------------------------------------------------------
+11. Is Binary Tree Heap
+public boolean isBTHeapt(Node node,int size,int idx){
+        if(node==null)
+            return true;
+        if(node.left!=null && node.left.data>node.data||node.right!=null && node.right.data>node.data)
+            return false;
+            
+        if(idx>=size)
+            return false;
+        
+        return isBTHeapt(node.left,size,2*idx+1)&&isBTHeapt(node.right,size,2*idx+2);
+    }
+-------------------------------------------------------------------------------------------------
+12. Minimum sum of two numbers formed from digits of an array
+-> sort the array take two strings add alternate digits to string, eg) s1 contains all odd digits , s2 contains all even digits, (this could be done using Min heap) now add two strings just like adding 2 arrays
+--->
+public static void sumof2arrays(int[] a1, int[] a2) {
+		int i = a1.length - 1;
+		int j = a2.length - 1;
+		int carry = 0;
+		ArrayList<Integer> ans = new ArrayList<Integer>();
+		while (i >= 0 || j >= 0) {
+			int sum = carry;
+			if (i >= 0) {
+				sum += a1[i];
+				i--;
+			}
+			if (j >= 0) {
+				sum += a2[j];
+				j--;
+			}
+
+			int rem = sum % 10;
+			carry = sum / 10;
+			ans.add(0, rem);
+		}
+		if (carry > 0) {
+			ans.add(0, carry);
+		}
+		for (int k = 0; k < ans.size(); k++) {
+			System.out.print(ans.get(k) + " ");
+		}
+	}
+-------------------------------------------------------------------------------------------------
+13. Smallest Range Covering Elements from K lists
+  public int[] smallestRange(List<List<Integer>> nums) {
+        int[]ans=new int[2];
+        PriorityQueue<pair>pq=new PriorityQueue<>((a,b)->a.data-b.data);
+        
+        int max=Integer.MIN_VALUE;
+        int min=Integer.MAX_VALUE;
+        int range=Integer.MAX_VALUE;
+        int l=0;
+        int h=0;
+       for(int i=0;i<nums.size();i++){
+           int a=nums.get(i).get(0);
+           max=Math.max(max,a);
+           min=Math.min(min,a);
+           pair np=new pair(a,i,0,nums.get(i).size());
+           pq.add(np);
+       }
+        
+        while(!pq.isEmpty()){
+            pair rp=pq.poll();
+            int maybemin=rp.data;
+            if(range>max-maybemin){
+                min=maybemin;
+                range=max-min;
+                l=min;
+                h=max;
+            }
+            
+            if(rp.idx+1==rp.arraysize)
+                break; //because my range can be altered further
+            
+               rp.idx++;
+               rp.data=nums.get(rp.listno).get(rp.idx);
+                max=Math.max(rp.data,max);
+                min=Math.min(rp.data,min);
+               pq.add(rp);             
+        }    
+        ans[0]=l;
+        ans[1]=h;
+        return ans;
+    }
+    class pair{
+        int data;
+        int listno;
+        int idx;
+        int arraysize;
+        pair(int d,int l,int i,int s){
+            data=d;
+            listno=l;
+            idx=i;
+            arraysize=s;
+        }
+    }
+-------------------------------------------------------------------------------------------------
+14. Convert Min Heap to Max Heap (Looks like nlogn but it is N only)
+Logic-> Just create max heap from the given array using heapify fxn, that's it
+-------------------------------------------------------------------------------------------------
+15. Convert Bst to Min Heap
+Logic-> Add all the elements from inorder traversal of bst then traverse preorder and copy all elements to node.
+Input :       4
+               /   \
+              2     6
+            /  \   /  \
+           1   3  5    7  
+
+Output :  1
+              /   \
+             2     5
+           /  \   /  \
+          3   4  6    7 
+-------------------------------------------------------------------------------------------------
+16. Minimum Cost of Ropes
+long minCost(long arr[], int n) 
+    {
+       PriorityQueue<Long> hp = new PriorityQueue<>();
+        for(int i=0;i<arr.length;i++){
+            hp.add(arr[i]);
+        }
+        long cost=0;
+        while(hp.size()>1){
+            long a=hp.remove();
+            long b=hp.remove();
+            cost+=a+b;
+            hp.add(a+b);
+        }
+        return cost;
+    }
+-------------------------------------------------------------------------------------------------
+17. Find the median from data Stream
+ PriorityQueue<Integer> max; //left priority queue is max heap
+    PriorityQueue<Integer> min; //right priority queue is min heap
+    
+    public MedianFinder() {
+        max=new PriorityQueue<>(Comparator.reverseOrder());
+        min=new PriorityQueue<>();
+    }
+    
+    public void addNum(int num) {
+        if(max.isEmpty()&&min.isEmpty()){
+            max.add(num);
+        }else if(num > max.peek()){
+            min.add(num);
+            if(min.size()-max.size()>=2){
+                max.add(min.remove());
+            }
+        }else{
+            max.add(num);
+            if(max.size()-min.size()>=2){
+                min.add(max.remove());
+            }
+        }
+    }
+    
+    public double findMedian() {
+        if(max.size()==min.size()){
+            double ans=(double)max.peek()+(double)min.peek();
+            ans=ans/(double)2;
+            return ans;
+        }
+        if(max.size()<min.size()){
+            return (double)min.peek();
+        }
+        return (double)max.peek();
+    }
+-------------------------------------------------------------------------------------------------
+18.
+-------------------------------------------------------------------------------------------------

@@ -1,0 +1,208 @@
+Solutions of these questions are either on GFG or LEETCODE 
+
+---------------------------------------MATRIX-----------------------------------------
+1. Spirally traversing a matrix
+
+static ArrayList<Integer> spirallyTraverse(int m[][], int r, int c)
+    {
+        int minr=0;
+        int minc=0;
+        int maxr=r-1;
+        int maxc=c-1;
+        int count=0;
+        int nel=r*c;
+        
+        ArrayList<Integer>list=new ArrayList<>();
+        while(count<nel){
+            
+            for(int col=minc;col<=maxc && count<nel;col++){
+                list.add(m[minr][col]);
+                count++;
+            }
+            
+            minr++;
+            
+            for(int row=minr;row<=maxr && count<nel;row++){
+                list.add(m[row][maxc]);
+                count++;
+            }
+            maxc--;
+            
+            for(int col=maxc;col>=minc && count<nel;col--){
+                list.add(m[maxr][col]);
+                count++;
+            }
+            maxr--;
+            
+            for(int row=maxr;row>=minr && count<nel;row--){
+                list.add(m[row][minc]);
+                count++;
+            }
+            minc++;
+        }
+        return list;
+    }
+-----------------------------------------------------------------------------------
+2a. Search in a row wise and column wise sorted matrix
+T(N)
+// set indexes for top right
+        int i = 0, j = n - 1; 
+        // element
+ 
+        while (i < n && j >= 0) 
+        {
+            if (mat[i][j] == x) 
+            {
+                System.out.print("n Found at " + 
+                                    i + " " + j);
+                return;
+            }
+            if (mat[i][j] > x)
+                j--;
+            else // if mat[i][j] < x
+                i++;
+        }
+-----------------------------------------------------------------------------------
+2b. Search element in a sorted matrix->(The first integer of each row is greater than the last integer of the previous row.)
+T(log n + log m)
+
+ public boolean searchMatrix(int[][] arr, int target) {
+      if(arr.length==0){
+          return false;
+      }
+        
+        int n=arr.length;
+        int m=arr[0].length;
+        int low=0;
+        int high=n*m-1;
+   //we will use binary search as usual taking 2d array indexes and then convert the row and column indexes corresponding to their mid index.         
+        while(low<=high){
+           int mid=(low+high)/2;
+            if(arr[mid/m][mid%m]==target){
+                return true;
+            }
+            
+            if(arr[mid/m][mid%m]<target){
+                low=mid+1;
+            }else{
+                high=mid-1;
+            }
+        }
+            
+        return false;
+    }
+-----------------------------------------------------------------------------------
+3. Row with max 1s (each row is sorted)
+-> int rowWithMax1s(int arr[][], int n, int m) {
+        int ans=-1;
+        int i=0;
+        int j=m-1;
+     
+     while(i<n && j>=0){
+         if(arr[i][j]==1){
+             ans=i;
+             j--;   //move left
+         }else{
+             i++;  //move down
+         }
+     }
+        return ans;
+    }
+-----------------------------------------------------------------------------------
+4. sort the matrix ->
+Approach-> we took an temp array of size n*n copy the elements of matrix and the sort the array and then again update the matrix array using temp array.
+-----------------------------------------------------------------------------------
+5. Rotate Matrix by 90 degrees
+
+private static void RotateMatrixby90degree(int[][] arr) {
+		// step 1 transpose the matrix
+		for (int i = 0; i < arr.length; i++) {
+			for (int j = i; j < arr[0].length; j++) {
+				int temp = arr[i][j];
+				arr[i][j] = arr[j][i];
+				arr[j][i] = temp;
+			}
+		}
+		// step 2 reverse every row
+		for (int i = 0; i < arr.length; i++) {
+			int l = 0, r = arr[0].length-1;
+			while (l <= r) {
+				int t = arr[i][l];
+				arr[i][l] = arr[i][r];
+				arr[i][r] = t;
+				l++;
+				r--;
+			}
+		}
+
+	}
+-----------------------------------------------------------------------------------
+6. Kth smallest element in sorted matrix ->(https://www.youtube.com/watch?v=oeQlc87HbbQ)
+->T(NLog(max-min))
+ 
+public int kthSmallest(int[][] matrix, int k) {
+        int n=matrix.length;
+        int matrix_min=matrix[0][0];
+        int matrix_max=matrix[n-1][n-1];
+        //we are using binary search here
+        
+        while(matrix_min<matrix_max){
+        int mid=(matrix_min+matrix_max)/2;
+           if(countNumbers(mid,matrix,n)<k){
+               matrix_min=mid+1;
+           }else{
+        //mid because it can be possible that the mid which is kth element is not present in the                 //   matrix array.
+        //1,5,9,10,11,12,13,13,15->here in this case once kth element comes out of 14 which is not               // present in the matrix.
+               matrix_max=mid;
+           }  
+        }
+        //min and max become equal therefore
+        return matrix_min;
+    }
+
+    public static int countNumbers(int mid,int[][]arr,int n){
+        //this will count the numbers less than the mid so that we could find the kth smallest as we get //to know how many element are smaller than the current mid.
+  
+        int row=0,col=n-1;
+        int count=0;
+        while(row<n && col>=0){
+            if(arr[row][col]<=mid){
+                count+=col+1;
+                row=row+1;
+            }else{
+                col-=1;
+            }
+        }
+        return count;        
+    }
+-----------------------------------------------------------------------------------
+7. Common elements in all rows
+-> took a hashmap, put all the elements of first row and then check for other rows that already present elements are there in current row or not. at last count the frequency if it is equal to row that print that element
+public static void CommonEleinAllRows(int[][] arr) {
+		int m = arr.length;
+		int n = arr[0].length;
+
+		HashMap<Integer, Integer> map = new HashMap<>();
+
+		for (int i = 0; i < n; i++) {
+			map.put(arr[0][i], 1);
+		}
+		for (int i = 1; i < m; i++) {
+			for (int j = 0; j < n; j++) {
+		// checking if element is present in the array and is not duplicate 				                // in the current row 
+				if (map.containsKey(arr[i][j]) && map.get(arr[i][j]) == i) {
+					map.put(arr[i][j], map.get(arr[i][j]) + 1);
+				} else {
+				}
+			}
+		}
+		for (int val : map.keySet()) {
+			if (map.get(val) == m) {
+				System.out.println(val);
+			}
+		}
+	}
+-----------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
