@@ -1,0 +1,252 @@
+Solutions of these questions are either on GFG or LEETCODE 
+
+---------------------------------------Bit Manipulation-----------------------------------------
+1. Count Set Bits
+public static int countbits(int n) {
+		int ans = 0;
+		while (n > 0) {
+			ans += (n & 1);
+			n = n >> 1;
+		}
+		return ans;
+
+	}
+#Kernighan's Algorithm->
+->//two's compliment -> either -n or (~n+1);
+
+	public static int countBits(int n) {
+		int c=0;
+		while(n!=0) {
+		   int rsbm=n&(-n); //rsbm-> right most set bit mask (n&(two's compliment of n))
+		   n-=rsbm;
+		   c++;
+		}
+		return c;
+	}
+
+	public static int countbitsfast(int n) {
+		int ans = 0;
+		while (n > 0) {
+			n = n & (n - 1); // this will remove last set bit from right to left.
+			ans++;
+		}
+		return ans;
+	}
+----------------------------------------------------------------------------------------------
+2. Decimal to Binary 
+private static int dectobin(int n) {
+
+		int ans = 0;
+		int p = 1;
+		while (n > 0) {
+			int lastbit = n & 1;
+			ans += lastbit * p;
+			p *= 10;
+			n = n >> 1;
+
+		}
+		return ans;
+	}
+----------------------------------------------------------------------------------------------
+3. Fast Exponentiation Optimized
+	public static int power_optimised(int a, int n) {
+		int ans = 1;
+		while (n > 0) {
+			int lastbit = (n & 1);
+			if (lastbit == 1) {
+				ans = ans * a;
+			}
+			a = a * a;
+			n = n >> 1;
+
+		}
+		return ans;
+	}
+----------------------------------------------------------------------------------------------
+4. Get Set Clear Update
+private static boolean isodd(int n) {
+		if ((n & 1) == 1) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public static int getbit(int n, int i) {
+		int mask = 1 << i;
+		int bit = (n & mask) > 0 ? 1 : 0;
+		return bit;
+
+	}
+
+	public static int setbit(int n, int i) {
+		int mask = 1 << i;
+		int ans = (n | mask);
+		return ans;
+
+	}
+#Important{~0 or -1 gives all 1's}
+	public static int clearbit(int n, int i) {
+		int mask = ~(1 << i);
+		int ans = (n & mask);
+		return ans;
+
+	}
+
+	public static int updatebit(int n, int i, int v) {
+		int mask = (v << i);
+		int cleared_bit_no = clearbit(n, i);
+		int ans = (cleared_bit_no | mask);
+		return ans;
+
+	}
+
+	public static int clearlastibits(int n, int i) {
+		int mask = (~0 << i);// or you can write (-1<<i)
+		return n & mask;
+
+	}
+#important -> 2^i-1 gives 0111 like mask for eg 16-1=15(0111)
+	public static int clearrangeofbits(int n, int i, int j) {
+		int ones = (~0); // = -1;
+		int a = (ones) << (j + 1);
+		int b = (1 << i) - 1;  //2^i-1
+		int mask = (a | b);
+		int ans = n & mask;
+
+		return ans;
+	}
+->Replace Bits In N by M range(i,j) 'i' from left, to right 'j'
+public static int replacebits(int n, int m, int i, int j) {
+		int nn = clearrangeofbits(n, i, j);
+		int ans = nn | (m << i);
+		return ans;
+
+	}
+----------------------------------------------------------------------------------------------
+5.  Subsets of a String
+private static void printsubsets(char[] a) {
+		int n = a.length;
+		for (int i = 0; i < (1 << n); i++) {
+			filterChars(i, a);
+		}
+	}
+
+	private static void filterChars(int n, char[] a) {
+		int j = 0;
+		while (n > 0) {
+			int lastbit = (n & 1);
+			if (lastbit == 1) {
+				System.out.print(a[j]);
+			}
+			j++;
+			n = n >> 1;
+		}
+		System.out.println();
+	}
+----------------------------------------------------------------------------------------------
+6. Unique No.1
+Logic-> take a variable ans=0 then xor it with all the elements of the array=>{ ANS=ANS^arr[i] };
+
+Unique No. 2
+->public int[] singleNumber(int[] nums)
+    {
+       int xor=0;
+       for(int i=0;i<nums.length;i++){
+           xor=xor^nums[i];
+       }
+       int[] ans=new int[2];
+       
+       int temp=xor;
+       int pos=0;
+       while((temp&1)!=1){
+            temp=temp>>1;
+            pos++;
+        }
+        int mask=1<<pos;
+        
+        int x=0;
+        for(int i=0;i<nums.length;i++){
+            if((nums[i]&mask)>0){
+                x=x^nums[i];
+            }
+        }
+        int y=xor^x;
+        ans[0]=Math.min(x,y);
+        ans[1]=Math.max(x,y);
+        return ans;
+    }
+
+Unique No. 3
+int n = scn.nextInt();
+
+		int[] cnt = new int[64];
+		int inp;
+		for (int i = 0; i < n; i++) {
+			inp = scn.nextInt();
+			// update the count array by extracting bits.
+			int j = 0;
+			while (inp > 0) {
+				int lastbit = (inp & 1);
+				cnt[j] += lastbit;
+				j++;
+				inp = inp >> 1;
+			}
+		}
+		// iterate the array and from the answer by converting 0s and 1s into a number.
+
+		int p = 1;
+		int ans = 0;
+		for (int i = 0; i < cnt.length; i++) {
+			cnt[i] = cnt[i] % 3;
+			ans += cnt[i] * p;
+			p = p << 1;
+		}
+
+		System.out.println(ans);
+----------------------------------------------------------------------------------------------
+7. Count Total set bits from 1 to N in (LogN)->https://www.youtube.com/watch?v=g6OxU-hRGtY
+
+ //Dry run this code for better explaination (eg.->dry run for 11)
+    public static int TotalSetBits1toN(int n){
+        if(n==0){
+            return 0;
+        }
+        int x=largestpowerof2inrange(n);
+        int btill2x=(1<<(x-1))*x; //bits upto 2 raise x-1; eg-> 1 to 7
+        int msb2xton=(n-(1<<x)+1); //MSB from 2 raise x to n; eg-> 8 to 11 msb's
+        int rest=n-(1<<x);  //11-8 -> now find bits for (0 1 2 3)
+        
+        int ans=btill2x+msb2xton+TotalSetBits1toN(rest); 
+        return ans;
+        
+        
+    }
+    public static int largestpowerof2inrange(int n){ 
+//in range means it can be less than equal to n for eg->8(2^3) for 11 
+        int x=0;
+        while((1<<x)<=n){
+            x++;
+        }
+        return x-1;
+    }
+----------------------------------------------------------------------------------------------
+8. Count number of bits to be flipped to convert A to B
+Logic-> take a var c=a^b, now find no of set bits in c , which is the ans;
+this is because xor will help in finding the bits which are different as we know (xor gives value 1 on different bits)
+----------------------------------------------------------------------------------------------
+9. Program to find whether a no is power of two
+->if(n==0)return false;
+    return ((n&(n-1))==0); for eg-> 16&15 gives 0 which is divisible by 2
+----------------------------------------------------------------------------------------------
+10.
+----------------------------------------------------------------------------------------------
+11.
+----------------------------------------------------------------------------------------------
+12.
+----------------------------------------------------------------------------------------------
+13.
+----------------------------------------------------------------------------------------------
+14.
+----------------------------------------------------------------------------------------------
+15.
