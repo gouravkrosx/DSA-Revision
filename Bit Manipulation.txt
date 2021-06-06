@@ -239,14 +239,159 @@ this is because xor will help in finding the bits which are different as we know
 ->if(n==0)return false;
     return ((n&(n-1))==0); for eg-> 16&15 gives 0 which is divisible by 2
 ----------------------------------------------------------------------------------------------
-10.
+10. Copy Set Bits in a Range->https://www.youtube.com/watch?v=v7pUZw-ZOYU&list=PL-Jc9J83PIiFJRioti3ZV7QabwoJK6eKe&index=23
+
+//write your code here
+    int mask=(1<<(right-left+1));  //right here is actually at left,and vice versa
+    mask--;
+    mask=(mask<<(left-1));
+    mask=a&mask;
+    b=mask|b;
+    
+    System.out.println(b);
 ----------------------------------------------------------------------------------------------
-11.
+Binary Number= 101110111 | 01 here i put spit in this , the position of split depends upon the power of two, means here this number if divided by 4 leaves quotient in the left part and remainder in the right part.
+
+11. Division two integers without using Multiplication and Division
+a)->https://www.youtube.com/watch?v=m4L_5qG4vG8
+O(Logn^2)
+public int divide(int dividend, int divisor) {
+     if(dividend==1<<31 && divisor==-1)
+         return Integer.MAX_VALUE;
+        
+        boolean sign=(dividend>=0)==(divisor>=0)?true:false;
+        dividend=Math.abs(dividend);
+        divisor=Math.abs(divisor);
+        
+        int res=0;
+        while(dividend-divisor>=0){
+            int count=0;
+            while(dividend-(divisor<<1<<count)>=0){
+                count++;
+            }
+            res+=1<<count;
+            dividend-=divisor<<count; 
+        }  
+        return sign?res:-res;
+    }
+b)->https://www.youtube.com/watch?v=bdxJHWIyyqI
+O(Logn)
+
+public static long divide(long dividend, long divisor)
+{
+long sign = ((dividend < 0) ^
+            (divisor < 0)) ? -1 : 1;
+
+dividend = Math.abs(dividend);
+divisor = Math.abs(divisor);
+
+long quotient = 0, temp = 0;
+ 
+
+for (int i = 31; i >= 0; --i)
+{
+ 
+    if (temp + (divisor << i) <= dividend)
+    {
+        temp += divisor << i;
+        quotient |= 1L << i;
+    }
+}
+ 
+return (sign * quotient);
+}
 ----------------------------------------------------------------------------------------------
-12.
+12. Find position of the only set bit
+Hint: Every number which is a power of two has only one set bit.
+static int findPosition(int n) {
+        if((n&(n-1))!=0||n==0)
+            return -1;
+        int count=0;
+        while(n!=0){
+            n=n>>1;
+            count++;
+        }
+        
+        return count;
+    }
 ----------------------------------------------------------------------------------------------
 13.
+A)O(LogN) -> just do this method int interview
+if N is odd-> 2x+1;     N^2->4x^2+4x+1;
+if N is even->2x;          N^2->4x^2
+static int square(int n)
+    {
+        // Base case
+        if (n == 0)
+            return 0;
+ 
+        // Handle negative number
+        if (n < 0)
+            n = -n;
+ 
+        // Get floor(n/2) using
+        // right shift
+        int x = n >> 1;
+ 
+        // If n is odd
+        ;
+        if (n % 2 != 0)
+            return ((square(x) << 2) + (x << 2) + 1);   
+        else // If n is even
+            return (square(x) << 2);
+    }
+B)O(LogN)
+public static int square(int num)
+{
+     
+    // Handle negative input
+    if (num < 0)
+        num = -num;
+ 
+    // Initialize result
+    int result = 0, times = num;
+ 
+    while (times > 0)
+    {
+        int possibleShifts = 0,
+                 currTimes = 1;
+ 
+        while ((currTimes << 1) <= times)
+        {
+            currTimes = currTimes << 1;
+            ++possibleShifts;
+        }
+ 
+        result = result + (num << possibleShifts);
+        times = times - currTimes;
+    }
+    return result;
+}
 ----------------------------------------------------------------------------------------------
-14.
+14. Power Set-> just like subset of string
+public List<String> AllPossibleStrings(String s)
+    {
+        List<String>ans=new ArrayList<>();
+        
+      int end=1<<s.length();
+        
+        for(int i=1;i<end;i++){
+            int j=0;
+            int temp=i;
+            StringBuilder sb=new StringBuilder();
+            while(temp!=0){
+                int lastbit=temp&1;
+                if(lastbit==1){
+                   sb.append(s.charAt(j));
+                }
+                j++;
+                temp=temp>>1;
+            }
+            ans.add(sb.toString());
+        }
+        Collections.sort(ans);
+        
+        return ans;
+    }
 ----------------------------------------------------------------------------------------------
 15.
