@@ -573,6 +573,8 @@ Approach-> Divide and conquer
 int maxProfit(vector<int>& prices) {
           // the idea is to divide the array into two parts there will be left and right parts 
       // left part can have atmost 1 transaction and right part also
+->in left part we buy first then sell, time frame is from left to right.
+->in right part we sell first then buy, time frame is from right to left
     
         int n=prices.size();
         if(n==0){
@@ -599,6 +601,26 @@ int maxProfit(vector<int>& prices) {
             profit=max(profit,left[i-1]+right[i]);
         }
         return profit;            
+    }
+
+Method 2 -> Difficult to understand
+ public int maxProfit(int[] prices) {
+        if(prices.length==0){
+            return 0;
+        }
+        
+     int fb=Integer.MIN_VALUE;
+     int sb=Integer.MIN_VALUE;
+     int fs=0;
+     int ss=0;
+        
+      for(int i=0;i<prices.length;i++){
+          fb=Math.max(fb,-prices[i]);
+          fs=Math.max(fs,fb+prices[i]);
+          sb=Math.max(sb,fs-prices[i]);
+          ss=Math.max(ss,sb+prices[i]);
+      }  
+     return ss;        
     }
 --------------------------------------------------------------------------------
 21. Array Subset of another array
@@ -856,10 +878,16 @@ T(logn) S(1)
 ->https://www.youtube.com/watch?v=ws98ud9uxl4
 ->https://github.com/Prince-1501/Hello_world-Competiitve-Programming/blob/master/Leetcode/Median%20of%20Two%20sorted%20arrays.pdf
 
+->Striver's Approach->https://www.youtube.com/watch?v=NTop3VTjmxk
+
 Approach used->Binary search
 
 Here we need to separate the parts of array in left half and right half having equal elements in both
 ---------AIM: Left half is smaller than Right half-----------------
+->means all the elements of left half should be smaller than all the elements in right half,
+Here we take the elements some elements from array 1 and some from array 2 for left half and same for right half
+for this we need to know where to apply the cut so that we could know the how many elements should be taken from each array.
+
 # so, i1 divides the first array by taking half of the array, the to make sure that the other half (right) have equal elements we just set i2=(n+m+1)/2-i1
 # min1=Minimum element of right side of arr[]
    min2= Minimum element of right side of brr[]
@@ -884,8 +912,9 @@ public double findMedianSortedArrays(int[] arr, int[] brr) {
         
         while(begin1<=end1){
         
-            int i1=(begin1+end1)/2;     mid point of array a.
-            int i2=(n+m+1)/2 -i1;     // 1 is added because of zero indexing
+            int i1=(begin1+end1)/2;     mid point of array a.         //cut 1 in array 1
+            int i2=(n+m+1)/2 -i1;    //cut 2 in array 2
+// 1 is added bcz of 0 indexing & so that it works for odd,even both  
             
             int min1=(i1==n)?Integer.MAX_VALUE:arr[i1];
             int max1=(i1==0)?Integer.MIN_VALUE:arr[i1-1];
@@ -900,9 +929,9 @@ public double findMedianSortedArrays(int[] arr, int[] brr) {
                     return (double)(Math.max(max1,max2));
                 }
             }else if(max2>min1){
-                begin1=i1+1;
+                begin1=i1+1; //picking more elements from array 1 so that this condition can be overpassed,
             }else{
-                end1=i1-1;
+                end1=i1-1;  //picking more elements from array 2
             }   
             
         }

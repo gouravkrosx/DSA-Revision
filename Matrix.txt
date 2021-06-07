@@ -46,22 +46,24 @@ static ArrayList<Integer> spirallyTraverse(int m[][], int r, int c)
 2a. Search in a row wise and column wise sorted matrix
 T(N)
 // set indexes for top right
-        int i = 0, j = n - 1; 
-        // element
- 
-        while (i < n && j >= 0) 
-        {
-            if (mat[i][j] == x) 
-            {
-                System.out.print("n Found at " + 
-                                    i + " " + j);
-                return;
-            }
-            if (mat[i][j] > x)
-                j--;
-            else // if mat[i][j] < x
+       public boolean searchMatrix(int[][] matrix, int target) {
+        int n = matrix.length-1;
+        int m = matrix[0].length-1;
+        int i=0;
+        while(i<=n && m>=0){//terminating condition of loop
+		//starting from the last element of the first column
+            if(matrix[i][m]<target){
+			//increasing row
                 i++;
-        }
+            }else if(matrix[i][m]>target){
+			//decreasing column
+                m--;
+            }else if(matrix[i][m]==target){
+                return true;
+            }
+        } 
+        return false;
+    }
 -----------------------------------------------------------------------------------
 2b. Search element in a sorted matrix->(The first integer of each row is greater than the last integer of the previous row.)
 T(log n + log m)
@@ -203,6 +205,58 @@ public static void CommonEleinAllRows(int[][] arr) {
 		}
 	}
 -----------------------------------------------------------------------------------
+8. Maximum size rectangle in a Binary Matrix
+Intuition-> we just break every row as a single array, simply dry run for easy explaination
+ public int maxArea(int mat[][], int m, int n) {
+       int[] arr=new int[n];
+       int ans=Integer.MIN_VALUE;
+       
+       for(int i=0;i<m;i++){
+           for(int j=0;j<n;j++){
+               if(mat[i][j]==1){
+                   arr[j]=arr[j]+1;
+               }else{
+                   arr[j]=0;
+               }
+           }
+           ans=Math.max(ans,LargestAreaHistogram(arr));
+       }
+       return ans;
+    }
+-----------------------------------------------------------------------------------
+9. Median of Row Wise Sorted Matrix
+-> Median is someone who can say i have lesser than equal to number of elements on my left, and i have greater than equal to number of element on my right.
 
+ private int countSmallerThanMid(ArrayList<Integer> row, int mid) {
+        int l = 0, h = row.size() - 1; 
+        while(l <= h) {
+            int md = (l + h) >> 1; 
+            if(row.get(md) <= mid) {
+                l = md + 1;
+            }
+            else {
+                h = md - 1;
+            }
+        }
+        return l; 
+    }
+    public int findMedian(ArrayList<ArrayList<Integer>> A) {
+        int low = Integer.MIN_VALUE;
+        int high = Integer.MAX_VALUE; 
+        int n = A.size();
+        int m = A.get(0).size(); 
+        while(low <= high) {
+            int mid = (low + high) >> 1; 
+            int cnt = 0;
+            for(int i = 0;i<n;i++) {
+                cnt += countSmallerThanMid(A.get(i), mid); 
+            }
+    
+            if(cnt <= (n * m) / 2) low = mid + 1; 
+            else high = mid - 1; 
+        }
+        return low; 
+    }
 -----------------------------------------------------------------------------------
------------------------------------------------------------------------------------
+10.
+
