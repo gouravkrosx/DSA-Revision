@@ -292,7 +292,7 @@ public static boolean KnightsMove(int[][] chessboard, int row, int col, boolean[
 			for (int j = i + 1; j < ch.length; j++) {
 				if (ch[j] > ch[i]) {
 					Swapping(ch, i, j);
-					int ans = MaximumIntegerWithAtMostKSwaps(ch, vidx + 1, k - 1);
+				int ans = MaximumIntegerWithAtMostKSwaps(ch, vidx + 1, k - 1);
 					max = Math.max(max, ans);
 					Swapping(ch, i, j);
 				}
@@ -437,6 +437,7 @@ public static void main(String[] args) throws java.lang.Exception {
 	}
 --------------------------------------------------------------------------------------------
 12. Remove Invalid Parentheses->(Leetcode 301)
+Intuition-> We remove every single parenthesis then check is it valid if valid then add it into ans
  List<String>ans=new ArrayList<>();
     Set<String>setA= new HashSet<>();
     
