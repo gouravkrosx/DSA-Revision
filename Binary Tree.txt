@@ -38,10 +38,10 @@ public int minDepth(TreeNode root) {
         int lh=minDepth(root.left);
         int rh=minDepth(root.right);
         
-        if(lh==0){
+        if(lh==0){  //if right skewed tree
             return rh+1;
         }
-        if(rh==0){
+        if(rh==0){  //if left skewed tree
             return lh+1;
         }
         return Math.min(lh,rh)+1;   

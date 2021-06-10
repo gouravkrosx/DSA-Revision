@@ -475,7 +475,7 @@ M4) O(h1+h2)
         Stack<Node>s1=new Stack<>();
         Stack<Node>s2=new Stack<>();
         
-        insertNodes(root1,s1);
+        insertNodes(root1,s1); 
         insertNodes(root2,s2);
         
         while(!s1.isEmpty()||!s2.isEmpty()){
