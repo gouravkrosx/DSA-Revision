@@ -1,0 +1,185 @@
+SOLUTIONS OF THESE QUESTIONS ARE EITHER ON GFG OR ON LEETCODE.
+---------------------------------------Greedy-----------------------------------------
+
+1. Job sequencing Problem
+//Function to find the maximum profit and the number of jobs done.
+    //Greedy Approach
+    public int[] JobScheduling(Job arr[], int n)
+    {
+       Arrays.sort(arr,(a,b)->(b.profit-a.profit));
+       
+       int max_deadline=0;
+       for(int i=0;i<n;i++){
+           if(arr[i].deadline>max_deadline){
+               max_deadline=arr[i].deadline;
+           }
+       }
+       int[] result=new int[max_deadline+1];
+       for(int i=1;i<=max_deadline;i++){
+           result[i]=-1;
+       }
+       int count_jobs=0,job_profit=0;
+       //traverse through (i==job_id);
+       for(int i=0;i<n;i++){
+           for(int j=arr[i].deadline;j>0;j--){
+               if(result[j]==-1){
+                 result[j]=i;   
+                 count_jobs++;
+                 job_profit+=arr[i].profit;
+                 break;
+               }
+           }
+       }
+       int[]res=new int[2];
+       res[0]=count_jobs;
+       res[1]=job_profit;
+       return res;
+    }
+---------------------------------------------------------------------------------
+2. Chocolate Distribution Problem, Minimum Cost of ropes , Rearrange characters in a string such that no two adjacent are same -> These 3 questions are already done in some previous section of problems.
+---------------------------------------------------------------------------------
+3. N meetings in one room ->Also known as Activity Selection Problem
+static class meeting {
+		int start;
+		int end;
+		int pos;
+
+		meeting(int s, int e, int p) {
+			this.start = s;
+			this.end = e;
+			this.pos = p;
+		}
+	}
+
+	static class meetingComparator implements Comparator<meeting> {
+		@Override
+		public int compare(meeting o1, meeting o2) {
+			if (o1.end < o2.end)
+				return -1;
+			else if (o1.end > o2.end)
+				return 1;
+			else if (o1.pos < o2.pos)
+				return -1;
+			return 1;
+		}
+	}
+
+	public static int maxMeetings(int[] start, int[] end, int n) {
+		ArrayList<meeting> meet = new ArrayList<>();
+		for (int i = 0; i < n; i++) {
+			meet.add(new meeting(start[i], end[i], i + 1));
+		}
+
+		meetingComparator mc = new meetingComparator();
+		Collections.sort(meet, mc);
+		ArrayList<Integer> ans = new ArrayList<>();
+		ans.add(meet.get(0).pos);
+		int limit = meet.get(0).end;
+		for (int i = 1; i < n; i++) {
+			if (meet.get(i).start > limit) {
+				limit = meet.get(i).end;
+				ans.add(meet.get(i).pos);
+			}
+		}
+
+		System.out.println(ans);
+		return ans.size();
+	}
+---------------------------------------------------------------------------------
+4. Minimum Platforms
+Intuition-> we sort both arrays and check whether there is platform needed for any arrival or departure train.
+DryRun the code to get better Understanding
+ static int findPlatform(int arr[], int dep[], int n)
+    { 
+       Arrays.sort(arr);
+       Arrays.sort(dep);
+       
+       int plat_needed=1,result=1;
+       int i=1,j=0;  //second arrival train and first departure train
+       
+       while(i<n && j<n){
+
+ //as if train hasn't departured yet then the new arrival train if comes earlier has to use new platform
+           if(arr[i]<=dep[j]){
+               plat_needed++;  
+               i++;
+           }else if(arr[i]>dep[j]){
+               plat_needed--;
+               j++;
+           }
+           
+           if(plat_needed>result)
+                result=plat_needed;
+       }
+        return result;       
+    }
+---------------------------------------------------------------------------------
+5. Minimum Number of coins Needed to make a change
+ public static int minCoins(int val){
+        ArrayList<Integer>ans=new ArrayList<>();
+        int[]den={1,2,5,10,20,50,100,500,1000}; //follows Greedy as sum upto i-1 is smaller than ith element
+        int n=den.length;
+        for(int i=n-1;i>=0;i--){
+            while(val>=den[i]){
+                val-=den[i];
+                ans.add(den[i]);
+            }
+        }
+        System.out.println(ans);
+        return ans.size();
+    }
+---------------------------------------------------------------------------------
+6. Fractional Knapsack
+ class itemComparator implements Comparator<Item>{
+        @Override
+        public int compare(Item a,Item b){
+        
+        double r1=(double)a.value/(double)a.weight;
+        double r2=(double)b.value/(double)b.weight;
+        
+        if(r1<r2)return 1;
+        else if(r1>r2)return -1;
+        return 0;
+        }
+    }
+    
+    double fractionalKnapsack(int W, Item arr[], int n) 
+    {
+       Arrays.sort(arr,new itemComparator());
+       
+       int curr_weight=0;
+       double finalans=0.0;
+       
+       for(int i=0;i<arr.length;i++){
+           if(curr_weight+arr[i].weight<=W){
+               curr_weight+=arr[i].weight;
+               finalans+=arr[i].value;
+           }else{
+               int remain=W-curr_weight;
+               finalans+=(double)arr[i].value/(double)arr[i].weight * (double)remain;
+               break;
+           }
+       }
+       return finalans;
+    }
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+
+	
