@@ -39,6 +39,7 @@ SOLUTIONS OF THESE QUESTIONS ARE EITHER ON GFG OR ON LEETCODE.
 2. Chocolate Distribution Problem, Minimum Cost of ropes , Rearrange characters in a string such that no two adjacent are same -> These 3 questions are already done in some previous section of problems.
 ---------------------------------------------------------------------------------
 3. N meetings in one room ->Also known as Activity Selection Problem
+Intuition-> the earlier the meeting will end the more we call organize. that's why in this question we sorted the array accoding to the end time.
 static class meeting {
 		int start;
 		int end;
@@ -163,15 +164,277 @@ DryRun the code to get better Understanding
        return finalans;
     }
 ---------------------------------------------------------------------------------
+7. Maximum product subset of an array
+ static int maxProductSubset(int a[], int n) {
+        if (n == 1) {
+            return a[0];
+        }
+ 
+        int max_neg = Integer.MIN_VALUE;
+        int count_neg = 0, count_zero = 0;
+        int prod = 1;
+        for (int i = 0; i < n; i++) {
+ 
+            if (a[i] == 0) {
+                count_zero++;
+                continue;
+            }
+ 
+            if (a[i] < 0) {
+                count_neg++;
+                max_neg = Math.max(max_neg, a[i]);
+            }
+ 
+            prod = prod * a[i];
+        }
+ 
+        if (count_zero == n) {
+            return 0;
+        }
+
+        if (count_neg % 2 == 1) {
+ 
+            // Exceptional case: There is only
+            // negative and all other are zeros
+            if (count_neg == 1
+                    && count_zero > 0
+                    && count_zero + count_neg == n) {
+                return 0;
+            }
+ 
+            // Otherwise result is product of
+            // all non-zeros divided by
+            //negative number with
+            // least absolute value.
+            prod = prod / max_neg;
+        }
+ 
+        return prod;
+    }
+
 ---------------------------------------------------------------------------------
+8. Huffman Encoding
+ static class Node{
+        int freq;
+        Node left, right;
+
+        Node(int freq){
+            this.freq = freq;
+            this.left = this.right = null;
+        }
+    }
+
+
+    static void preOrder(Node root, String code, ArrayList<String> list){
+        if(root == null)
+            return;
+        if(root.left == null && root.right == null)
+            list.add(code);
+
+        preOrder(root.left, code+"0", list);
+        preOrder(root.right, code+"1", list);
+    }
+
+    static ArrayList<String> huffmanCodes(String S, int[] f, int N){
+        PriorityQueue<Node> pq = new PriorityQueue<>(new Comparator<Node>() {
+            @Override
+            public int compare(Node o1, Node o2) {
+                if(o1.freq == o2.freq)
+                    return 1;
+                return Integer.compare(o1.freq, o2.freq);
+            }
+        });
+
+        for(int i = 0;i < N;i++){
+            pq.add(new Node(f[i]));
+        }
+
+        while (pq.size() != 1){
+            Node first = pq.poll();
+            Node second = pq.poll();
+
+            Node newNode = new Node(first.freq + second.freq);
+
+            newNode.left = first;
+            newNode.right = second;
+
+            pq.add(newNode);
+        }
+
+        ArrayList<String> list = new ArrayList<>();
+
+        Node root = pq.peek();
+
+        preOrder(root, "", list);
+
+        return list;
+
+    }
 ---------------------------------------------------------------------------------
+9. Maximum Trains for which stoppage can be provided.
+Logic-> Just like Activity Selection Problem.
+Here, in this question we have been given train no. , arrival time, departure time, req platform no.
+so we will make an array(Platform) of size (no of platforms) for each no. platform and put -1 in every index.
+Make a class(say Trains) which contain arrival time, departure time and platform no. as data members. Now traverse through given 2d array and put all in ArrayList<Trains>Tlist and now sort according to its departure time. and then traverse this Tlist and check if for a given platform train can be stopped or not, if its first time that we have a train for a given platform then just put it in array (Platform) and after that the above condition. if possible then increment the MAXStopage++.
 ---------------------------------------------------------------------------------
+10. Buy Maximum Stocks if i stocks can be bought on i-th day
+ public static void MaxStocks(int[]price,int k){
+        ArrayList<pair>list=new ArrayList<>();
+        for(int i=0;i<price.length;i++){
+            list.add(new pair(price[i],i+1));   //stock price ,day
+        }
+        
+        Collections.sort(list);
+        
+        int stocks=0;
+        for(int i=0;i<list.size();i++){
+            stocks+=Math.min(list.get(i).second,k/list.get(i).first);
+            k-=list.get(i).first*Math.min(list.get(i).second,k/list.get(i).first);
+        }
+        System.out.println(stocks);
+    }
 ---------------------------------------------------------------------------------
+11. Shop in Candy Store
+static ArrayList<Integer> candyStore(int candies[],int n,int k){
+      Arrays.sort(candies);
+      int min=0;
+      int c=0;
+      int i=0;
+      int j=n-1;
+      while(i<=j){
+           if(c>=n)
+             break;
+          min+=candies[i];
+          c=c+k+1;     //added 1 for bought candy and k for free candy
+          i++;
+      }
+      
+      int max=0;
+       c=0;
+       i=n-1;
+      while(i>=0){
+           if(c>=n)
+             break;
+          max+=candies[i];
+          c=c+k+1;
+          i--;
+      }
+      
+      ArrayList<Integer>list=new ArrayList<>();
+      list.add(min);
+      list.add(max);
+     
+     return list;
+    }
 ---------------------------------------------------------------------------------
+12. Minimum Cost to cut a board into squares/CHOCOLA - Chocolate (Spoj)
+private static int Chocolate(int m, int n, ArrayList<Integer> x, ArrayList<Integer> y) {
+		int cost = 0;
+		int v_cut = 1;
+		int h_cut = 1;
+		int i = 0;
+		int j = 0;
+		Collections.sort(x, Collections.reverseOrder());
+		Collections.sort(y, Collections.reverseOrder());
+		// we are taking MaxPriceEdge first because initially we have less pieces so
+		// increment in total cost will be less,
+		// after cutting... the pieces will increase at that time we will be taking
+		// MinPriceEdge ->Greedy
+		while (i < m && j < n) {
+			if (x.get(i) > y.get(j)) {
+				cost += v_cut * x.get(i);
+				i++;
+				h_cut++;
+			} else {
+				cost += h_cut * y.get(j);
+				j++;
+				v_cut++;
+			}
+		}
+		while (i <m) {
+			cost += v_cut * x.get(i);
+			i++;
+		}
+		while (j < n) {
+			cost += h_cut * y.get(j);
+			j++;
+		}
+		return cost;
+	}
 ---------------------------------------------------------------------------------
+13. Check if it is possible to survive on Island
+->Sunday is holiday.
+// function to find the minimum days
+    static void survival(int S, int N, int M)
+    {
+ 
+        // If we can not buy at least a week
+        // supply of food during the first
+        // week OR We can not buy a day supply
+        // of food on the first day then we
+        // can't survive.
+        if (((N * 6) < (M * 7) && S > 6) || M > N)
+            System.out.println("No");
+ 
+        else {
+ 
+            // If we can survive then we can
+            // buy ceil(A/N) times where A is
+            // total units of food required.
+            int days = (M * S) / N;
+ 
+            if (((M * S) % N) != 0)
+                days++;
+ 
+            System.out.println("Yes " + days);
+        }
+    }
+ 
 ---------------------------------------------------------------------------------
+14. Maximize sum after K negations   -->Check requirement
+ public static long maximizeSum(long a[], int n, int k)
+    {
+       int i=0;
+       Arrays.sort(a);
+       while(k>0){
+           if(i<n){
+             if(a[i]==0){
+                   break;
+             }else if(a[i]>0){
+                if(k%2==0){
+                   break;
+                 }else{
+                    a[i]=-a[i];
+                    break;
+               }
+           }else{
+               a[i]=-a[i];
+               k--;
+               i++;
+            }
+          }
+       }
+       long sum=0;
+       for(long val:a){
+           sum+=val;
+       }
+       return sum;
+    }
 ---------------------------------------------------------------------------------
+15. Maximize sum(arr[i]*i) of an Array -> Very basic Question
+int mod = (int)1e9+7;
+int Maximize(int arr[], int n)
+{
+Arrays.sort(arr);
+
+long sum = 0;
+for (int i = 0; i < n; i++)
+sum = (sum + (long)arr[i] * i) % mod;
+
+return (int)sum;
+}
 ---------------------------------------------------------------------------------
+16.
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
