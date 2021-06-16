@@ -391,33 +391,25 @@ private static int Chocolate(int m, int n, ArrayList<Integer> x, ArrayList<Integ
     }
  
 ---------------------------------------------------------------------------------
-14. Maximize sum after K negations   -->Check requirement
- public static long maximizeSum(long a[], int n, int k)
+14. Maximize sum after K negations  
+ public static long maximizeSum(long arr[], int n, int k)
     {
-       int i=0;
-       Arrays.sort(a);
-       while(k>0){
-           if(i<n){
-             if(a[i]==0){
-                   break;
-             }else if(a[i]>0){
-                if(k%2==0){
-                   break;
-                 }else{
-                    a[i]=-a[i];
-                    break;
-               }
-           }else{
-               a[i]=-a[i];
-               k--;
-               i++;
+       Arrays.sort(arr);
+        for(int i=0;i<arr.length;i++){
+            if(arr[i]<0 && k>0){
+                arr[i]=-arr[i];
+                k--;
             }
-          }
-       }
-       long sum=0;
-       for(long val:a){
-           sum+=val;
-       }
+        }
+        long min=Integer.MAX_VALUE;
+        long sum=0;
+        
+        for(int i=0;i<n;i++){
+            sum+=arr[i];
+            min=Math.min(min,arr[i]);
+        }
+        if((k&1)==1)sum-=2*min;
+        
        return sum;
     }
 ---------------------------------------------------------------------------------
@@ -434,7 +426,178 @@ sum = (sum + (long)arr[i] * i) % mod;
 return (int)sum;
 }
 ---------------------------------------------------------------------------------
-16.
+16. Maximum sum of absolute difference of any permutation
+Logic-> we take an arraylist and story elements like smaller bigger alternatively to get max absolute diff.
+static int MaxSumDifference(Integer []a, int n)
+    {
+        List<Integer> finalSequence = new ArrayList<Integer>();
+    
+        Arrays.sort(a);
+     
+        for (int i = 0; i < n / 2; ++i) {
+            finalSequence.add(a[i]);
+            finalSequence.add(a[n - i - 1]);
+        }
+        if (n % 2 != 0)
+            finalSequence.add(a[n/2]);
+        
+        int MaximumSum = 0;
+     
+        for (int i = 0; i < n - 1; ++i) {
+            MaximumSum = MaximumSum + Math.abs(finalSequence.get(i) - finalSequence.get(i + 1));
+        }
+     
+        // absolute difference of last element
+        // and 1st element
+        MaximumSum = MaximumSum + Math.abs(finalSequence.get(n - 1) - finalSequence.get(0));
+  
+        return MaximumSum;
+    }
+---------------------------------------------------------------------------------
+17. Maximize sum of consecutive differences in a circular array /Swap and Maximize
+-> Just like above Question
+ long maxSum(long arr[] ,int n)
+    {
+        Arrays.sort(arr);
+        int i=0;
+        int j=n-1;
+        int count=0;
+        long sum=0;
+        
+        while(i<j){
+            sum+=Math.abs(arr[i]-arr[j]);
+            if(count%2==0)
+                i++;
+            else
+                j--;
+            count++;    
+        }
+        sum+=Math.abs(arr[j]-arr[0]);
+        return sum;
+    }
+---------------------------------------------------------------------------------
+18. Minimum sum of absolute difference of pairs of two arrays
+Logic-> sort both the given arrays and just do sum+=Math.abs(arr[i]-brr[i]);
+---------------------------------------------------------------------------------
+19. Smallest subset with sum greater than all other elements
+In Greedy also we check that sum of elements upto ith element should be smaller than (i+1)th, here also we kinda checked it.
+static int minElements(int arr[], int n)
+    {
+        int halfSum = 0;
+        for (int i = 0; i < n; i++)
+            halfSum = halfSum + arr[i];
+        halfSum = halfSum / 2;
+     
+         Arrays.sort(arr);
+         
+        int res = 0, curr_sum = 0;
+        for (int i = n-1; i >= 0; i--) {
+            curr_sum += arr[i];
+            res++;
+     
+            if (curr_sum > halfSum)        
+                return res;
+        }
+        return res;
+    }
+---------------------------------------------------------------------------------
+20. Smallest number (when sum of digits and no. of digits is given)
+ static String smallestNumber(int sum, int dig){
+        String str="";
+        if(dig*9<sum){
+            return "-1";
+        }
+        
+        for(int i=1;i<=dig;i++){
+            if(i==dig){
+                str=sum+str;
+                break;
+            }
+            
+            if(sum>9){
+                str="9"+str;
+                sum-=9;
+            }else{
+                int temp=sum-1;
+                str=temp+str;
+                sum=1;
+            }
+        }
+        return str;
+    }
+---------------------------------------------------------------------------------
+21. Find maximum sum possible equal sum of three stacks
+public static int maxSum(int stack1[], int stack2[],int stack3[], int n1, int n2, int n3)
+    {
+      int sum1 = 0, sum2 = 0, sum3 = 0;
+      
+      for (int i=0; i < n1; i++)
+          sum1 += stack1[i];
+      
+      for (int i=0; i < n2; i++)
+          sum2 += stack2[i];
+      
+      for (int i=0; i < n3; i++)
+          sum3 += stack3[i];
+      
+      // As given in question, first element is top
+      // of stack..
+      int top1 =0, top2 = 0, top3 = 0;
+      int ans = 0;
+      while (true)
+      {
+          // If any stack is empty
+          if (top1 == n1 || top2 == n2 || top3 == n3)
+             return 0;
+      
+          if (sum1 == sum2 && sum2 == sum3)
+             return sum1;
+          
+          if (sum1 >= sum2 && sum1 >= sum3)
+             sum1 -= stack1[top1++];
+          else if (sum2 >= sum1 && sum2 >= sum3)
+             sum2 -= stack2[top2++];
+          else if (sum3 >= sum2 && sum3 >= sum1)
+             sum3 -= stack3[top3++];
+       }
+    }
+---------------------------------------------------------------------------------
+22. Page Faults in LRU
+-> Dry Run the Code 
+->Page faults occur when they are not in memory 
+static int pageFaults(int n, int c, int pages[]) {
+		Set<Integer> set = new HashSet<>();
+		HashMap<Integer, Integer> map = new HashMap<>(); 
+
+		int pgfault = 0;
+
+		for (int i = 0; i < n; i++) {
+			if (set.size() < c) {
+				if (!set.contains(pages[i])) {
+					pgfault++;
+					set.add(pages[i]);
+				}
+			} else {
+				if (!set.contains(pages[i])) {
+					pgfault++;
+					// checking for Least Recently Used
+					int lru = Integer.MAX_VALUE;// min index refers lru
+					int val = 0;
+					for (Integer s : set) {
+						if (map.get(s) < lru) {
+							lru = map.get(s);
+							val = s;
+						}
+					}
+					set.remove(val);
+					set.add(pages[i]);
+				}
+			}
+			map.put(pages[i], i);
+		}
+
+		return pgfault;
+	}
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
