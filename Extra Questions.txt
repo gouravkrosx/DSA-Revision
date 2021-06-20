@@ -1,0 +1,15 @@
+			                        Some Extra Questions
+
+------------------------------------------------------------------------------------
+1. Tower of Hanoi ->https://www.youtube.com/watch?v=QDBrZFROuA0
+-> Make the recursion Tree and do the dry run , and do inorder traversal 
+public static void toh(int n, int t1id, int t2id, int t3id){
+        if(n==0){
+            return;
+        }
+        //(*) ->Means following all instructions of tower of hanoi
+        toh(n-1,t1id,t3id,t2id); //will print the instructions to move n-1 disks from t1 to t3 using t2(*)
+        System.out.println(n+"["+t1id+" -> "+t2id+"]");
+        toh(n-1,t3id,t2id,t1id);
+    }
+-------------------------------------------------------------------------------------
