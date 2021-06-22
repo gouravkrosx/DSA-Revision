@@ -32,6 +32,29 @@ public static int KnapsackTD(int[] wt, int[] price, int vidx, int cap, int[][] s
 		return ans;
 
 	}
+->Bottom Up Approach->https://www.youtube.com/watch?v=bUSaenttI24&list=WL&index=57&t=21s
+
+ public static int KnapsackBU(int[]wt,int[]val,int n,int cap){
+        int[][]dp=new int[n+1][cap+1];
+        
+        for(int i=1;i<=n;i++){
+            for(int j=1;j<=cap;j++){
+                if(j>=wt[i-1]) //player can bat or weight can be added.
+                {   int rCap=j-wt[i-1];
+                    if(dp[i-1][rCap]+val[i-1]>dp[i-1][j]){
+                       dp[i][j]=dp[i-1][rCap]+val[i-1];  //took i-1 in val array also bcz of the storage, draw matrix to know
+                    }else{
+                       dp[i][j]=dp[i-1][j]; 
+                    }
+                    
+                }else{
+                    dp[i][j]=dp[i-1][j]; //player can't bat or weight can't be added
+                }
+            }
+        }
+        return dp[n][cap];
+    }
+
 ----------------- -------------------------------------------------------------------------------
 2. Matrix Chain Multiplication
 public static int MCMTD(int[] matrix, int si, int ei, int[][] strg) {
@@ -341,21 +364,181 @@ public boolean SubsetSum(int nums[], int vidx, int sum, int total,HashMap<String
 	}
 
 ------------------------------------------------------------------------------------------------
-12. Target Sum Subset
+12. Target Sum Subset ->(Kind of 0-1 Knapsack Problem)
+https://www.pepcoding.com/resources/online-java-foundation/dynamic-programming-and-greedy/target-sum-subsets-dp-official/ojquestion
+
+ public static boolean TargetSumSubsets(int[]arr,int n,int tar){
+      boolean[][]dp=new boolean[n+1][tar+1];
+      dp[0][0]=true; //because empty set can be make sum 0 only.
+      for(int i=1;i<=n;i++){
+        for(int j=0;j<=tar;j++){
+            if(j==0){
+                dp[i][j]=true;
+                continue;
+            }
+            if(j<arr[i-1]){
+                dp[i][j]=dp[i-1][j];
+            }else{
+                boolean op1=dp[i-1][j];
+                boolean op2=dp[i-1][j-arr[i-1]];
+                dp[i][j]=op1||op2;
+            }
+        }
+      }
+      return dp[n][tar];
+  }
 ------------------------------------------------------------------------------------------------
+13. Friends Pairing Problem
+ public static long FriendsPairing(int n) {
+		if (n == 0)
+			return 0;
+		if (n == 1)
+			return 1;
+		if (n == 2)
+			return 2;
+
+		long dp[] = new long[n + 1];
+
+		int M = 1000000007;
+
+		dp[1] = 1;
+		dp[2] = 2;
+
+		for (int i = 3; i < dp.length; i++) {
+			dp[i] = (dp[i - 1] + ((i - 1) * dp[i - 2]) % M) % M;
+		}
+		
+		return dp[n];
+	}
+------------------------------------------------------------------------------------------------
+14. Binomial Coefficient Problem (nCr)
+Formula Used->   C(n, r) = C(n-1, r-1) + C(n-1, r)
+ C(n, 0) = C(n, n) = 1
+ public static int nCr(int n, int r) {
+		int C[][] = new int[n + 2][r + 2];
+
+		for (int i = 0; i <= n; i++) {
+			for (int j = 0; j <= Math.min(i, r); j++) {
+				if (j == 0 || j == i)
+					C[i][j] = 1;
+				else
+					C[i][j] = (C[i - 1][j] % MOD + (C[i - 1][j - 1]) % MOD) % MOD;
+
+			}
+		}
+		return C[n][r];
+	}
+
 
 ------------------------------------------------------------------------------------------------
+15. Permutation Coefficient Problem (nPr)
+Formula Used->P(n, k) = P(n-1, k) + k* P(n-1, k-1)
+P(n,0)=1;
 
+static int permutationCoeff(int n,
+                                int k)
+    {
+        int P[][] = new int[n + 2][k + 2];
+     
+        // Calculate value of Permutation
+        // Coefficient in bottom up manner
+        for (int i = 0; i <= n; i++)
+        {
+            for (int j = 0;
+                j <= Math.min(i, k);
+                j++)
+            {
+                // Base Cases
+                if (j == 0)
+                    P[i][j] = 1;
+     
+                // Calculate value using previosly
+                // stored values
+                else
+                    P[i][j] = P[i - 1][j] +
+                            (j * P[i - 1][j - 1]);
+     
+                // This step is important
+                // as P(i,j)=0 for j>i
+                P[i][j + 1] = 0;
+            }
+        }
+        return P[n][k];
+    }
 ------------------------------------------------------------------------------------------------
+16. Grid Paths (CSES)
+ public static int GridPaths(int[][] grid, int n) {
+		int[][] strg = new int[n + 1][n + 1];
 
+		for (int row = n; row >= 1; row--) {
+			for (int col = n; col >= 1; col--) {
+				if (grid[row - 1][col - 1] == 1) {
+					strg[row][col] = 0;
+					continue;
+				}
+				if (row == n && col == n) {
+					strg[row][col] = 1;
+				} else {
+					int op1 = (col == n) ? 0 : strg[row][col + 1];
+					int op2 = (row == n) ? 0 : strg[row + 1][col];
+					strg[row][col] = (op1 + op2) % MOD;
+				}
+			}
+		}
+		return strg[1][1];
+	}
 ------------------------------------------------------------------------------------------------
-
+17. Removing Digits (CSES)
+	private static int RemovingDigits(int n) {
+		int[] dp = new int[n + 1];
+		for (int i = 1; i <= n; i++) {
+			char[] arr = new String("" + i).toCharArray();
+			int res = Integer.MAX_VALUE;
+			for (int j = 0; j < arr.length; j++) {
+				if (arr[j] != '0')
+					res = Math.min(dp[i - (arr[j] - '0')] + 1, res);
+			}
+			dp[i] = res;
+		}
+		return dp[n];
+	}
 ------------------------------------------------------------------------------------------------
+18. Longest Common Subsequence 3D (with 3 Strings)
+public static int LCS3(String s1, String s2, String s3, int[][][] strg) {
+		if (s1.length() == 0 || s2.length() == 0 || s3.length() == 0) {
+			return 0;
+		}
 
+		if (strg[s1.length()][s2.length()][s3.length()] != -1) {
+			return strg[s1.length()][s2.length()][s3.length()];
+		}
+		char ch1 = s1.charAt(0);
+		char ch2 = s2.charAt(0);
+		char ch3 = s3.charAt(0);
+		String ros1 = s1.substring(1);
+		String ros2 = s2.substring(1);
+		String ros3 = s3.substring(1);
+		int ans = 0;
+		if (ch1 == ch2 && ch2 == ch3) {
+			ans = LCS3(ros1, ros2, ros3, strg) + 1;
+		} else {
+			int options[] = new int[6];
+			options[0] = LCS3(s1, ros2, ros3, strg);
+			options[1] = LCS3(ros1, s2, ros3, strg);
+			options[2] = LCS3(ros1, ros2, s3, strg);
+			options[3] = LCS3(s1, s2, ros3, strg);
+			options[4] = LCS3(s1, ros2, s3, strg);
+			options[5] = LCS3(ros1, s2, s3, strg);
+			ans = 0;
+			for (int val : options)
+				ans = Math.max(ans, val);
+
+		}
+		strg[s1.length()][s2.length()][s3.length()] = ans;
+		return ans;
+	}
 ------------------------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------------------------
-
+19. 
 ------------------------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------------------------

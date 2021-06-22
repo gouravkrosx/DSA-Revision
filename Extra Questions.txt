@@ -13,4 +13,5 @@ public static void toh(int n, int t1id, int t2id, int t3id){
         toh(n-1,t3id,t2id,t1id);
     }
 -------------------------------------------------------------------------------------
-Do All variations of buy and sell stock
+2.Do All variations of buy and sell stock
+3. 46. Permutations
