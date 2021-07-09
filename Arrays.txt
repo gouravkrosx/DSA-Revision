@@ -81,11 +81,11 @@ public void sortColors(int[]nums){
 	
  int maxSubarraySum(int arr[], int n){
         
-        int maxSoFar=arr[0];
-        int maxEndHere=arr[0];
+        int maxSoFar=arr[0];  //overall best
+        int maxEndHere=arr[0]; //current best
         
         for(int i=1;i<n;i++){
-            maxEndHere=Math.max(maxEndHere+arr[i],arr[i]);
+            maxEndHere=Math.max(maxEndHere+arr[i],arr[i]);  
             maxSoFar=Math.max(maxSoFar,maxEndHere);
         }
         return maxSoFar;

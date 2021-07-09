@@ -853,7 +853,7 @@ count=cn1+cn2+cn3+0
 count=cn1+cn2+cn3
 count=cn1+cn2+cn3+cn1-cn1
 count=(cn1+cn2)+(cn1+cn3)-count(m){c1}
-count=count(mc20+count(c1m)-count(m)
+count=count(mc2)+count(c1m)-count(m)
 }
 
  public long CountPalidromicSubsequences(String str) {
@@ -1017,35 +1017,393 @@ lps=lps(mid)+2
 27.  Longest Palindromic Substring
 ->Use Count palidromic substring code, and just take a max variable, when you encounter with true value just check the length of string.
 ------------------------------------------------------------------------------------------------
+28. Longest Alternating Subsequence
+ public int AlternatingaMaxLength(int[] arr)
+    {
+       		int c = 0;
+		for (int i = 0; i < arr.length - 1; i++) {
+			if (arr[i] < arr[i + 1]) {
+				c = 1;
+				break;
+			} else if (arr[i] > arr[i + 1]) {
+				c = 2;
+				break;
+			}
+		}
+		if (c == 0) {
+			return 1;
+		}
+		int[] dp = new int[arr.length + 1];
+		Arrays.fill(dp, -1);
+		boolean flag = (c == 1) ? true : false;
+		return LongestAlternatingSubsequence(arr, 0, dp, flag);
+    }
+    int LongestAlternatingSubsequence(int[] arr, int idx, int[] dp, boolean f) {
+		if (idx + 1 == arr.length)
+			return 1;
 
+		if (dp[idx] != -1)
+			return dp[idx];
+
+		int u = 0, d = 0, p = 0;
+		if (arr[idx] < arr[idx + 1] && f) {
+			u = 1 + LongestAlternatingSubsequence(arr, idx + 1, dp, false);
+		} else if (arr[idx] > arr[idx + 1] && !f) {
+			d = 1 + LongestAlternatingSubsequence(arr, idx + 1, dp, true);
+		}
+		p = LongestAlternatingSubsequence(arr, idx + 1, dp, f);
+		int ans = Math.max(u, Math.max(d, p));
+		dp[idx] = ans;
+		return ans;
+	}
 ------------------------------------------------------------------------------------------------
+29. GoldMine Problem
+static int maxGold(int n, int m, int arr[][])
+    {
+        int j = 0;
+		int max = 0;
+		int[][] dp = new int[n + 1][m + 1];
+		for (int r = 0; r < n; r++) {
+			for (int c = 0; c < m; c++) {
+				dp[r][c] = -1;
+			}
+		}
+		for (int i = 0; i < arr.length; i++) {
+			max = Math.max(max, GoldMineProblem(arr, n - 1, m - 1, i, j, dp));
+		}
+		return max;
+    }
+    public static int GoldMineProblem(int[][] arr, int row, int col, int i, int j, int[][] dp) {
 
+		if (i > row || j > col || i < 0)
+			return 0;
+		if (dp[i][j] != -1)
+			return dp[i][j];
+
+		if (j == col)
+			return arr[i][j];
+
+		int dur = GoldMineProblem(arr, row, col, i - 1, j + 1, dp) + arr[i][j];// diagonally up towards right
+		int r = GoldMineProblem(arr, row, col, i, j + 1, dp) + arr[i][j]; // right
+		int ddr = GoldMineProblem(arr, row, col, i + 1, j + 1, dp) + arr[i][j];// diagonally down towards right
+
+		int ans = Math.max(dur, Math.max(r, ddr));
+		dp[i][j] = ans;
+		return ans;
+	}
 ------------------------------------------------------------------------------------------------
-
+30. Maximum Sum increasing subsequence
+->Used Longest Increasing subsequence problem
+and just change { dp[i]=1+max; } To { dp[i]=nums[i]+max; }
 ------------------------------------------------------------------------------------------------
+31. Count distinct subsequences
+Logic-> "abcba"
+we will take a HashMap<Character,Integer>map, in this character will have key as ( last occurence index)
+so now  when 2nd time 'b' come then (i=3) dp[i]=2*dp[i-1]-dp[idx=just prev index of last occ of this character {here 0}] we did this because
+   when 1st b come    when 2nd b come then also , below seq will be generated so we have to subtract that . 
+.    b    			b
+a   ab			ab 
 
+public static int DistinctSubsequences(String s) {
+		HashMap<Character,Integer>map=new HashMap<Character, Integer>();
+		long[]dp=new long[s.length()+1];
+		dp[0]=1; //empty seq
+		for(int i=1;i< dp.length;i++) {
+			
+            			dp[i]=2*dp[i-1]%MOD;
+			char ch=s.charAt(i-1);
+            
+			if(map.containsKey(ch)) {
+				int j=map.get(ch);
+				dp[i]=(dp[i]-dp[j-1])%MOD;
+			}
+            
+            			map.put(ch,i);
+		}
+
+       		 if(dp[s.length()]<0){
+           		 dp[s.length()]=(dp[s.length()]+MOD)%MOD;
+      		  }
+		return (int) (dp[s.length()]-1);// because we only need non-empyt seq
+	}
 ------------------------------------------------------------------------------------------------
+32. Egg Dropping Problem 
+Keypoints:
+*Optimize the badluck /for gurantee there are 2 options which are below
+(do best when it is in your control)&(Assume worst will happen which is not in your control)
+-Guaranteed best time-> Best of the worst
+-Lucky Best time-> Best of the Best
+#Intuition
+Best choice of the worst Luck (min of the maxes) 
+-> At each floor it is the luck that an egg survives or breaks, at each floor we will take the worst means maxofTwo(survive,break), and take overall min
 
+At kth floor	
+	survives	
+e/f-------.------------> e/f-k
+                .  Breaks
+                .	----------->e-1/k-1
+
+Base Case: e=0 , not possible
+	f=0, 0 moves
+	e=1, f moves
+	f=1, 1 move
+M1)
+ public int EggDroppingPuzzle(int k,int n ){
+        int[][]dp=new int[k+1][n+1];
+        //k eggs,n floors
+        
+        for(int i=1;i<=k;i++){
+            for(int j=1;j<=n;j++){
+                if(i==1){
+                    dp[i][j]=j;
+                }else if(j==1){
+                    dp[i][j]=1;
+                }else{
+                    int min=Integer.MAX_VALUE;
+                    //mj=my j, pj= previous j
+                    for(int mj=j-1,pj=0;mj>=0;mj--,pj++){
+                        int a=dp[i][mj]; //egg survives
+                        int b=dp[i-1][pj]; //egg breaks
+                        int val=Math.max(a,b);
+                        min=Math.min(val,min);
+                    }
+                    dp[i][j]=min+1;
+                }
+            }
+        }
+        return dp[k][n];
+    }
+M2) Binary Search->
+		
 ------------------------------------------------------------------------------------------------
-
+33. Optimal Strategy for a game
+ public static long OptimalStrategyForAGame(int[]arr,int n){
+        long dp[][]=new long[n][n];
+        
+        for(int gap=0;gap<n;gap++){
+            for(int i=0,j=gap;j<n;i++,j++){
+                if(gap==0){
+                    dp[i][j]=arr[i];
+                }else if(gap==1){
+                    dp[i][j]=Math.max(arr[i],arr[j]);
+                }else{
+                    //first choice is ours, other choices are of luck
+                    // choices of i,j after taking first i / j
+                    // i-> (i+1)->{(i+1,j-1),(i+2,j)}
+                    long val1=arr[i]+Math.min(dp[i+1][j-1],dp[i+2][j]);
+                    //j-> (j-1)->{(i+1,j-1),(i,j-2)};
+                    long val2=arr[j]+Math.min(dp[i+1][j-1],dp[i][j-2]);
+                    dp[i][j]=Math.max(val1,val2);
+                }
+            }
+        }
+        return dp[0][n-1];
+    }
 ------------------------------------------------------------------------------------------------
+34. Max Sum of Rectangle No larger Than K (Leetcode 363)  //try to understand this using dry run
+Same below Question but use this->
+private int maxSumSubArray(int[] a , int k){
 
+    int max = Integer.MIN_VALUE;
+    int preSum = 0;
+    TreeSet<Integer> ts = new TreeSet();
+    ts.add(0);
+
+    for(int i=0;i<a.length;i++){
+        preSum += a[i];
+        Integer gap = ts.ceiling(preSum - k);
+        if(gap != null) max = Math.max(max, preSum - gap);
+        ts.add(preSum);
+    }
+    return max;
+} 
+instead of Kadane's algo
 ------------------------------------------------------------------------------------------------
-
+35. Maximum sum rectangle in a 2D matrix
+->
+ public static int MaximumSumRectangle(int[][] mat, int row, int col) {
+		int msr = Integer.MIN_VALUE;
+	    int[] helper = new int[col];
+		for (int s = 0; s < row; s++) {
+		    Arrays.fill(helper,0);
+			for (int r = s; r < row; r++) {
+				for (int c = 0; c < col; c++) {
+					helper[c] += mat[r][c];
+				}
+				msr = Math.max(msr, KadaneAlgo(helper, col));
+			}
+		}
+		return msr;
+	}
 ------------------------------------------------------------------------------------------------
+36. Minimum No. of Jumps to reach end.
+public static long MinJumps(int[] nums, int vidx, long[] dp) {
+		if (vidx >= nums.length-1)
+			return 0;
 
+		if (dp[vidx] != -1) {
+			return dp[vidx];
+		}
+
+		long jumps = Integer.MAX_VALUE;
+		for (int val = vidx+1; val <= vidx+nums[vidx]; val++) {
+          			  if(nums[vidx]!=0)
+			jumps = Math.min(jumps, MinJumps(nums,val, dp));
+		}
+		jumps+=1;
+		dp[vidx] = jumps;
+		return jumps;
+	}
 ------------------------------------------------------------------------------------------------
-
+37. Word Break Problem
+ public boolean WordBreak(String str,Set<String>set,int start,Boolean[]dp){
+       if(start==str.length()){
+           return true;
+       }
+        
+        if(dp[start]!=null){
+            return dp[start];
+        }
+        
+        for(int end=start+1;end<=str.length();end++){
+            if(set.contains(str.substring(start,end))){
+                if(WordBreak(str,set,end,dp)){
+                    dp[start]=true;
+                    return true;
+                }
+            }
+        }
+        dp[start]=false;
+        return dp[start];
+    }
 ------------------------------------------------------------------------------------------------
+38. Assembly line Scheduling ALgorithm ->https://www.youtube.com/watch?v=8I0kiyxfrM0
 
+ public static int carAssembleTime(int a[][], int t[][],
+                                       int e[], int x[]) {
+        int n = a[0].length;
+         
+        // time taken to leave first station in line 1 
+        int first = e[0] + a[0][0];
+ 
+        // time taken to leave first station in line 2
+        int second = e[1] + a[1][0];
+          
+        for (int i = 1; i < n; i++) {
+            int up = Math.min(first + a[0][i],
+                    second + t[1][i] + a[0][i]),
+                    down = Math.min(second + a[1][i],
+                            first + t[0][i] + a[1][i]);
+            first = up;
+            second = down;
+        }
+  
+        first += x[0];
+        second += x[1];
+  
+        return Math.min(first, second);
+    }
 ------------------------------------------------------------------------------------------------
+39. Paint fence 
+Logic-> we fix the last two colors
+this is for n=2
+i) they can be same (k ways)
+ii) they can be different (k*(k-1)) ways
 
+for n>=3 
+a) when last fence have same colors -> (all the ways of prev (n-1)th  (case ii) as they all are different and last color can be append to make this very case) 
+b) total of previous (n-1)th  * (k-1) because every color can be append with k-1 colors leaving itself to make the last two colors different.
+
+ long countWays(int n,int k)
+    {
+        if(n==0)
+        return 0;
+        if(n==1)
+        return k;
+           
+        long same=(k*1)%mod;
+        long diff=(k*(k-1))%mod;
+        long total=(same+diff)%mod;
+        
+        for(int i=3;i<=n;i++){
+            same=(diff*1)%mod;
+            diff=(total*(k-1))%mod;
+            total=(same +diff)%mod;
+        }
+        return total%mod;
+    }
+---------------------------->
+long countWays(int n,int k)
+    {
+         if(n==0)
+        return 0;
+        if(n==1)
+        return k;
+        
+       long dp[]=new long[n+1];
+		dp[0] = 0;
+		dp[1] = k;
+		dp[2] = k * k;
+
+		for (int i = 3; i <= n; i++) {
+			dp[i] = ((k - 1) * (dp[i - 1] + dp[i - 2])) % mod;
+		}
+		return dp[n];
+                       }
 ------------------------------------------------------------------------------------------------
-
+40. Maximize the cut Segments
+public int maximizeCuts(int n, int x, int y, int z)
+    {
+        int[]dp=new int[n+1];
+        Arrays.fill(dp,-1);
+       int ans=MaximizeCutsSegments(n,x,y,z,dp);
+        if(ans<0)return 0;
+        return ans;
+        
+    }
+    public int MaximizeCutsSegments(int n,int x,int y,int z,int[]dp){
+        if(n==0)
+        return 0;
+        
+        if(n<0)
+        return Integer.MIN_VALUE;
+        
+        if(dp[n]!=-1){
+            return dp[n];
+        }
+        
+        int a=MaximizeCutsSegments(n-x,x,y,z,dp)+1;
+        int b=MaximizeCutsSegments(n-y,x,y,z,dp)+1;
+        int c=MaximizeCutsSegments(n-z,x,y,z,dp)+1;
+        
+        return dp[n]=Math.max(a,Math.max(b,c));
+        
+    }
 ------------------------------------------------------------------------------------------------
+41. Maximum size square sub-matrix with all 1s
+Logic-> what is the max size of square that can be made if we set a point as top left point of square
+ public int maximalSquare(char[][] matrix) {
+		int m = matrix.length;
+		int n = matrix[0].length;
+		int[][] dp = new int[m][n];
 
-------------------------------------------------------------------------------------------------
-
+		int ans = 0;
+		for (int i = matrix.length - 1; i >= 0; i--) {
+			for (int j = matrix[0].length - 1; j >= 0; j--) {
+				if (matrix[i][j] == '0') {
+					dp[i][j] = 0;
+				} else {
+					if (i == matrix.length - 1 || j == matrix[0].length - 1) {
+						dp[i][j] = 1;
+					} else {
+						dp[i][j] = Math.min(dp[i + 1][j + 1], Math.min(dp[i + 1][j], dp[i][j + 1])) + 1;
+					}
+				}
+				ans = Math.max(ans, dp[i][j]);
+			}
+		}
+		return ans*ans;
+	}
 ------------------------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------------------------
