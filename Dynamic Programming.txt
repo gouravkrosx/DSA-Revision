@@ -1405,17 +1405,153 @@ Logic-> what is the max size of square that can be made if we set a point as top
 		return ans*ans;
 	}
 ------------------------------------------------------------------------------------------------
+42. Min / Max Path Sum In Matrix 
+-> Same as gold mine problem
+	public int MinPathSum(int[][] arr, int row, int col, int i, int j, int[][] dp) {
+        		if(i==row&& j==col)
+        		    return arr[i][j];
+        
+       		 if (i > row || j > col)
+			return 10000;
+        
+      		  if (dp[i][j] != -1)
+			return dp[i][j];
 
+		int d = MinPathSum(arr, row, col, i + 1, j, dp) + arr[i][j];
+		int r = MinPathSum(arr, row, col, i, j + 1, dp) + arr[i][j];
+		
+		int ans = Math.min(d,r);
+		dp[i][j] = ans;
+		return ans;
+	}
 ------------------------------------------------------------------------------------------------
-
+43.  Maximum difference of zeros and ones in binary string 
+Logic-> convert "0"-> "1"  and  "1" -> "-1" and apply Kadane's algo
 ------------------------------------------------------------------------------------------------
-
+44. Count number of ways to reacha given score in a game
+-> Same as Coin change problem (combination)
 ------------------------------------------------------------------------------------------------
+45. Minimum cost to fill given weight in a bag 
+->Kind of Unbounded Knapsack
+static long MinimumCost(int cost[], int N, int W, int i, long[][] dp) {
+		if (W <= 0)
+			return 0;
+		if (i == N) {
+			return 1000000000;  //check if this fxn return this value means not possible case
+		}
+		if (dp[i][W] != -1)
+			return dp[i][W];
 
+		if (cost[i] != -1 && W >= i + 1) {
+			return dp[i][W] = Math.min(cost[i] + MinimumCost(cost, N, W - i - 1, i, dp),
+					MinimumCost(cost, N, W, i + 1, dp));
+		} else
+			return dp[i][W] = MinimumCost(cost, N, W, i + 1, dp);
+	}
 ------------------------------------------------------------------------------------------------
-
+46. Maximum Profit in Job Scheduling
+DP->
+public int jobScheduling(int[] startTime, int[] endTime, int[] profit) {
+        int n = profit.length, res =0;
+        int[][] mat = new int[n][3];
+        int[] dp = new int[n];
+        for(int i=0;i<n;i++){
+            mat[i][0]=startTime[i];
+            mat[i][1]=endTime[i];
+            mat[i][2]=profit[i];
+        }
+        
+        Arrays.sort(mat,(a,b)->a[0]-b[0]);
+        
+        for(int i=0;i<n;i++){
+            int sum=mat[i][2];
+            for(int j=0;j<i;j++)
+                if( mat[j][1]<=mat[i][0] )
+                    sum= Math.max( sum, dp[j]+mat[i][2] );            
+            dp[i]=sum;
+            res = Math.max(res,dp[i]);
+        }
+        return res;    
+    }
+DP+Binary Search->
+ public int jobScheduling(int[] startTime, int[] endTime, int[] profit) {
+        int n = profit.length, res =0;
+        int[][] mat = new int[n][3];
+        int[] dp = new int[n];
+        for(int i=0;i<n;i++){
+            mat[i][0]=startTime[i];
+            mat[i][1]=endTime[i];
+            mat[i][2]=profit[i];
+        }
+        
+        Arrays.sort(mat,(a,b)->{
+		//If two jobs have same starting time, then choose job that ends before.
+            if(a[0]==b[0]) return a[1]-b[1];
+            return a[0]-b[0];
+        });
+        
+        for(int i=n-1;i>=0;i--){
+            int j = ceil(mat,mat[i][1],i+1,n-1);
+			/*
+			Choose best option between 
+			1.Exclude current job and looking for max profit from next index OR
+			2.Include current job and add max profit from the first interval that 
+			doesnot overlap with current ending interval.
+			*/
+            dp[i] = Math.max( (i+1 <n ? dp[i+1] : 0) ,mat[i][2]+ ((j==-1)?0:dp[j]));
+            res=Math.max(res,dp[i]);
+        }
+        
+        return res;
+    }
+    
+    private int ceil(int[][] mat, int val,int start, int end){
+        if(start>end || val> mat[end][0]) return -1;
+        if(start==end) return (val<=mat[start][0])?start:-1;
+        int mid;
+        while(start<=end){
+            mid= start+ (end-start)/2;
+            if(val==mat[mid][0]) return mid;
+            else if(val>mat[mid][0]) start= mid+1;
+            else end=mid-1;
+        }
+        return start;
+    }
 ------------------------------------------------------------------------------------------------
-
+47. Coin game winner where every player has three choices
+static boolean findWinner(int x, int y, int n)
+    {
+        // To store results
+        boolean[] dp = new boolean[n + 1];
+      
+        Arrays.fill(dp, false);
+     
+        // Initial values
+        dp[0] = false;
+        dp[1] = true;
+      
+        // Computing other values.
+        for (int i = 2; i <= n; i++) {
+      
+            // If A losses any of i-1 or i-x
+            // or i-y game then he will
+            // definitely win game i
+            if (i - 1 >= 0 && dp[i - 1] == false)  //false here denotes that last turn was of B
+                dp[i] = true;
+            else if (i - x >= 0 && dp[i - x] == false)
+                dp[i] = true;
+            else if (i - y >= 0 && dp[i - y] == false)
+                dp[i] = true;
+      
+            // Else A loses game.
+            else
+                dp[i] = false;
+        }
+      
+        // If dp[n] is true then A will
+        // game otherwise  he losses
+        return dp[n];
+    }
 ------------------------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------------------------
