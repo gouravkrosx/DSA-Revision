@@ -1553,21 +1553,279 @@ static boolean findWinner(int x, int y, int n)
         return dp[n];
     }
 ------------------------------------------------------------------------------------------------
-48. 
+48.  Longest subsequence such that difference between adjacent is one
+Logic-> Just like Longest Increasing Subsequence, we just need to check for difference of 1 instead checking whether current element
+is strictly increasing than prev taken.
 ------------------------------------------------------------------------------------------------
+49. Maximum Length of Pair Chain
+public int findLongestChain(int[][] pair) {
+     Chain[] arr=new Chain[pair.length];
+        for(int i=0;i<pair.length;i++){
+            int a=pair[i][0];
+            int b=pair[i][1];
+            arr[i]=new Chain(a,b);
+        } 
+     Arrays.sort(arr); //on the basis of first element
+     return LIS(arr);  //on the basis of first element of curr should be greater than prev selected second.
+    }
+------------------------------------------------------------------------------------------------
+50.Interleaving Strings
+ public boolean InterleavingString(String s1,String s2,String s3,int i,int j,Boolean[][]dp){
+        if(i==s1.length() && j==s2.length())
+            return true;
+        
+        if(dp[i][j]!=null)
+            return dp[i][j];
+        
+        
+        boolean ans=false;
+        if(i<s1.length() && j<s2.length() && s1.charAt(i)==s2.charAt(j) && s2.charAt(j)==s3.charAt(i+j)){
+            boolean op1=InterleavingString(s1,s2,s3,i+1,j,dp);
+            boolean op2=InterleavingString(s1,s2,s3,i,j+1,dp);
+            ans=op1||op2;    
+        }else if(i<s1.length() && s1.charAt(i)==s3.charAt(i+j)){
+           ans=InterleavingString(s1,s2,s3,i+1,j,dp);
+        }else if(j<s2.length() && s2.charAt(j)==s3.charAt(i+j)) {
+            ans=InterleavingString(s1,s2,s3,i,j+1,dp);
+        }
+        dp[i][j]=ans;
+        return ans;
+    }
+Bottom up-->
+public boolean isInterleave(String s1, String s2, String s3) {
+int len1 = s1.length();
+int len2 = s2.length();
+int len3 = s3.length();
+
+    if(len1 + len2 != len3){
+        return false;
+    }
+    
+    boolean [][] dp = new boolean[len2+1][len1+1];
+    // basic case
+    dp[0][0] = true;
+    
+    //filling the first row in the 2D matrix boolean dp matrix by iterating j in column
+    for(int j = 1; j < dp[0].length; j++){
+        //left side value
+        dp[0][j] = dp[0][j-1] && (s1.charAt(j-1)==s3.charAt(j-1));
+    }
+    //filling the first column in the 2D matrix boolean dp matrix by iterating i in row
+    for(int i=1; i<dp.length; i++){
+        dp[i][0] = dp[i-1][0] && (s2.charAt(i-1) == s3.charAt(i-1));
+    }
+    
+    //
+    for(int i=1; i<dp.length; i++){
+        for(int j=1; j<dp[0].length; j++){
+            dp[i][j] = dp[i-1][j] && (s2.charAt(i-1)==s3.charAt(i+j-1)) || dp[i][j-1] &&
+                (s1.charAt(j-1)==s3.charAt(i+j-1));
+        }
+    }
+    return dp[len2][len1];
+}
+
+Space optimised O(s2.length())
 
 ------------------------------------------------------------------------------------------------
+51. Buy And Sell STocks I
+Intuition-> Basically peak valley approach,but we can also understand with something that->
+If we sell the stock on today then what is the max profit, for this we go to past in time machine and see when there is least price of the 
+stock, we bought the stock at that day.
+
+* Buy And Sell Stock II
+->First traverse normal and check at every day the Max(if we sell the stock at this day what would be the 
+max profit(Check above intuition), if we sell the stock till today what will be the max profit)
+
+->Second traverse , reverse traverse and check at every day the Max of two cases.
+Case1: if we have to buy the stock today (mandatory) then what would be the profit
+(Basically we go to future in time machine and then check when the stock have max value, we will sell on that day)
+Case2: if we have to buy the stock from today (including today, means henceforth) (form reverse)then the max profit
+
+At last sum the both transactions (from both traversals) and find the max SUm.
+
+ public int maxProfit(int[] prices) {
+        int mpist=0;//max profit if sold today
+        int leastsf=prices[0]; //least so far
+        int[] dps=new int[prices.length]; //dp of max profit sold until today
+        
+        for(int i=1;i<prices.length;i++){
+            if(leastsf>prices[i]){
+                leastsf=prices[i];
+             }
+            
+            mpist=prices[i]-leastsf;
+            dps[i]=Math.max(dps[i-1],mpist);
+        }
+        
+        int mpibt=0;//max profit if bought today
+        int maxat=prices[prices.length-1];//max after today
+        int[] dpb=new int[prices.length]; 
+        //dp of max profit bought from today including curr day (henceforth)  
+        for(int i=prices.length-2;i>=0;i--){
+            if(maxat<prices[i]){
+                maxat=prices[i];
+            }
+            
+            mpibt=maxat-prices[i];
+            dpb[i]=Math.max(mpibt,dpb[i+1]);
+        }
+        //now we sum both the  non-overlapping transaction best on right and best on left
+        int op=0;
+        for(int i=0;i<prices.length;i++){
+            op=Math.max(op,dps[i]+dpb[i]);
+        }
+        return op;        
+    }
+------------------------------------------------------------------------------------------------
+52. Buy And Sell Stocks (K transactions allowed)
+Logic->
+Here we put days on column and no transactions on rows. 
+at a particular cell we define that on this day if we are allowed this much transaction then what would be the max profit
+So, There are two cases
+Case1: if we are on ith day and we are allowed t transactions and if (i-1)th day all t transaction are done. then it will contribute.
+Case2: if (t-1)transactions have already happened on (0 to (i-1)th)day then profit from this will be max of all the days from 0 to (i-1)th
+day and the transaction between current day and ith day.
+= dp[ith(0 to (i-1)th )] + price[curr]-price[ith]; 
+Ans At dp[i]=max of both the cases.
+
+Done for Optimization
+in case 2 we basically need max of all the transaction before curr day for t-1 transaction
+dp[i]+price[curr]-price[i]; for all the i's we have price[curr] is common
+so we need to maximize dp[i]-price[i]; ans at last add price[curr]
+
+ public int maxProfitKtransactions(int k, int[] prices) {
+        int n=prices.length;
+        if(n==0)
+        return 0;
+        
+        int[][]dp=new int[k+1][n];
+    //for row=0 or col=0 ans is 0 
+    //0 ans in 0th row means 0 transaction therefore no profit
+    //0 ans in 0th col means single day so not selling so 0 profit    
+        for(int t=1;t<=k;t++){
+            int mx=Integer.MIN_VALUE;
+            for(int d=1;d<n;d++){
+                mx=Math.max(mx,dp[t-1][d-1]-prices[d-1]);
+                dp[t][d]=Math.max(dp[t][d-1],mx+prices[d]);
+            }   
+        }
+        return dp[k][n-1];
+    }
 
 ------------------------------------------------------------------------------------------------
-
+53. Mobile numeric keypad
+Logic-> if we can press n keys then dp[i] stores that if n keys are pressed and if last key(nth key) pressed is "i" then
+how many words are there (basically seq of numbers)
+	public long getCount(int N)
+	{
+		long[]dp=new long[10];
+		Arrays.fill(dp,1);
+		int[][]data=new int[10][];
+		data[0]=new int[]{0,8};
+		data[1]=new int[]{1,2,4};
+		data[2]=new int[]{2,1,3,5};
+		data[3]=new int[]{3,2,6};
+		data[4]=new int[]{4,1,5,7};
+		data[5]=new int[]{5,2,4,6,8};
+		data[6]=new int[]{6,3,9,5};
+		data[7]=new int[]{7,8,4};
+		data[8]=new int[]{8,5,7,9,0};
+		data[9]=new int[]{9,6,8};
+		
+		for(int i=2;i<=N;i++){
+		    long[]dpp=new long[10];
+		    for(int j=0;j<=9;j++){
+		        for(int k:data[j])
+		            dpp[j]+=dp[k];
+		    }
+		    dp=dpp;
+		}
+		long ans=0;
+		for(long val:dp)
+		    ans+=val;
+		  
+		return ans;    
+	}
 ------------------------------------------------------------------------------------------------
-
+54. Maximum subsequence sum such that no three are consecutive
+static int maxSumWO3Consec(int arr[], int n)
+    {
+        // Stores result for subarray arr[0..i], i.e.,
+        // maximum possible sum in subarray arr[0..i]
+        // such that no three elements are consecutive.
+        int sum[] = new int[n];
+ 
+        // Base cases (process first three elements)
+        if (n >= 1)
+            sum[0] = arr[0];
+ 
+        if (n >= 2)
+            sum[1] = arr[0] + arr[1];
+ 
+        if (n > 2)
+            sum[2] = Math.max(sum[1], Math.max(arr[1] + arr[2], arr[0] + arr[2]));
+ 
+        // Process rest of the elements
+        // We have three cases
+        // 1) Exclude arr[i], i.e., sum[i] = sum[i-1]
+        // 2) Exclude arr[i-1], i.e., sum[i] = sum[i-2] + arr[i]
+        // 3) Exclude arr[i-2], i.e., sum[i-3] + arr[i] + arr[i-1]
+        for (int i = 3; i < n; i++)
+            sum[i] = Math.max(Math.max(sum[i - 1], sum[i - 2] + arr[i]),
+                              arr[i] + arr[i - 1] + sum[i - 3]);
+ 
+        return sum[n - 1];
+    }
 ------------------------------------------------------------------------------------------------
+55. Boolean Parenthesization 
+->
+ ltc/lfc       rtc/rfc    //ltc->left true count
+ (lhs) operand (rhs)      //lfc-> left false count
 
-------------------------------------------------------------------------------------------------
+Operands->
+	    tc                        fc	
+& ->   ltc*rtc                     ltc*rfc+lfc*rtc+lfc*rfc
+| ->   ltc*rfc+lfc*rtc+ltc*rtc     lfc*rfc
+^ ->   ltc*rfc+lfc*rtc  	   ltc*rtc+lfc*rfc
 
-------------------------------------------------------------------------------------------------
+public int countParenth(char[] symb, char[] oper) {
+        int n=symb.length;
+        int[][]dpt=new int[n][n];
+        int[][]dpf=new int[n][n];
 
+        for(int gap=0;gap<n;gap++){
+            for(int i=0,j=gap;j<n;j++,i++){
+                if(gap==0){
+                  if(symb[i]=='T'){
+                      dpt[i][j]=1;
+                      dpf[i][j]=0;
+                  }else{
+                      dpt[i][j]=0;
+                      dpf[i][j]=1;
+                  }
+                }else{
+                    for(int k=i;k<j;k++){
+                        int ltc=dpt[i][k];
+                        int rtc=dpt[k+1][j];
+                        int lfc=dpf[i][k];
+                        int rfc=dpf[k+1][j];
+                        if(oper[k]=='&'){
+                            dpt[i][j]+=ltc*rtc;
+                            dpf[i][j]+=ltc*rfc+lfc*rtc+lfc*rfc;
+                        }else if(oper[k]=='|'){
+                            dpt[i][j]+=ltc*rfc+lfc*rtc+ltc*rtc;
+                            dpf[i][j]+=lfc*rfc;
+                        }else{
+                            dpt[i][j]+=ltc*rfc+lfc*rtc;
+                            dpf[i][j]+=ltc*rtc+lfc*rfc;
+                        }
+                    }
+                }
+            }
+        }
+          return dpt[0][n-1]; 
+    }
 ------------------------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------------------------

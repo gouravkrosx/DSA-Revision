@@ -566,61 +566,21 @@ T(nk),S(k-1)
         }
         return diff;
 
-
-Leetcode #123 Best time to buy and sell stock III ->https://www.youtube.com/watch?v=37s1_xBiqH0
-Approach-> Divide and conquer
-
-int maxProfit(vector<int>& prices) {
-          // the idea is to divide the array into two parts there will be left and right parts 
-      // left part can have atmost 1 transaction and right part also
-->in left part we buy first then sell, time frame is from left to right.
-->in right part we sell first then buy, time frame is from right to left
-    
-        int n=prices.size();
-        if(n==0){
-            return 0;
-        }
-        
-        vector<int>left(n),right(n);
-
-        int leftmin=prices[0];
-        for(int i=1;i<n;i++){
-            left[i]=max(left[i-1],prices[i]-leftmin);
-            leftmin=min(leftmin,prices[i]);
-        }
-        
-        int rightmax=prices[n-1];
-        for(int j=n-2;j>=0;j--){
-            right[j]=max(right[j+1],rightmax-prices[j]);
-            rightmax=max(rightmax,prices[j]);
-        }
-        
-        int profit=right[0];
-        for(int i=1;i<n;i++){
-            //left[i-1] because its the part of prices array and the other part is from i-1+1=i which is right part
-            profit=max(profit,left[i-1]+right[i]);
-        }
-        return profit;            
-    }
-
-Method 2 -> Difficult to understand
+Another Method->
  public int maxProfit(int[] prices) {
-        if(prices.length==0){
-            return 0;
+        int bd=0;
+        int sd=0;
+        int profit=0;
+        for(int i=1;i<prices.length;i++){
+            if(prices[i]>prices[i-1]){
+                sd++;
+            }else{
+                profit+=prices[sd]-prices[bd];
+                bd=sd=i;
+            }
         }
-        
-     int fb=Integer.MIN_VALUE;
-     int sb=Integer.MIN_VALUE;
-     int fs=0;
-     int ss=0;
-        
-      for(int i=0;i<prices.length;i++){
-          fb=Math.max(fb,-prices[i]);
-          fs=Math.max(fs,fb+prices[i]);
-          sb=Math.max(sb,fs-prices[i]);
-          ss=Math.max(ss,sb+prices[i]);
-      }  
-     return ss;        
+        profit+=prices[sd]-prices[bd];
+        return profit;  
     }
 --------------------------------------------------------------------------------
 21. Array Subset of another array
