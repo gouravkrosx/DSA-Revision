@@ -757,6 +757,24 @@ public static void main(String args[]) {
 		}
 	}
 ---------------------------------------------------------------------------------
+28. Maximum sum of (disjoint) pairs with specific difference
+->disjoint pair-> (a,b) (c,d)
+ public static int maxSumPairWithDifferenceLessThanK(int arr[], int n, int k) 
+    {
+        Arrays.sort(arr);
+        int sum=0;
+        int i=n-1;
+        
+        while(i>0){
+            if(arr[i]-arr[i-1]<k){
+                sum+=arr[i]+arr[i-1];
+                i-=2;
+            }else{
+                i--;
+            }
+        }
+        return sum;
+    }
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------

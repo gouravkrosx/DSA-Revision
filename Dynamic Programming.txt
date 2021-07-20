@@ -1827,13 +1827,65 @@ public int countParenth(char[] symb, char[] oper) {
           return dpt[0][n-1]; 
     }
 ------------------------------------------------------------------------------------------------
+56. Optimal Binary Search Tree 
+#Keypoints->
+no. of comparisons= depth of the element in the tree
 
+ private static void optimalbst(int[] keys, int[] freq, int n) {
+    int[][]dp=new int[n][n];
+    int[]psa=new int[n]; // so that we will not calculate sum of freq again n again
+    // and we need this because by adding this req value, we are adding the current element in the bst
+    // which increases the other's depth  by 1.
+    //suppose ans of c-d  is 2  (min(c'+2d',d'+2c')=c'+2d') now if we want ans of
+    // a-(c-d) then the ans will be c'+2d'+(a'+c'+d')
+    
+    psa[0]=freq[0];
+    for(int i=1;i<psa.length;i++){
+        psa[i]=psa[i-1]+freq[i];
+    }
+    
+    for(int gap=0;gap<n;gap++){
+        for(int i=0,j=gap;j<n;j++,i++){
+            if(gap==0){
+                dp[i][j]=freq[i];
+            }else if(gap==1){
+                int f1=freq[i];
+                int f2=freq[j];
+                dp[i][j]=Math.min(f1+2*f2,f2+2*f1);
+            }else{
+                int min=Integer.MAX_VALUE;
+                int fr=psa[j]-((i==0)?0:psa[i-1]);
+                for(int k=i;k<=j;k++){
+                    int left=((k==i)?0:dp[i][k-1]);
+                    int right=((k==j)?0:dp[k+1][j]);
+                    min=Math.min(min,left+right+fr);
+                }
+                dp[i][j]=min;
+            }      
+        }
+    }
+      System.out.println(dp[0][n-1]);
+    }
 ------------------------------------------------------------------------------------------------
-
+57. Count Balanced Binary Trees of Height h
+static long countBT(int h){
+        if(h==0||h==1)
+            return 1;
+            
+            long mod=1000000007;
+            long[]dp=new long[h+1];
+            dp[0]=dp[1]=1;
+            
+            // case1: c(h-1)*c(h-1);
+            // case2: c(h-1)*c(h-2);
+            // case3: c(h-2)*c(h-1);
+            for(int i=2;i<=h;i++){
+                dp[i]=( dp[i-1]*( (2*dp[i-2])%mod + dp[i-1]) )%mod;
+            }
+            return dp[h];
+        }
 ------------------------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------------------------
-
+58. Minimum removals from array to make max –min <= K
 ------------------------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------------------------
