@@ -1886,9 +1886,236 @@ static long countBT(int h){
         }
 ------------------------------------------------------------------------------------------------
 58. Minimum removals from array to make max –min <= K
-------------------------------------------------------------------------------------------------
+Dp->
+static int countRemovals(int a[], int i, int j, int k)
+    {
+        // base case when all elements are removed
+        if (i >= j)
+            return 0;
+     
+        // if condition is satisfied, no more
+        // removals are required
+        else if ((a[j] - a[i]) <= k)
+            return 0;
+     
+        // if the state has already been visited
+        else if (dp[i][j] != -1)
+            return dp[i][j];
+     
+        // when Amax-Amin>d
+        else if ((a[j] - a[i]) > k) {
+     
+            // minimum is taken of the removal
+            // of minimum element or removal
+            // of the maximum element
+            dp[i][j] = 1 + Math.min(countRemovals(a, i + 1, j, k),
+                                    countRemovals(a, i, j - 1, k));
+        }
+        return dp[i][j];
+    }
+Binary Search->
+
+static int removals(int arr[], int n, int k)
+{
+    int i, j, ans = n - 1;
+     
+    // Sort the given array
+    Arrays.sort(arr);
+     
+    // Iterate from 0 to n-1
+    for(i = 0; i < n; i++)
+    {
+         
+        // Find max(so that we have to remove lesser no of elements) value of j such that
+        // arr[j] - arr[i] <= k 
+        j = findInd(arr[i], i, n, k, arr);
+         
+        // If there exist such j
+        // that satisfies the condition
+        if (j != -1)
+        {
+             
+            // Number of elements
+            // to be removed for this
+            // particular case is
+            // (j - i + 1)
+            ans = Math.min(ans,
+                           n - (j - i + 1));
+        }
+    }
+    return ans;
+}
+
+static int findInd(int key, int i,
+                   int n, int k, int arr[])
+{
+    int start, end, mid, ind = -1;
+    start = i + 1;
+    end = n - 1;
+     
+    // Binary search implementation
+    // to find the rightmost element
+    // that satisfy the condition
+    while (start < end)
+    {
+        mid = start + (end - start) / 2;
+        if (arr[mid] - key <= k)
+        {    
+            ind = mid;
+            start = mid + 1;
+        }
+        else
+        {            
+           end = mid;
+        }
+    }
+     
+    // Return the rightmost position
+    return ind;
+}
 
 ------------------------------------------------------------------------------------------------
+59. Wine Problem
+public static int WineProblemTD(int[] arr, int si, int ei, int[][] strg) {
+		int year = arr.length - ei + si;
+		if (si == ei) {
+			return arr[si] * year;
+		}
+		if (strg[si][ei] != 0) {
+			return strg[si][ei];
+		}
+		int first = WineProblemTD(arr, si + 1, ei, strg) + arr[si] * year;
+		int last = WineProblemTD(arr, si, ei - 1, strg) + arr[ei] * year;
+
+		int ans = Math.max(first, last);
+		strg[si][ei] = ans;
+		return ans;
+
+	}
+
+	public static int WineProblemBU(int[] arr) {
+		int n = arr.length;
+		int[][] strg = new int[n][n];
+		for (int slide = 0; slide <= n - 1; slide++) {
+			for (int si = 0; si <= n - slide - 1; si++) {
+				int ei = si + slide;
+				int year = arr.length - ei + si;
+				if (si == ei) {
+
+					strg[si][ei] = arr[si] * year;
+					continue;
+				}
+				int first = strg[si + 1][ei] + arr[si] * year;
+				int last = strg[si][ei - 1] + arr[ei] * year;
+
+				int ans = Math.max(first, last);
+				strg[si][ei] = ans;
+
+			}
+		}
+		return strg[0][n - 1];
+	}
+
+------------------------------------------------------------------------------------------------
+60. HarryPotter Color Mixture
+public static int harrypottercolormixturesTD(int[] arr, int si, int ei, int[][] strg) {
+		if (si == ei) {
+			return 0;
+		}
+
+		if (strg[si][ei] != 0) {
+			return strg[si][ei];
+		}
+		int ans = Integer.MAX_VALUE;
+		for (int k = si; k <= ei - 1; k++) {
+			int fp = harrypottercolormixturesTD(arr, si, k, strg);
+			int sp = harrypottercolormixturesTD(arr, k + 1, ei, strg);
+			int sw = resultingcolour(arr, si, k) * resultingcolour(arr, k + 1, ei);
+
+			int overall = sw + fp + sp;
+			if (overall < ans) {
+				ans = overall;
+			}
+		}
+		strg[si][ei] = ans;
+		return ans;
+	}
+
+	public static int resultingcolour(int[] arr, int i, int j) {
+		int sum = 0;
+		for (int k = i; k <= j; k++) {
+			sum += arr[k];
+		}
+		return sum % 100;
+	}
+
+	public static int harrypottercolormixturesBU(int[] arr) {
+		int n = arr.length;
+		int[][] strg = new int[n][n];
+
+		for (int slide = 1; slide <= n - 1; slide++) {
+			for (int si = 0; si <= n - slide - 1; si++) {
+				int ei = si + slide;
+				int ans = Integer.MAX_VALUE;
+				for (int k = si; k <= ei - 1; k++) {
+					int fp = strg[si][k];
+					int sp = strg[k + 1][ei];
+					int sw = resultingcolour(arr, si, k) * resultingcolour(arr, k + 1, ei);
+
+					int overall = sw + fp + sp;
+					if (overall < ans) {
+						ans = overall;
+					}
+				}
+				strg[si][ei] = ans;
+			}
+		}
+		return strg[0][n - 1];
+	}
+----------------------------------------------------------------------------------
+61. Rod Cutting
+	public static int RodcuttingTD(int[] arr, int len, int[] strg) {
+
+		if (strg[len] != 0) {
+			return strg[len];
+		}
+		int profit = arr[len];
+		int left = 1;
+		int right = len - 1;
+		while (left <= right) {
+			int fp = RodcuttingTD(arr, left, strg);
+			int sp = RodcuttingTD(arr, right, strg);
+
+			int ans = fp + sp;
+			profit = (profit < ans) ? ans : profit;
+			left++;
+			right--;
+		}
+		strg[len] = profit;
+		return profit;
+
+	}
+
+	public static int RodcuttingBU(int[] arr) {
+		int[] strg = new int[arr.length];
+		for (int i = 1; i < strg.length; i++) {
+			int profit = arr[i];
+			int left = 1;
+			int right = i - 1;
+			while (left <= right) {
+				int fp = strg[left];
+				int sp = strg[right];
+
+				int ans = fp + sp;
+				profit = (profit < ans) ? ans : profit;
+				left++;
+				right--;
+			}
+			strg[i] = profit;
+		}
+		return strg[arr.length - 1];
+
+	}
 
 ------------------------------------------------------------------------------------------------
 
