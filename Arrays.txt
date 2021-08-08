@@ -95,7 +95,7 @@ public void sortColors(int[]nums){
 4. Minimize the heights
 
  int getMinDiff(int[] arr, int n, int k) {
-  //here in this question we have to minimize the maximum(minmax) and maximize the minimum(maxmin) hence find miimum difference, here we don't need that any value less than (maxmin) and any value greater than (minmax)   
+  //here in this question we have to minimize the maximum(minmax) and maximize the minimum(maxmin) hence find minimum difference, here we don't need that any value less than (maxmin) and any value greater than (minmax)   
 
 //increase the smaller value and decrease the bigger value.  
      Arrays.sort(arr);
@@ -108,7 +108,7 @@ public void sortColors(int[]nums){
       //handling middle elements
       for(int i=1;i<n;i++){
           if(arr[i]>=k){   //since height should be non-negative
-              
+              //we are taking adjacent because only adjacent will give the smallest difference.
               int mn=Math.min(first,arr[i]-k); 
               int mx=Math.max(last,arr[i-1]+k);
               ans=Math.min(ans,mx-mn);         
@@ -867,8 +867,8 @@ public double findMedianSortedArrays(int[] arr, int[] brr) {
             return findMedianSortedArrays(brr,arr);
         }
         
-        int begin1=0;
-        int end1=n;
+        int begin1=0;  //min elements which can be chosen from a array
+        int end1=n;    //max elements 
         
         while(begin1<=end1){
         

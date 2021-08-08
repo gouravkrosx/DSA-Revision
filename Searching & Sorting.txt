@@ -294,7 +294,7 @@ public static long find0SumSubarray(long[] arr ,int n)
 13. Product of array except self (for O(n) with S(1)->https://www.youtube.com/watch?v=gREVHiZjXeQ)
 -> For O(1) space take a variable product(this will store the righ prefix product), and also we have a output array which doesn't count for extra space, fill the output array with prefix product.
 nums->       1   2   3   4		product=1->1*4->4*3->4*3*2
-out - >         1   2   6   24                              out[i]=out[i-1]*product;
+out - >      1   2   6   24                              out[i]=out[i-1]*product;
 ->                 24   12  8    6
     public int[] productExceptSelf(int[] arr) {
         int n=arr.length;

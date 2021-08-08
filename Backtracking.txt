@@ -343,6 +343,7 @@ public static void PartitionInKsubsets(int i, int n, int k, int nos, ArrayList<A
 			}
 			return;
 		}
+	//Size of ans ArrayList is K.
 		for (int j = 0; j < ans.size(); j++) {
 			if (ans.get(j).size() > 0) {
 				// existing non empty set-> so "nos" will not increase

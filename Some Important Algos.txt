@@ -1,0 +1,7 @@
+1. Any To Any conversion (eg binary to decimal)
+2. bubble,insertion,selection sorting.
+3. Merge Sort
+4. Quick Sort
+5. Kmp ALgo, Rabin karp Algo
+
+#. All Graph Algos like(Bfs, Dfs, Cycle Detection in )

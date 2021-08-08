@@ -241,7 +241,7 @@ Intuition-> we just break every row as a single array, simply dry run for easy e
         return l; 
     }
     public int findMedian(ArrayList<ArrayList<Integer>> A) {
-        int low = Integer.MIN_VALUE;
+        int low = Integer.MIN_VALUE;  //1
         int high = Integer.MAX_VALUE; 
         int n = A.size();
         int m = A.get(0).size(); 

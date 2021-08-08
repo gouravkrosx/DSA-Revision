@@ -191,12 +191,13 @@ private static void PrintSubsequences(String q, String ans) {
 	}
 -----------------------------------------------------------------------------------
 7. Permutations of a given string using backtracking
+-> the one which is less don't have choice to leave.
 -> use   private static ArrayList<String> res;
 ->and after calling this FUNCTION->
 Collections.sort(res);
 System.out.println(res.toString().replace("[","").replace("]","").replace(",",""));
 	private static void Permutations(int cs, int ts, HashMap<Character, Integer> fmap, String ans) {
-		if (cs> ts) {
+		if (cs==ts) {  //cs->current spot, ts->total spot
 		  res.add(ans);
 			return;
 		}
@@ -884,5 +885,6 @@ r=0,str=2d character array but with variable length of column, sen =empty senten
         return res;      
     } 
 -----------------------------------------------------------------------------------
+30. Why strings are immutable in Java?
 -----------------------------------------------------------------------------------
 

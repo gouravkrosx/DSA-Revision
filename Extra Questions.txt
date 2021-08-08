@@ -16,6 +16,47 @@ public static void toh(int n, int t1id, int t2id, int t3id){
 2. Do All variations of buy and sell stock
 -------------------------------------------------------------------------------------
 3. Permutations (leetcode 46)
+->Time complexity->(n!*n)
+->Space complexity->(2n)
+
+Using extra space->
+ public void solve( List<List<Integer>>ans,List<Integer>ds,boolean[]freq,int[]nums){
+        if(ds.size()==nums.length)
+        {
+            ans.add(new ArrayList<>(ds));
+            return;
+        }
+        
+        for(int i=0;i<nums.length;i++){
+            if(!freq[i]){
+                freq[i]=true;
+                ds.add(nums[i]);
+                solve(ans,ds,freq,nums);
+                ds.remove(ds.size()-1);
+                freq[i]=false;
+            }
+        }
+    }
+Space optimised->
+ public void solve(List<List<Integer>>ans,int idx,int[]nums){
+    
+        if(idx==nums.length){
+            //copy the altered array.
+            List<Integer>ds=new ArrayList<>();
+            for(int i=0;i<nums.length;i++){
+                ds.add(nums[i]);
+            }
+            ans.add(new ArrayList<>(ds));
+            return;
+        }
+        //swap every index with every other ahead index
+        for(int i=idx;i<nums.length;i++){
+            swap(i,idx,nums);
+            solve(ans,idx+1,nums);
+            swap(i,idx,nums);
+        }    
+    }
+
 
 -------------------------------------------------------------------------------------
 4. Subarray Product less than K (leetcode 713)
@@ -79,9 +120,13 @@ private int maxSumSubArray(int[] a , int k){
 -------------------------------------------------------------------------------------
 14. Longest Consecutive Sequence (Leetcode 28)
 -------------------------------------------------------------------------------------
+15. Distinct Subsequence
 -------------------------------------------------------------------------------------
+16. Path In Zigzag Labelled Binary Tree (Leetcode 1104.)
 -------------------------------------------------------------------------------------
+17. Validate Binary Tree Nodes (Leetcode 1361)
 -------------------------------------------------------------------------------------
+18. Biggest cycle in Directed Graph.
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------

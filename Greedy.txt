@@ -88,10 +88,11 @@ static class meeting {
 	}
 ---------------------------------------------------------------------------------
 4. Minimum Platforms
-Intuition-> we sort both arrays and check whether there is platform needed for any arrival or departure train.
+Intuition> we sort both arrays and check whether there is platform needed for any arrival or departure train. because in our approach we just need the time of arrival (platform++) and time of departure(platform--) and we traverse through time.
 DryRun the code to get better Understanding
  static int findPlatform(int arr[], int dep[], int n)
     { 
+	//arrival->start time, departure-> end time
        Arrays.sort(arr);
        Arrays.sort(dep);
        

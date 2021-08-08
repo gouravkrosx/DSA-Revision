@@ -1,7 +1,7 @@
 1) sort and array using recursion
 2)DP question-> https://www.youtube.com/watch?v=VT4bZV24QNo
 3)Heavy weight knapsack
-4) Just add all the questions from eclipse after doing all questions
+
 
 
 SOLUTIONS OF THESE QUESTIONS ARE EITHER ON GFG OR ON LEETCODE.
@@ -2118,7 +2118,7 @@ public static int harrypottercolormixturesTD(int[] arr, int si, int ei, int[][] 
 	}
 
 ------------------------------------------------------------------------------------------------
-
+62. Word Wrap
 ------------------------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------------------------

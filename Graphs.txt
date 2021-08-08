@@ -1,0 +1,913 @@
+SOLUTIONS OF THESE QUESTIONS ARE EITHER ON GFG OR ON LEETCODE.
+---------------------------------------Graphs-----------------------------------------
+
+
+1. Implement a Graph
+
+public static void main(String[] args) {
+		Scanner scn = new Scanner(System.in);
+		int n = scn.nextInt();
+		int m = scn.nextInt();
+
+		ArrayList<ArrayList<pair>> adj = new ArrayList<>();
+		for (int i = 1; i <= n + 1; i++) {
+			adj.add(new ArrayList<>());
+		}
+
+		for (int i = 0; i < m; i++) {
+			int u = scn.nextInt();
+			int v = scn.nextInt();
+			int w = scn.nextInt();
+
+			pair p1 = new pair(v, w);
+			adj.get(u).add(p1);
+
+			pair p2 = new pair(u, w);
+			adj.get(v).add(p2);
+		}
+
+		for (int i = 1; i <= n; i++) {
+			for (int j = 0; j < adj.get(i).size(); j++) {
+				System.out.println(i + " -> " + adj.get(i).get(j).node + " - " + adj.get(i).get(j).weight);
+			}
+		}
+	}
+
+	public static class pair {
+		int node;
+		int weight;
+
+		pair(int n, int w) {
+			this.node = n;
+			this.weight = w;
+		}
+
+	}
+--------------------------------------------------------------------------------------
+2. BFS of a Graph
+// T-> O(N+E)
+// S-> O(N)+O(N)+O(N+E)
+// visArray, queue, adj list
+	public static ArrayList<Integer> BfsOfGraph(int v, ArrayList<ArrayList<Integer>> adj) {
+
+		ArrayList<Integer> bfs = new ArrayList<>();
+		boolean[] vis = new boolean[v + 1]; // taken this so that we traverse through all connected components in case
+											// of disconnected graph
+
+		for (int i = 1; i <= v; i++) {
+			if (!vis[i]) {
+				Queue<Integer> q = new LinkedList<>();
+
+				q.add(i);
+				vis[i] = true;
+				while (!q.isEmpty()) {
+					int r = q.poll();
+					bfs.add(r);
+
+					for (int an : adj.get(r)) {
+						if (!vis[an]) {
+							vis[an] = true;
+							q.add(an);
+						}
+					}
+				}
+			}
+		}
+		return bfs;
+	}
+--------------------------------------------------------------------------------------
+3. DFS of a Graph
+
+// T-> O(N+E)
+// S-> O(N)+O(N)+O(N+E)
+
+	// for dfs either you can copy same code for bfs and instead of using queue use
+	// stack OR you can apply recursion
+
+	public static ArrayList<Integer> DfsOfGraph(int v, ArrayList<ArrayList<Integer>> adj) {
+		ArrayList<Integer> storeDfs = new ArrayList<>();
+		boolean[] vis = new boolean[v + 1];
+		for (int i = 1; i <= v; i++) {
+			if (!vis[i]) {
+				dfs(i, vis, adj, storeDfs);
+			}
+		}
+		return storeDfs;
+	}
+
+	public static void dfs(int node, boolean[] vis, ArrayList<ArrayList<Integer>> adj, ArrayList<Integer> storeDfs) {
+		storeDfs.add(node);
+		vis[node]=true;
+		for(int an:adj.get(node)) {
+			if(!vis[an]) {
+				dfs(an, vis, adj, storeDfs);
+			}
+		}
+	}
+--------------------------------------------------------------------------------------
+3. Cycle Detection in Undirected Graph
+
+//For DFS & BFS
+// T-> O(N+E)
+// S-> O(N)+O(N)+O(N+E)
+
+Using BFS->
+	public static boolean CycleDetectionBFS(int v, ArrayList<ArrayList<Integer>> adj) {
+		boolean vis[] = new boolean[v + 1];
+
+		for (int i = 1; i <= v; i++) {
+			if (!vis[i]) {
+				if (checkCycleBfs(i, adj, vis)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private static boolean checkCycleBfs(int s, ArrayList<ArrayList<Integer>> adj, boolean[] vis) {
+		Queue<Node> q = new LinkedList<>();
+		vis[s] = true;
+		q.add(new Node(s, -1));
+
+		while (!q.isEmpty()) {
+			int n = q.peek().node;
+			int p = q.peek().parent;
+			q.remove();
+			for (int an : adj.get(n)) { // an->adjNodes of curr node
+				if (!vis[an]) {
+					vis[an] = true;
+					q.add(new Node(an, n));
+				} else if (p != an) {
+					// this detects the cycle -> as this indicates that the this node(an=adjNodes)
+					// is visited and it's not equal to (parent node/prev node) of curr node
+					// means curr node has come from another path also at meets here therefore makes
+					// cycle
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public static class Node {
+		int node;
+		int parent;
+
+		public Node(int n, int p) {
+			this.node = n;
+			this.parent = p;
+		}
+	}
+
+Using DFS->
+public static boolean CycleDetectionDFS(int v, ArrayList<ArrayList<Integer>> adj) {
+
+		boolean vis[] = new boolean[v + 1];
+
+		for (int i = 1; i <= v; i++) {
+			if (!vis[i]) {
+				if (checkCycleDfs(i, -1, adj, vis)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private static boolean checkCycleDfs(int node, int parent, ArrayList<ArrayList<Integer>> adj, boolean[] vis) {
+		vis[node] = true;
+
+		for (int an : adj.get(node)) {
+			if (!vis[an]) {
+				if (checkCycleDfs(an, node, adj, vis))
+					return true;
+			} else if (parent != an) {
+				return true;
+			}
+		}
+		return false;
+	}
+--------------------------------------------------------------------------------------
+4. Cycle Detection in directed Graph
+
+//For DFS & BFS
+// T-> O(N+E)
+// S-> O(N)+O(N)+O(N+E)
+
+Using DFS->
+public static boolean DetectCycleDfs(int n, ArrayList<ArrayList<Integer>> adj) {
+		boolean vis[] = new boolean[n + 1];
+		boolean dfsVis[] = new boolean[n + 1];
+
+		for (int i = 1; i <= n; i++) {
+			if (!vis[i]) {
+				if (IsCycleDfs(i, vis, dfsVis, adj)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public static boolean IsCycleDfs(int node, boolean[] vis, boolean[] dfsVis, ArrayList<ArrayList<Integer>> adj) {
+		vis[node] = true;
+		dfsVis[node] = true;
+		for (int an : adj.get(node)) {
+			if (!vis[an]) {
+				if (IsCycleDfs(an, vis, dfsVis, adj))
+					return true;
+			} else if (dfsVis[an]) { // here it get checked there exists any cycle in directed graph
+				return true;
+			}
+		}
+
+		dfsVis[node] = false;
+		return false;
+	}
+
+Using BFS->
+// For Bfs we use topological sort. if we are unable to generate topological
+	// sort it means the graph must have cycle because we use topoSort in DAG.
+	public static boolean CycleDetectionBfs(int n, ArrayList<ArrayList<Integer>> adj) {
+		int[] indegree = new int[n + 1];
+
+		for (int i = 1; i <= n; i++) {
+			for (int an : adj.get(i)) {
+				indegree[an]++; // as these are adjacent of i node means there is incoming edge from i (which is
+								// indegree)
+			}
+		}
+
+		Queue<Integer> q = new LinkedList<>();
+		for (int i = 1; i <= n; i++) {
+			if (indegree[i] == 0)
+				q.add(i);
+		}
+		int c = 0;
+		while (!q.isEmpty()) {
+			int rn = q.poll();
+			c++;
+			for (int an : adj.get(rn)) {
+				indegree[an]--;
+				if (indegree[an] == 0) {
+					q.add(an);
+				}
+			}
+		}
+		if (c == n)
+			return false; // because topoSort is linear ordering there at most total n nodes will be
+							// encountered.
+		return true; // if not means there must be cycle
+	}
+--------------------------------------------------------------------------------------
+5. Topological Sorting of Graph
+
+// Topological Sorting->It is linear ordering of vertices such that if there is
+	// an edge u->v, u appears before v in that ordering.
+	// there can be multiple topoSort for a given graph. Topological sorting is
+	// possible for Directed Acyclic Graphs (DAG)
+
+//	For DFS Intuition
+	// The general intuition behind this algo is-> just because if there is a
+	// path/edge from u->v the dfs call went from u to v so, the first dfs call that
+	// will
+	// get over will be of v after that of u, so automatically if your stack is the
+	// topoSort, v will be inserted First right after will u, which is making sure
+	// that if there is an edge from u to v , u appears before v.
+
+	// T-> O(N+E)
+	// S-> vis->O(N) + auxiliary space (recursion)->O(N) + ajdList->O(N+E)
+	// +TopoSortSTACK->O(N)
+
+Using Dfs->
+
+public static ArrayList<Integer> TopoSortDfs(int n, ArrayList<ArrayList<Integer>> adj) {
+		Stack<Integer> st = new Stack<>();
+		boolean[] vis = new boolean[n + 1];
+
+		for (int i = 1; i <= n; i++) {
+			if (!vis[i]) {
+				Dfs(i, vis, st, adj);
+			}
+		}
+
+		ArrayList<Integer> Topo = new ArrayList<>();
+		while (!st.isEmpty()) {
+			Topo.add(st.pop());
+		}
+		return Topo;
+	}
+
+	public static void Dfs(int node, boolean[] vis, Stack<Integer> st, ArrayList<ArrayList<Integer>> adj) {
+		vis[node] = true;
+		for (int an : adj.get(node)) {
+			if (!vis[an])
+				Dfs(an, vis, st, adj);
+		}
+		st.push(node);
+	}
+
+Using BFS->
+
+	// For BFS Intuition
+// if a node is appearing in the starting of Ans List then it means that there is no edge before that node that means we can say topological sort start with 
+//	someone	who has indegree 0, as there can be multiple topoSort therefore it can start with any node having indegree 0, Why did we subtract indegrees of 
+//	adjacent nodes ? we can say that this node has dependency factor on its adjacent nodes therefore as we write or add this node to the anslist , all the edges 
+//	between its adjacent will go off so this decreases the indegree of the adjacent nodes. and now as soon as their(adj nodes) indegrees become 0 they become 
+//	independent hence we can add them to the ans.	
+
+	// Bfs Topological Sort is also known as Kahn's Algorithm
+//	Time and space complexity is same as DfsTopoSort.
+	public static ArrayList<Integer> TopoSortBfs(int n, ArrayList<ArrayList<Integer>> adj) {
+		ArrayList<Integer> topo = new ArrayList<>();
+		int[] indegree = new int[n + 1];
+
+		for (int i = 1; i <= n; i++) {
+			for (int an : adj.get(i)) {
+				indegree[an]++; // as these are adjacent of i node means there is incoming edge from i (which is
+								// indegree)
+			}
+		}
+
+		Queue<Integer> q = new LinkedList<>();
+		for (int i = 1; i <= n; i++) {
+			if (indegree[i] == 0)
+				q.add(i);
+		}
+
+		while (!q.isEmpty()) {
+			int rn = q.poll();
+			topo.add(rn);
+			for (int an : adj.get(rn)) {
+				indegree[an]--;
+				if (indegree[an] == 0) {
+					q.add(an);
+				}
+			}
+		}
+		return topo;
+	}
+--------------------------------------------------------------------------------------
+6. Bipartite Graph
+
+// Bipartite Graph-> A graph that can colored using exactly 2 colors such that
+	// no two adjacent nodes have same color.
+	// KeyObservations->
+//	1. If a graph has odd length cycle, it is not bipartite
+//  2. If graph doesn't have odd length cycle, then it is bipartite( covers no cycle and cycle with even length)
+
+//	For DFS & BFS
+	// T-> O(N+E)
+	// S-> O(N)+O(N)+O(N+E)
+
+Using Bfs->
+public static boolean BipartiteBfs(int n, ArrayList<ArrayList<Integer>> adj) {
+		int[] color = new int[n + 1];
+		Arrays.fill(color, -1);
+		for (int i = 1; i <= n; i++) {
+			if (color[i] == -1) {
+				if (!checkBipartiteBfs(i, adj, color))
+					return false;
+			}
+		}
+		return true;
+	}
+
+	public static boolean checkBipartiteBfs(int s, ArrayList<ArrayList<Integer>> adj, int[] color) {
+		Queue<Integer> q = new LinkedList<>();
+		q.add(s);
+		color[s] = 1;
+
+		while (!q.isEmpty()) {
+			int rn = q.poll();
+			for (int an : adj.get(rn)) {
+				if (color[an] == -1) {
+					color[an] = 1 - color[rn];
+					q.add(an);
+				} else if (color[an] == color[rn])
+					return false;
+			}
+
+		}
+		return true;
+	}
+
+Using DFS->
+public static boolean BipartiteDfs(int v, ArrayList<ArrayList<Integer>> adj) {
+		int[] color = new int[v + 1];
+		Arrays.fill(color, -1);
+		for (int i = 1; i <= v; i++) {
+			if (color[i] == -1) {
+				if (!checkBipartiteDfs(i, adj, color))
+					return false;
+			}
+		}
+		return true;
+	}
+
+	private static boolean checkBipartiteDfs(int node, ArrayList<ArrayList<Integer>> adj, int[] color) {
+		if (color[node] == -1)
+			color[node] = 1;
+
+		for (int an : adj.get(node)) {
+			if (color[an] == -1) {
+				color[an] = 1 - color[node];
+				if (!checkBipartiteDfs(an, adj, color))
+					return false;
+			} else if (color[an] == color[node])
+				return false;
+		}
+		return true;
+	}
+--------------------------------------------------------------------------------------
+#) SHORTEST PATHS->
+
+// Shortest distance from source to every other node in Undirected Graph with Unit weights.
+// Bfs Algorithm always gives shortest path as it moves every step by unit distance.	
+//	TC->O(N+E)
+//	SC->O(2N)
+	public static void ShortestDistanceUndirectedGraph(int n, int src, ArrayList<ArrayList<Integer>> adj) {
+		int[] dis = new int[n];
+		for (int i = 0; i < n; i++) {
+			dis[i] = 1000000000;
+		}
+
+		Queue<Integer> q = new LinkedList<>();
+		q.add(src);
+		dis[src] = 0;
+
+		while (!q.isEmpty()) {
+			int rn = q.poll();
+			for (int an : adj.get(rn)) {
+				if (dis[rn] + 1 < dis[an]) {
+					dis[an] = dis[rn] + 1;
+					q.add(an);
+				}
+			}
+		}
+		for (int i = 0; i < n; i++) {
+			System.out.print(dis[i] + " ");
+		}
+		System.out.println();
+
+	}
+
+	// Shortest distance from source to every other node in Directed Acyclic Graph
+	// with weights.
+	public static void ShortestPathDirectedAcyclicGraph(int n, int src, ArrayList<ArrayList<pair>> adj) {
+		Stack<Integer> st = new Stack<>();
+		boolean[] vis = new boolean[n];
+
+		for (int i = 0; i < n; i++) {
+			if (!vis[i]) {
+				TopoSortDfs(i, vis, st, adj);
+			}
+		}
+		int[] dis = new int[n];
+		for (int i = 0; i < n; i++) {
+			dis[i] = Integer.MAX_VALUE;
+		}
+		dis[src] = 0;
+
+		while (!st.isEmpty()) {
+			int node = st.pop();
+			// it means that this node has been reached previously
+			if (dis[node] != Integer.MAX_VALUE) {
+				for (pair an : adj.get(node)) {
+					if (dis[node] + an.weight < dis[an.node]) {
+						dis[an.node] = dis[node] + an.weight;
+					}
+				}
+			}
+		}
+
+		for (int i = 0; i < n; i++) {
+			if (dis[i] == Integer.MAX_VALUE)
+				System.out.print("INF");
+			else
+				System.out.print(dis[i] + " ");
+		}
+		System.out.println();
+
+	}
+--------------------------------------------------------------------------------------
+7.Dijkstra's ALgorithm  -(Greedy Algo)
+
+//	Shortest Distance from source to every other node in Undirected Weighted Graph is known as Dijkstra Algorithm
+//TC-> O((N+E)logN)
+//SC-> O(2N)
+	
+	public static void DijkstraAlgorithm(int n, int src, ArrayList<ArrayList<pair>> adj) {
+		// we will use PriorityQueue here though we can use set also as it works in
+		// similar fashion.
+		int[] dis = new int[n];
+		for (int i = 0; i < n; i++) {
+			dis[i] = 1000000000;
+		}
+		dis[src] = 0;
+
+		// min pq acc to distances
+		PriorityQueue<pair> pq = new PriorityQueue<>((a, b) -> (a.weight - b.weight));
+		pq.add(new pair(src, 0));
+
+		while (!pq.isEmpty()) {
+			pair rp = pq.poll();
+			for (pair an : adj.get(rp.node)) {
+				if (dis[rp.node] + an.weight < dis[an.node]) {
+					dis[an.node] = dis[rp.node] + an.weight;
+					pq.add(new pair(an.node, dis[an.node]));
+				}
+			}
+		}
+		for (int i = 0; i < n; i++) {
+			System.out.print(dis[i] + " ");
+		}
+		System.out.println();
+
+	}
+--------------------------------------------------------------------------------------
+8. Minimum Spanning Tree using Prims Algo  -(Greedy Algo)
+
+// When you convert a Undirected Weighted Graph into a tree which has exactly N nodes and (N-1)edges and every node is reachable by every other node. is called 
+//	a Spanning tree.There can be multiple Spanning Trees.
+//	Among all the spanning trees possible from the graphs , the spanning tree which has minimum cost of edges is called Min Spanning Tree.
+
+Prims->
+
+
+//	Prims Algorithm-> it is used to find Minimum Spanning tree
+//	-> It basically picks up a Node and then it takes the minimal edges connected to it and subsequently it keeps on taking the minimal edges connected
+//	to all the nodes. ( take care in account that do not pick the edge which makes cycle.
+
+	// Tc of below implementation is more than N*N.
+	public static void PrimsAlgorithm(int n, ArrayList<ArrayList<pair>> adj) {
+		int[] key = new int[n];
+		boolean[] mstSet = new boolean[n];
+		int[] parent = new int[n];
+
+		for (int i = 0; i < n; i++) {
+			key[i] = 100000000;
+			mstSet[i] = false;
+			parent[i] = -1;
+		}
+		key[0] = 0; // it is done such that mst starts with some node.
+
+		// as Mst has (N-1)edges-->
+		for (int i = 0; i < n - 1; i++) {
+
+			// Step-1: Find minimum key value in keyArray which has not been part of MST
+			// yet.
+			int mini = 100000000;
+			int u = 0;
+			for (int v = 0; v < n; v++) {
+				if (mstSet[v] == false && key[v] < mini) {
+					mini = key[v];
+					u = v;
+				}
+			}
+
+			// u is the min key value
+
+			// Step-2: Now make this min key value the part of MST.
+			mstSet[u] = true;
+
+			// Step-3: Now traverse through its(u)adjacent nodes and you made sure you
+			// updated the key index if weight was lesser and it was not a part of MST.
+			for (pair an : adj.get(u)) {
+				if (mstSet[an.node] == false && an.weight < key[an.node]) {
+					parent[an.node] = u;
+					key[an.node] = an.weight;
+				}
+			}
+
+		}
+
+		// as we started with 0 so it can never have a parent that's why i started with
+		// 1.
+		for (int i = 1; i < n; i++) {
+			System.out.println(parent[i] + " - " + i);
+		}
+
+	}
+	// To optimize Prims Algo we use PriorityQueue
+//	TC-> O((N+E)logN)approx
+//	SC-> approx O(N)
+
+	public static void PrimsAlgoOptimised(int n, ArrayList<ArrayList<pair>> adj) {
+		int[] key = new int[n];
+		boolean[] mstSet = new boolean[n];
+		int[] parent = new int[n];
+
+		for (int i = 0; i < n; i++) {
+			key[i] = 100000000;
+			mstSet[i] = false;
+			parent[i] = -1;
+		}
+
+		PriorityQueue<pair> pq = new PriorityQueue<>((a, b) -> (a.weight - b.weight));
+		key[0] = 0; // it is done such that mst starts with some node.
+		pq.add(new pair(0, key[0])); // pair (index-keyValue)
+
+		// as Mst has (N-1)edges-->
+		for (int i = 0; i < n - 1; i++) {
+
+			// Step-1: Find minimum key value in PriorityQueue
+			int u = pq.poll().node; // this will give me the index at which min key value is present in key array.
+
+			// u is the min key value
+
+			// Step-2: Now make this min key value the part of MST.
+			mstSet[u] = true;
+
+			// Step-3: Now traverse through its(u)adjacent nodes and you made sure you
+			// updated the key index if weight was lesser and it was not a part of MST.
+			for (pair an : adj.get(u)) {
+				if (mstSet[an.node] == false && an.weight < key[an.node]) {
+					parent[an.node] = u;
+					key[an.node] = an.weight;
+					pq.add(new pair(an.node, key[an.node]));
+				}
+			}
+
+		}
+
+		// as we started with 0 so it can never have a parent that's why i started with
+		// 1.
+		for (int i = 1; i < n; i++) {
+			System.out.println(parent[i] + " - " + i);
+		}
+
+	}
+
+--------------------------------------------------------------------------------------
+9. Minimum Spanning Tree Using Kruskal's ALgo -(Greedy Algo)
+
+->Kruskal uses Disjoint Set
+
+// M->edges, N->Nodes
+//T.C-> O(MlogM) for sorting + O(M) for traversing *O(4*alpha)
+//S.C-> O(M) + SC for DS
+	public static void KruskalAlgo(int n, ArrayList<Node> adj) {
+		Collections.sort(adj, (a, b) -> (a.w - b.w));
+
+		int[] parent = new int[n];
+		int[] rank = new int[n];
+
+		for (int i = 0; i < n; i++) {
+			parent[i] = i;
+			rank[i] = 0;
+		}
+
+		int cost = 0;
+//		Node->(u,v,w)
+		ArrayList<Node> mst = new ArrayList<>();
+
+		for (Node it : adj) {
+			if (findParent(it.u, parent) != findParent(it.v, parent)) { // different component because if we add the
+																		// same component, it will make cycle.
+				cost += it.w;
+				mst.add(it);
+				union(it.u, it.v, parent, rank);
+			}
+		}
+		System.out.println(cost);
+		for (Node it : mst) {
+			System.out.println(it.u + "-" + it.v);
+		}
+	}
+--------------------------------------------------------------------------------------
+#) DISJOINT SET
+
+
+// Disjoint Set-> Its a kind of data structure used to detect cycle in kruskal algo, the main task of this data structure-> to tell us that a particular node and the 
+//		other node belongs to same component or the different component
+//		there are two function a) findParent() which finds parent of a node in a component. b) Union(a,b) it joins the two components.
+//		The Effective implementation of Disjoint Set is done by { Union by Rank, Path compression } 
+
+//		Path compression-> Suppose if you have component like 4->6->7 which means if we have to find the parent of 7 then we have to go through like 6 is parent of 7
+//		then 4 is the parent of 6 .So if the ultimate parent of 7 is 4 then why  don't you point 7 to 4 directly instead of 6. this is called path compression.
+//
+
+//		Union By Rank-> Union(a,b) in this we first find the parent of 'a' and parent of 'b' then check their ranks if they are same then increase any one 
+//		(prefer smaller no. parent) and then join both component and which parent get selected, make it the parent of whole component, and if ranks are differnt, take the
+//		higher rank and do the same task, this is called Union by Rank.
+//		Whenever the rank is same then only increase the rank of the selected parent, don't increase when ranks differ because by increasing the rank the height of the tree
+//		increases. if we join the larger tree with smaller tree, the depth doesn't increases but if do the exact opposite the depth will increase.
+
+//		Time complexity of both the functions a) find parent b) union  is  O(4*alpha) which is approximately equals to O(4) which is constant TC
+//		Space complexity -> O(2N)
+	public static void main(String[] args) {
+
+		Scanner scn = new Scanner(System.in);
+
+		makeSet();
+		int m = scn.nextInt();
+		while (m-- > 0) {
+			int u = scn.nextInt();
+			int v = scn.nextInt();
+			union(u, v);
+		}
+
+		int a = scn.nextInt();
+		int b = scn.nextInt();
+		// if a and b belong to the same component or not.
+		if (findPar(a) != findPar(b)) {
+			System.out.print("Different Component");
+		} else {
+			System.out.println("Same Component");
+		}
+
+		
+
+	}
+
+	static int[] parent = new int[8];
+	static int[] rank = new int[8];
+
+	public static void makeSet() {
+		for (int i = 1; i < 8; i++) {
+			parent[i] = i; // because we first make the component parent of itself
+			rank[i] = 0;
+		}
+	}
+
+	public static int findPar(int node) {
+		if (node == parent[node]) {
+			return node;
+		}
+
+		return parent[node] = findPar(parent[node]); // by this we are calling as well as compressing path //if we don't
+														// do path compression then T.C will be logN
+	}
+
+	public static void union(int u, int v) {
+		u = findPar(u);
+		v = findPar(v);
+
+		if (rank[u] < rank[v]) {
+			parent[u] = v;
+		} else if (rank[u] > rank[v]) {
+			parent[v] = u;
+		} else {
+			parent[v] = u;
+			rank[u]++;
+		}
+
+	}
+
+
+--------------------------------------------------------------------------------------
+10. Kosaraju's Algorithm
+
+//	Kosaraju's Algo-> it helps us to find out all the Strongly Connected Components (SCC) in a Directed graph.
+//	Strongly connected Components-> it is a component in which if you start with any node you can reach every other node in that component.
+//	Intuition-> It tries to have a dfs right starting from the back edges right starting from the back nodes so only those nodes in SCC are visited
+
+
+	// TC-> O(N+E)
+	// SC-> O(N+E)
+	public static void KosarajuAlgo(int n, ArrayList<ArrayList<Integer>> adj) {
+
+		// Step-1: Sort all the nodes in order of finishing time.->TopoSort
+		Stack<Integer> st = new Stack<>();
+		boolean[] vis = new boolean[n];
+
+		for (int i = 0; i < n; i++) {
+			if (!vis[i]) {
+				DfsTOPO(i, vis, st, adj);
+			}
+		}
+
+		// Step-2: Tranpose the graph so that you don't end up going to the other part
+		// (means apart from SCC). By Transposing means (Reverse all the edges)
+
+		ArrayList<ArrayList<Integer>> transpose = new ArrayList<>();
+		for (int i = 0; i < n; i++) {
+			transpose.add(new ArrayList<>());
+		}
+
+		for (int i = 0; i < n; i++) {
+			vis[i] = false;
+			for (int it : adj.get(i)) {
+				transpose.get(it).add(i);
+			}
+		}
+
+		// Step-3: Do the Dfs According to the finishing time.
+		while (!st.isEmpty()) {
+			int node = st.peek();
+			st.pop();
+			if (!vis[node]) {
+				System.out.print("SCC: ");
+				revDFS(node, vis, transpose);
+				System.out.println();
+			}
+		}
+
+	}
+
+	public static void revDFS(int node, boolean[] vis, ArrayList<ArrayList<Integer>> transpose) {
+		vis[node] = true;
+		System.out.print(node+" ");
+		for (int it : transpose.get(node)) {
+			if (!vis[it]) {
+				revDFS(it, vis, transpose);
+			}
+		}
+
+	}
+
+--------------------------------------------------------------------------------------
+11. Bellman Ford ALgorithm
+
+
+//	This Algorithm is used to find shortest path from source to to every other node, unlike Dijkstra it also works in case of negative weights
+//	Dijkstra fails for negative edge weight, eg) suppose you have an edge from u to v having weight = -2 now if you apply dijkstra here it will keep trying
+//	to find the shortest path and falls into infinte loop. 
+
+//	Condition in which BellmanFord ALgo doesn't work is the cycle may contained in graph should not be negative. because it negative cycle it will fall int 
+//	infinite loop, So using this Algo you can detect the negative cycle.
+
+// BellmanFord Algo works for Directed Graph but if you want it to work for undirected graph just convert into directed graph using bi-directional edges.	
+// Algorithm states that after relaxing (n-1) no of times (which basically works for worst case) whatever distance array you have its the shortest.
+//	just relax 1 more time if in distance array any distance again reduces then graph contains -ve cycle
+//	The intuition behind the (n-1) times relaxation because for n no. of node max path possible is (n-1). so for each time suppose if there is max 1 relaxation.
+//	then at the end of n-1 all the nodes get relaxed as src dis is 0;
+
+//	TC-> O(N-1)*O(E)
+//	SC-> O(N)
+
+public static void BellmanFordAlgo(int src, int n, ArrayList<Node> edges) {
+		int[] dis = new int[n];
+		for (int i = 0; i < n; i++) {
+			dis[i] = 100000000;
+		}
+		dis[src] = 0;
+
+//		Node->(u,v,w)
+//		Relaxing n-1 number of times.across all the edges
+		for (int i = 0; i < n - 1; i++) {
+			for (Node node : edges) {
+				if (dis[node.u] + node.w < dis[node.v]) {
+					dis[node.v] = dis[node.u] + node.w;
+				}
+			}
+		}
+// 		Relax one more time to check negative cycle		
+		int flag = 0;
+
+		for (Node node : edges) {
+			if (dis[node.u] + node.w < dis[node.v]) {
+				flag = 1;
+				System.out.println("Negative cycle");
+				break;
+			}
+		}
+		if (flag == 0) {
+			for (int i = 0; i < n; i++) {
+				System.out.println(i + " - " + dis[i]);
+			}
+		}
+	}
+
+	public static class Node {
+		int u;
+		int v;
+		int w;
+
+		public Node(int u, int v, int w) {
+			this.u = u;
+			this.v = v;
+			this.w = w;
+		}
+	}
+
+
+
+--------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------
+	

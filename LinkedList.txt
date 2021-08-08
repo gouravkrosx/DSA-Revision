@@ -270,6 +270,17 @@ public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
     }
 --------------------------------------------------------------------------------------------------------
 11. Intersection point in two linked list
+Intuition-> 
+      a-->  o-o-o-o-o
+		     \
+		      o-o-o
+          	     /	      
+          b-->  o-o-o	
+
+->Suppose there are two sprinters 'b' started with startline whereas 'a' before startline(eg 2km behind the startline) now they start running and at some time refree see that this is unfair so he let 'b' first finish the race so when 'b' reaches end 'a' is exactly the diff(a-b) behind him. now refree let 'b' to cover the extra 2km distance by starting running from 'a's start point. in the mean time 'a' reaches to the end. at this position both start with exact same place. when we put 'a' at 'b's start point.
+if (distA=distB) then 1 traversal.
+if (distA!=distB) then 2 traversal.	
+
  public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
        
         ListNode first=headA;
