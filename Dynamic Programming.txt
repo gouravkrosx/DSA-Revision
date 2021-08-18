@@ -1099,18 +1099,17 @@ and just change { dp[i]=1+max; } To { dp[i]=nums[i]+max; }
 31. Count distinct subsequences
 Logic-> "abcba"
 we will take a HashMap<Character,Integer>map, in this character will have key as ( last occurence index)
-so now  when 2nd time 'b' come then (i=3) dp[i]=2*dp[i-1]-dp[idx=just prev index of last occ of this character {here 0}] we did this because
-   when 1st b come    when 2nd b come then also , below seq will be generated so we have to subtract that . 
-.    b    			b
-a   ab			ab 
+so now  when 2nd time 'b' come then (i=3) dp[i]=2*dp[i-1]-dp[idx=just prev index of last occ of this character {here 0}] we did this because when 1st b come         when 2nd b come then also , below seq will be generated so we have to subtract that by which b and ab 							    occurs two times due to prev index of last occurrence of b {. a} 
+.    b    			. b  (no)   (yes) b   bb
+a   ab			        a ab             ab   abb
 
 public static int DistinctSubsequences(String s) {
 		HashMap<Character,Integer>map=new HashMap<Character, Integer>();
 		long[]dp=new long[s.length()+1];
 		dp[0]=1; //empty seq
-		for(int i=1;i< dp.length;i++) {
+		for(int i=1;i<dp.length;i++) {
 			
-            			dp[i]=2*dp[i-1]%MOD;
+            		dp[i]=2*dp[i-1]%MOD;
 			char ch=s.charAt(i-1);
             
 			if(map.containsKey(ch)) {
@@ -1473,50 +1472,86 @@ public int jobScheduling(int[] startTime, int[] endTime, int[] profit) {
         }
         return res;    
     }
+
 DP+Binary Search->
- public int jobScheduling(int[] startTime, int[] endTime, int[] profit) {
-        int n = profit.length, res =0;
-        int[][] mat = new int[n][3];
+
+ -> Create a Job array for ease of calculation.
+-> Sort jobs according to finish time.
+-> For the job array jobs
+maxprofit(int[] jobs, n){
+a) if (n == 1) return jobs[0];
+b) Return the maximum of following two profits.
+-> Maximum profit by excluding current job : maxprofit(jobs, n-1)
+-> Maximum profit by including the current job
+}
+
+Find Profit including current Job:
+Find the latest job before the current job (in sorted array) that doesn't conflict with current job 'jobs[n-1]'.
+Once found, we recur for all jobs till that job and add profit of current job to result.
+
+Complexity : O(n Log n)
+
+->
+public class JobScheduling {
+
+    private class Job {
+        int start, finish, profit;
+        Job(int start, int finish, int profit) {
+            this.start = start;
+            this.finish = finish;
+            this.profit = profit;
+        }
+    }
+
+    public int jobScheduling(int[] startTime, int[] endTime, int[] profit) {
+        int n = startTime.length;
+        Job[] jobs = new Job[n];
+        for(int i=0;i<n;i++) {
+            jobs[i] = new Job(startTime[i],endTime[i],profit[i]);
+        }
+        return scheduleApt(jobs);
+    }
+
+    private int scheduleApt(Job[] jobs) {
+        // Sort jobs according to finish time
+        Arrays.sort(jobs, Comparator.comparingInt(a -> a.finish));
+        // dp[i] stores the profit for jobs till jobs[i]
+        // (including jobs[i])
+        int n = jobs.length;
         int[] dp = new int[n];
-        for(int i=0;i<n;i++){
-            mat[i][0]=startTime[i];
-            mat[i][1]=endTime[i];
-            mat[i][2]=profit[i];
+        dp[0] = jobs[0].profit;
+        for (int i=1; i<n; i++) {
+            // Profit including the current job
+            int profit = jobs[i].profit;
+            int l = search(jobs, i);
+            if (l != -1)
+                profit += dp[l];
+            // Store maximum of including and excluding
+            dp[i] = Math.max(profit, dp[i-1]);
         }
-        
-        Arrays.sort(mat,(a,b)->{
-		//If two jobs have same starting time, then choose job that ends before.
-            if(a[0]==b[0]) return a[1]-b[1];
-            return a[0]-b[0];
-        });
-        
-        for(int i=n-1;i>=0;i--){
-            int j = ceil(mat,mat[i][1],i+1,n-1);
-			/*
-			Choose best option between 
-			1.Exclude current job and looking for max profit from next index OR
-			2.Include current job and add max profit from the first interval that 
-			doesnot overlap with current ending interval.
-			*/
-            dp[i] = Math.max( (i+1 <n ? dp[i+1] : 0) ,mat[i][2]+ ((j==-1)?0:dp[j]));
-            res=Math.max(res,dp[i]);
-        }
-        
-        return res;
+
+        return dp[n-1];
     }
-    
-    private int ceil(int[][] mat, int val,int start, int end){
-        if(start>end || val> mat[end][0]) return -1;
-        if(start==end) return (val<=mat[start][0])?start:-1;
-        int mid;
-        while(start<=end){
-            mid= start+ (end-start)/2;
-            if(val==mat[mid][0]) return mid;
-            else if(val>mat[mid][0]) start= mid+1;
-            else end=mid-1;
+
+    private int search(Job[] jobs, int index) {
+        int start = 0, end = index - 1;
+        while (start <= end) {
+            int mid = (start + end) / 2;
+            if (jobs[mid].finish <= jobs[index].start) {
+                if (jobs[mid + 1].finish <= jobs[index].start)
+                    start = mid + 1;
+                else
+                    return mid;
+            }
+            else
+                end = mid - 1;
         }
-        return start;
+        return -1;
     }
+
+}
+
+
 ------------------------------------------------------------------------------------------------
 47. Coin game winner where every player has three choices
 static boolean findWinner(int x, int y, int n)
@@ -1681,11 +1716,11 @@ At last sum the both transactions (from both traversals) and find the max SUm.
 52. Buy And Sell Stocks (K transactions allowed)
 Logic->
 Here we put days on column and no transactions on rows. 
-at a particular cell we define that on this day if we are allowed this much transaction then what would be the max profit
+at a particular cell we define that upto this day if we are allowed this much transaction then what would be the max profit
 So, There are two cases
 Case1: if we are on ith day and we are allowed t transactions and if (i-1)th day all t transaction are done. then it will contribute.
-Case2: if (t-1)transactions have already happened on (0 to (i-1)th)day then profit from this will be max of all the days from 0 to (i-1)th
-day and the transaction between current day and ith day.
+Case2: if (t-1)transactions have already happened on any of the(0 to (i-1)th)day then profit from this will be max of all the days from 0 to (i-1)th
+day and the transaction between current day and choosen ith day.from(0 to (i-1)th).
 = dp[ith(0 to (i-1)th )] + price[curr]-price[ith]; 
 Ans At dp[i]=max of both the cases.
 

@@ -886,21 +886,232 @@ public static void BellmanFordAlgo(int src, int n, ArrayList<Node> edges) {
 
 
 --------------------------------------------------------------------------------------
+#) Applying Dfs on 2D grid.
+->Here cell=grid, Common-(sides/sides+corners)=edges,
+->Here you can move limited no. of moves max 8 or 4 like top, down, bottom, up, topright etc.
 
+static int[]dx={-1,0,1,0};
+static int[]dy={0,1,0,-1};
+
+void dfs(int x,int y){
+
+vis[x][y]=true;
+
+System.out.println(x+" "+y);
+
+for(int i=0;i<4;i++){
+    if(isValidCell(x+dx[i],y+dy[i]))
+    {
+        dfs(x+dx[i],y+dy[i]);
+    }
+}
+
+// if(isValidCell(x-1,y)) //up
+// dfs(x-1,y);
+
+// if(isValidCell(x,y+1))   //right
+// dfs(x,y+1);
+
+// if(isValidCell(x+1,y))  //down
+// dfs(x+1,y);
+
+// if(isValidCell(x,y-1))      //left
+// dfs(x,y-1);
+
+}
+
+boolean isValidCell(int x,int y){
+	if(x<0||x>=m||y<0||y>=n){   //0 based indexing on M x N Grid
+		return false;
+	}
+	if(vis[x][y]==true)  //already visited cell
+	return false;
+
+	return true;
+}
 --------------------------------------------------------------------------------------
+#) Applying Bfs on 2D grid.
 
+
+void bfs(int srcX,int srcY){
+
+Queue<Pair>q=new LinkedList<>();
+q.add(new Pair(srcX,srcY));
+dis[srcX][srcY]=0;
+vis[srcX][srcY]=true;
+while(!q.isEmpty()){
+
+Pair rp=q.remove();
+int currX=rp.x;
+int currY=rp.y;
+for(int i=0;i<4;i++){
+	if(isValidCell(currX+dx[i],currY+dy[i])){
+		int newX=currX+dx[i];
+		int newY=currY+dy[i];
+		q.add(new Pair(newX,newY));
+		dis[newX][newY]=dis[currX][currY]+1;
+		vis[newX][newY]=true;
+
+	}
+}
+//print distance array.
+}
 --------------------------------------------------------------------------------------
-
+12. Minimum Step by knight
+ public int minStepToReachTarget(int source[], int target[], int N) {
+        boolean visited[][]=new boolean[N+1][N+1];
+        int dx[]={-2,-2,-1,-1,1,1,2,2};
+        int dy[]={-1,1,-2,2,-2,2,-1,1};
+        Queue<Coordinates> q= new LinkedList<>();
+        q.add(new Coordinates(source[0],source[1],0));
+        while(!q.isEmpty()){
+            Coordinates curr=q.remove();
+            
+            if(curr.x==target[0]&&curr.y==target[1])
+                return curr.dist;
+            for(int i=0;i<8;i++){
+                int x=curr.x+dx[i];
+            int y=curr.y+dy[i];
+                if(isSafe(x,y,N)&&!visited[x][y]){
+                    visited[x][y]=true;
+                    q.add(new Coordinates(x,y,curr.dist+1));
+                }
+            }
+        }
+        return Integer.MAX_VALUE;
+    }
+    
+    public boolean isSafe(int x,int y,int n){
+        return x>=1&&x<=n&&y>=1&&y<=n;
+    }
 --------------------------------------------------------------------------------------
+13. Clone Graph ->https://www.youtube.com/watch?v=f2EfGComRKM
 
+public Node cloneGraph(Node node) {
+        
+        Node[]vis=new Node[1000];//as we don't know the exact size;
+        if(node==null)
+            return node;
+        
+        Node copy=new Node(node.val);
+        
+        vis[node.val]=copy;
+        
+        //looping through adjacent nodes of original graph because they contain neighbours;
+        for(Node an:node.neighbors){
+            if(vis[an.val]==null){
+             Node newnode=new Node(an.val);
+                copy.neighbors.add(newnode);
+                dfs(an,newnode,vis); //we are passing original graph also.(an->adjacent node)
+            }else{
+                copy.neighbors.add(vis[an.val]);
+            }
+        }
+        
+        return copy;
+    }
+    //an is from original array which contains aj_list of neighbors, whereas
+    //nn contain empty list but same value as an.
+    public void dfs(Node an,Node nn,Node[]vis){
+        vis[nn.val]=nn;
+        
+        for(Node cn:an.neighbors){
+            if(vis[cn.val]==null){
+                Node newnode=new Node(cn.val);
+                nn.neighbors.add(newnode);
+                dfs(cn,newnode,vis);
+            }else{
+             nn.neighbors.add(vis[cn.val]);   
+            }
+        }
+    }
 --------------------------------------------------------------------------------------
+14. Number of Operations to make Network Connected.
+-> Used Disjoint set.
 
+ public int makeConnected(int n, int[][] connections) {
+        if(connections.length<n-1)return -1; //we need atleast n-1 edges to make all connected.
+        int[]par=new int[n];
+        int[]rank=new int[n];
+        
+        for(int i=0;i<n;i++){
+            par[i]=i;
+            rank[i]=0;
+        }
+        
+        int components=n;
+        int m=connections.length;
+        
+        for(int i=0;i<m;i++){
+            int p1=findParent(par,connections[i][0]);
+            int p2=findParent(par,connections[i][1]);
+            if(p1!=p2){
+                if(rank[p1]>rank[p2]){
+                    par[p2]=p1;
+                }else if(rank[p2]>rank[p1]){
+                    par[p1]=p2;
+                }else{
+                    rank[p1]++;
+                    par[p2]=p1;
+                }    
+                components--;
+            }
+        }
+        return components-1; //as we only need the no. of connected components. 
+        //and we know that components-1  edges are required to make all connected.
+        
+    }
+    public int findParent(int[]par,int i){
+        if(i==par[i])
+            return i;
+        
+        return par[i]=findParent(par,par[i]); //path compression
+    }
 --------------------------------------------------------------------------------------
-
+15. Number of Islands
+*Logic-> Just go through every cell like for(0->row){for(0-col){ c++;  [bfs/dfs] }}; c will give ans. 
 --------------------------------------------------------------------------------------
+16. Flood Fill ALgo
 
+public int[][] floodFill(int[][] image, int sr, int sc, int newColor) {
+        if (image[sr][sc] == newColor) return image;
+        fill(image, sr, sc, image[sr][sc], newColor);
+        return image;
+    }
+    
+    private void fill(int[][] image, int sr, int sc, int color, int newColor) {
+        if (sr < 0 || sr >= image.length || sc < 0 || sc >= image[0].length || image[sr][sc] != color) return;
+        image[sr][sc] = newColor;
+        fill(image, sr + 1, sc, color, newColor);
+        fill(image, sr - 1, sc, color, newColor);
+        fill(image, sr, sc + 1, color, newColor);
+        fill(image, sr, sc - 1, color, newColor);
+    }
 --------------------------------------------------------------------------------------
+17. M-Coloring Problem -O(M^N)
 
+//node=0; is passed.
+ public static boolean M_ColoringProblem(List<Integer>[]G,int[]color,int node,int m,int n){
+        if(node==n)//we have covered all nodes means colored every node acc to condition
+            return true;
+            
+        for(int i=1;i<=m;i++){
+            if(isValid(G,color,node,i)){
+                color[node]=i;
+                if(M_ColoringProblem(G,color,node+1,m,n)){
+                    return true;
+                }
+                color[node]=0;
+            }
+        }
+        return false;
+    }
+    public static boolean isValid(List<Integer>[]G,int[]color,int node,int col){
+        for(int it:G[node]){
+            if(color[it]==col)return false;
+        }
+        return true;
+    }
 --------------------------------------------------------------------------------------
 
 --------------------------------------------------------------------------------------
