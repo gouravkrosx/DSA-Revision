@@ -1113,12 +1113,676 @@ public int[][] floodFill(int[][] image, int sr, int sc, int newColor) {
         return true;
     }
 --------------------------------------------------------------------------------------
+18. Find Bridges in graph.
+
+->O(N+E), S(2N)
+
+//Bridge in Graph -> Those edges are called bridges in graph on whose removal the graph is broken into 2 or more no. of components.
+// Back edges-> A Back edge connects node to its ancestor(atleast grandparent).
+// Back edges can never be bridges because there already exists a path(indirect) from ancestor to curr node and backedge is the direct path from curr node to ancestor.
+//Back edge create a cycle.
+	
+
+	public static void PrintBridges(int n, ArrayList<ArrayList<Integer>> adj) {
+		boolean vis[] = new boolean[n];
+		int[] tis = new int[n]; // time of insertion means when we enter a node.
+		int[] low = new int[n]; // lowest time of insertion. //or the lowest ancestor you can reach through some backedges.
+
+		int timer = 0;
+		for (int i = 0; i < n; i++) {
+			if (!vis[i]) {
+				DFS(i, -1, vis, tis, low, adj, timer);
+			}
+		}
+	}
+
+	private static void DFS(int node, int parent, boolean[] vis, int[] tis, int[] low,
+			ArrayList<ArrayList<Integer>> adj, int timer) {
+		vis[node] = true;
+		tis[node] = low[node] = timer++;
+
+		for (int it : adj.get(node)) {
+			if (it == parent)  
+				continue;
+
+			if (!vis[it]) {
+				DFS(it, node, vis, tis, low, adj, timer);   //forward edge
+				if (low[it] > tis[node]) { 
+					System.out.println(it + "-" + node); // Bridge in graph
+				}
+
+//else -> if low[it]<=tis[node] this means if we remove this edge then there is another edge connected to curr node's parent.(ancestor)-> which is back edge here.
+				
+				low[node] = Math.min(low[it], low[node]); 
+
+ //after checking for bridge condition curr node also tries to minimize its low time because if child can reach this min value of low[] then curr node can also as it is connected to it by an edge.	
+
+			} else {
+
+				low[node] = Math.min(low[node], tis[it]); 
+
+//so there is a backedge from node-it , so it gets updated because this node is connected to its ancestor here (it). 
+		
+   			}											 	
+		}
+
+	}
+--------------------------------------------------------------------------------------
+19. Find Articulation point in graph.
+->refer above problem to understand more.
+
+// Articulation Point-> It is a node on whose removal the graph is broken down into two or more no. of components.
+// An end point of a bridge is an articulation point. if removal of the end point leads to disconnect the graph.
+// whatever endpoint have degree more than one is the articulation point.
+// Articulation point can exist without the existence of bridges. suppose if a node is connected to 2 or more than two nodes. like a web and the center is 
+// articulation point.	
+// There is no node whose low time is smaller than insertion time of root.
+
+	
+		public static void PrintArticulationPoints(int n, ArrayList<ArrayList<Integer>> adj) {
+			boolean vis[] = new boolean[n];
+			int[] tis = new int[n]; // time of insertion
+			int[] low = new int[n]; // lowest time of insertion.
+	
+			int[] isArticulation = new int[n];
+	
+			int timer = 0;
+			for (int i = 0; i < n; i++) {
+				if (!vis[i]) {
+					DFS(i, -1, vis, tis, low, adj, timer, isArticulation);
+				}
+			}
+			for (int i = 0; i < n; i++)
+				if (isArticulation[i] == 1)
+					System.out.println(i);
+		}
+	
+		private static void DFS(int node, int parent, boolean[] vis, int[] tis, int[] low,
+				ArrayList<ArrayList<Integer>> adj, int timer, int[] isArticulation) {
+			vis[node] = true;
+			tis[node] = low[node] = timer++;
+			int child = 0;
+	
+			for (int it : adj.get(node)) {
+				if (it == parent)
+					continue;
+	
+				if (!vis[it]) {
+					//forward edge
+					DFS(it, node, vis, tis, low, adj, timer, isArticulation);
+					low[node] = Math.min(low[it], low[node]);
+					if (low[it] >= tis[node] && parent != -1) {
+						isArticulation[node] = 1;
+					}
+					child++;  //to check the subtree connected to root.
+				} else {
+					//BackEdge
+					low[node] = Math.min(low[node], tis[it]);
+				}
+			}
+			if (parent == -1 && child > 1)  // if root of dfs tree has more than 1 subtree than it is an articulation point.
+				isArticulation[node] = 1;
+	
+		}
+
 
 --------------------------------------------------------------------------------------
+20. Journey to moon
+Logic-> Firstly make graph from given data, now count size of each component. and now  do this->
+->here Pairs store the size of each connected component of the graph.
+
+		ArrayList<Integer> pairs = Bfs(adj, new ArrayList<>(), n);
+		int[] suffix = new int[pairs.size()];
+		suffix[pairs.size() - 1] = pairs.get(pairs.size() - 1);
+		for (int i = suffix.length - 2; i >= 0; i--) {
+			suffix[i] += suffix[i + 1] + pairs.get(i);
+		}
+		long res = 0;
+		for (int i = 0; i < suffix.length - 1; i++) {
+			res += suffix[i + 1] * pairs.get(i);
+		}
+
+		return res;
 
 --------------------------------------------------------------------------------------
+21. Minimum time taken by each job to be completed given by a DAG.
+
+-> Use toposort indegree logic and then whenever indegree of adj node become 0 then 
+ans[adjnode]=ans[node]+1;
+--------------------------------------------------------------------------------------
+22. Find whether it is possible to finish all tasks or not from given dependencies/ Course schedule on leetcode
+-> in this question toposort with dfs won't work but toposort with bfs works because in bfs we can count the elements which get entered 
+in the queue.
+->Logic -> we have to find the cycle in directed graph.
+--------------------------------------------------------------------------------------
+23. Snake and Ladder
+
+ public int snakesAndLadders(int[][] board) {
+        int n=board.length;
+        boolean[][]vis=new boolean[n][n];
+        
+        int steps=0;
+        Queue<Integer>q=new LinkedList<>();
+        vis[n-1][0]=true;
+        q.add(1);
+        
+        while(!q.isEmpty()){
+            int size=q.size();
+            
+            for(int i=0;i<size;i++){
+                 int x=q.poll();
+                if(x==n*n)return steps;
+               for(int k=1;k<=6;k++){
+                  
+                   if(k+x>n*n)break;
+                    
+                   int[]pos=findCoordinates(k+x,n);
+                   int r=pos[0];
+                   int c=pos[1];
+                   
+                   if(!vis[r][c]){
+                       vis[r][c]=true;
+                       
+                       if(board[r][c]==-1){
+                            q.add(k+x);    
+                       }else{
+                           q.add(board[r][c]);
+                       }
+                   } 
+               }          
+            }
+    
+            steps++;              
+        }
+        return -1;       
+    }
+    
+    public int[] findCoordinates(int curr,int n){  //done this part because the numbers are actually like snake and ladder 
+        int r= n - (curr-1)/n - 1;
+        int c= (curr-1)%n;
+        
+        if(r%2==n%2){
+            return new int[]{r,n-c-1};
+        }
+        return new int[]{r,c};
+    }
 
 --------------------------------------------------------------------------------------
+24. Floyd Warshall ( all pairs shortest path)
+-> extended version of dijkstra(single source shortest path)
+
+public void shortest_distance(int[][] matrix)
+    {
+        somechanges(matrix);//changed -1 to infinity to make code easier.
+            int infi=Integer.MAX_VALUE;
+            
+            int n=matrix.length;
+            for(int k=0;k<n;k++){
+                for(int i=0;i<n;i++){
+                    for(int j=0;j<n;j++){
+                        if(matrix[i][k]==infi||matrix[k][j]==infi)continue;
+                        matrix[i][j]=Math.min(matrix[i][j],matrix[i][k]+matrix[k][j]);
+                        if(matrix[i][j]==infi)
+                            matrix[i][j]=-1;
+                            
+                      }
+                  }
+           }
+    }
+--------------------------------------------------------------------------------------
+25. Number of Triangles in directed and undirected Graph.
+
+Logic-> we will run three loops for 2 nodes of triangle , each loop will be from (0 to n-1)
+Now whenever there will be and edge among them means (arr[i]==arr[j]==arr[k]==1) then count++
+it will be mentioned that the given graph is directed or not. 
+If Directed graph-> ans=count/3;
+If Undirected graph-> ans=count/6; 
+--------------------------------------------------------------------------------------
+26. Word Ladder
+-> logic-> you just have to make a graph, and nodes have adj nodes which have only 1 letter diff, and then apply Bfs but
+this making of graph and all will give you TLE.
+->So what you can do is you just change every letter of curr word from (a to z) and then check if it exists in vis Map if it is then 
+it must be its adjacent having only 1 letter diff.
+
+O(No. of words in wordlist*26*length of each word); 
+ public int ladderLength(String src, String tar, List<String> wordlist) {
+        
+        if(!wordlist.contains(tar))return 0;
+    
+        HashMap<String,Boolean>vis=new HashMap<>();
+        
+        for(int i=0;i<wordlist.size();i++){
+            vis.put(wordlist.get(i),false);
+        }
+        
+        Queue<String>q=new LinkedList<>();
+               
+        vis.put(src,true);
+        q.offer(src);
+        int ans=1;
+        
+        while(!q.isEmpty()){
+            int size=q.size();
+            for(int i=0;i<size;i++){
+                String w=q.poll();
+                
+                if(w.equals(tar))return ans;
+                
+                wordMatch(w,vis,q);             
+            }
+            ans++;         
+        }
+        return 0;
+    }
+    public void wordMatch(String word,HashMap<String,Boolean>vis,Queue<String>q){
+        
+        char[] arr=word.toCharArray();
+        for(int i=0;i<arr.length;i++){
+            char ch=arr[i];
+            for(int j=0;j<=26;j++){
+                
+                char temp=(char)('a'+j);
+                arr[i]=temp;
+                
+                String str=new String(arr);
+                if(vis.containsKey(str) && vis.get(str)==false){
+                    vis.put(str,true);
+                    q.offer(str);
+                }
+            }
+            arr[i]=ch;
+        }        
+    }
+--------------------------------------------------------------------------------------
+27. Total no. of spanning Trees in a Graph
+->use Kirchhoff's Matrixo-Tree Theorem
 
 --------------------------------------------------------------------------------------
+28. Longest Path in a Directed Acyclic Graph
+
+-> Solution is same as finding shortest distance from source to every other node in DAG.
+we use toposort.
+
+public static void LongestPathDirectedAcyclicGraph(int n, int src, ArrayList<ArrayList<pair>> adj) {
+		Stack<Integer> st = new Stack<>();
+		boolean[] vis = new boolean[n];
+
+		for (int i = 0; i < n; i++) {
+			if (!vis[i]) {
+				TopoSortDfs(i, vis, st, adj);
+			}
+		}
+		int[] dis = new int[n];
+		for (int i = 0; i < n; i++) {
+			dis[i] = Integer.MIN_VALUE;
+		}
+		dis[src] = 0;
+
+		while (!st.isEmpty()) {
+			int node = st.pop();
+			// it means that this node has been reached previously
+			if (dis[node] != Integer.MIN_VALUE) {
+				for (pair an : adj.get(node)) {
+					if (dis[node] + an.weight > dis[an.node]) {
+						dis[an.node] = dis[node] + an.weight;
+					}
+				}
+			}
+		}
+
+		for (int i = 0; i < n; i++) {
+			if (dis[i] == Integer.MIN_VALUE)
+				System.out.print("INF");
+			else
+				System.out.print(dis[i] + " ");
+		}
+		System.out.println();
+
+	}
+
+
+--------------------------------------------------------------------------------------
+29. Longest Increasing Path in a matrix (leetcode 329 )
+
+ public int longestIncreasingPath(int[][] matrix) {
+        
+		//Base condition
+        if(matrix.length==0)
+            return 0;
+        
+		
+        int dp[][] = new int[matrix.length][matrix[0].length];
+        int max = 0;
+        
+        for(int i =0;i<matrix.length;i++){
+            for(int j =0;j<matrix[0].length;j++){
+                //result is not stored
+                if(dp[i][j]==0){
+                   dfs(matrix,i,j,Integer.MIN_VALUE,dp);
+                   max = Math.max(dp[i][j],max); 
+                }
+            }
+        } 
+        return max;
+    }
+    
+    private int dfs(int[][] matrix,int i,int j,int pre,int[][] dp){
+        //Dont go beyond boundaries and next element should be greater for increasing path
+        if(i<0 || j<0 ||i>=matrix.length || j>=matrix[0].length || pre>=matrix[i][j])
+            return 0;
+			
+		//already explored
+        else if(dp[i][j]!=0) return dp[i][j];
+        
+		//exploring all direction
+        int pathOne = dfs(matrix,i+1,j,matrix[i][j],dp);
+        int pathTwo = dfs(matrix,i-1,j,matrix[i][j],dp);
+        int pathThree = dfs(matrix,i,j-1,matrix[i][j],dp);
+        int pathFour = dfs(matrix,i,j+1,matrix[i][j],dp);
+        
+		//finding the max path
+        int maxOne = Math.max(pathOne,pathTwo);
+        int maxTwo = Math.max(pathThree,pathFour);
+        
+		//store maximum path on that index
+        dp[i][j] = 1+Math.max(maxOne,maxTwo);
+        
+        return dp[i][j];   
+    }
+--------------------------------------------------------------------------------------
+30. Water Jug Problem (Kind of puzzle)
+->https://www.youtube.com/watch?v=0Oef3MHYEC0
+
+public boolean canMeasureWater(int x, int y, int z) {
+    //limit brought by the statement that water is finallly in one or both buckets
+    if(x + y < z) return false;
+    //case x or y is zero
+    if( x == z || y == z || x + y == z ) return true;
+    
+    //get GCD, then we can use the property of Bézout's identity
+    return z%GCD(x, y) == 0;
+}
+
+public int GCD(int a, int b){
+    while(b != 0 ){
+        int temp = b;
+        b = a%b;
+        a = temp;
+    }
+    return a;
+}
+--------------------------------------------------------------------------------------
+31. Minimum Edges to Reverse to make Path from a source to a Destination
+
+Logic-> just mark 0 weight on given edge and add another oppo edge with weight 1, do this for every edge on the graph.
+And then Apply Dijkstra Algo to find the shortest path from source to destination.
+
+--------------------------------------------------------------------------------------
+32. Find if there is a path of more than k length from a source
+->
+Longest Path is a NP Hard
+if we are able to solve this problem in Polynomial we can solve the Longest Path also in Polynomial
+so Exponential is the best we can do
+
+O(N!)
+boolean pathMoreThanKUtil(int src, int k, boolean[] path)
+    { 
+       
+      // If k is 0 or negative, return true;
+      if (k <= 0)
+        return true;
+ 
+      ArrayList<AdjListNode> it = adj.get(src);
+ 
+      for(int i = 0; i < adj.get(src).size(); i++)
+      {
+        AdjListNode vertex = adj.get(src).get(i);
+ 
+        int v = vertex.v;
+        int w = vertex.weight;
+
+        if (path[v] == true) //means there is cycle from this path.
+          continue;
+
+        if (w >= k)
+          return true;
+
+        path[v] = true;
+ 
+        if (pathMoreThanKUtil(v, k-w, path))
+          return true;
+ 
+        path[v] = false;  //backtracking
+      }
+      
+      return false;
+    }
+
+--------------------------------------------------------------------------------------
+33. Two Cliques
+-> In this question just change the adjacency list as follows
+0->{1,2,3}     0->{4}     
+1->{0,2}       1->{3,4}
+2->{1,0}       2->{3,4} 
+3->{0,4}       3->{1,2}
+4->{3}         4->{0,1,2} 
+
+Make Graph of new adjacency list and check whether it is Bipartite of not. if it is Bipartite
+then it can be divided into two cliques.
+
+Intuition-> in bipartite graph nodes get separated into two sets (color-A and color-B) 
+the nodes in these sets are not connected to each other. so if we made graph of reverse of adj list then we should think its reverse that nodes in both the sets are connected to each other as in individual set. 
+--------------------------------------------------------------------------------------
+34. Alien Dictionary
+-> we basically check every adjacent word from dictList and find where there is mismatch of letter 
+whenever there is mismatch we just make an directed edge from (misMatched letter from currString to mismatch letter to nextString) and afterthat we just apply Toposort using Kahn's algo.
+
+public static String AlienOrder(String[] words) {
+    
+		HashMap<Character, HashSet<Character>> graph = new HashMap<>();
+		HashMap<Character, Integer> indegree = new HashMap<>();
+
+		for (String str : words) {
+			char[] crr = str.toCharArray();
+			for (char ch : crr) {
+				indegree.put(ch, 0);
+			}
+		}
+
+		for (int i = 0; i < words.length - 1; i++) {
+			String curr = words[i];
+			String next = words[i + 1];
+
+			int len = Math.min(curr.length(), next.length());
+
+			boolean flag = false;
+			for (int l = 0; l < len; l++) {
+				char ch1 = curr.charAt(l);
+				char ch2 = next.charAt(l);
+
+				if (ch1 != ch2) {
+					HashSet<Character> set = new HashSet<>();
+					if (graph.containsKey(ch1)) {
+						HashSet<Character> st = graph.get(ch1);
+
+						if (!st.contains(ch2)) {
+							set.add(ch2);
+							indegree.put(ch2, indegree.get(ch2) + 1);
+							graph.put(ch1, set);
+						}
+					} else {
+						set.add(ch2);
+						indegree.put(ch2, indegree.get(ch2) + 1);
+						graph.put(ch1, set);
+					}
+
+					flag = true;
+					break;
+				}
+			}
+
+			if (!flag && curr.length() > next.length()) {
+				return "";
+			}
+		}
+		// now applying Kahn's algo (toposort)
+
+		Queue<Character> q = new LinkedList<>();
+
+		for (char ch : indegree.keySet()) {
+			if (indegree.get(ch) == 0) {
+				q.offer(ch);
+			}
+		}
+
+		int count = 0; // taken this to check if there is cycle or not.
+		StringBuilder ans = new StringBuilder();
+
+		while (!q.isEmpty()) {
+			char rc = q.poll();
+			ans.append(rc);
+			count++;
+
+			if (graph.containsKey(rc)) {
+				HashSet<Character> nbrs = graph.get(rc);
+				for (char nbr : nbrs) {
+					indegree.put(nbr, indegree.get(nbr) - 1);
+					if (indegree.get(nbr) == 0) {
+						q.offer(nbr);
+					}
+				}
+			}
+		}
+
+		if (count == indegree.size()) {
+			return ans.toString();
+		}
+
+		return "";
+  }
+
+--------------------------------------------------------------------------------------
+35. Cheapest Flights Within K Stops
+->Simply used Dijkstra algoclass Pair {
+	int city, cost;
+
+	Pair(int city, int cost) {
+		this.city = city;
+		this.cost = cost;
+	}
+}
+
+class City {
+	int city, distFromSrc, costFromSrc;
+
+	City(int city, int distFromSrc, int cost) {
+		this.city = city;
+		this.distFromSrc = distFromSrc;
+		this.costFromSrc = cost;
+	}
+}
+class Solution {
+
+public int findCheapestPrice(int n, int[][] flights, int src, int dst, int K) {
+	// DFS
+    if(n <= 0 || flights == null || flights.length == 0 || K < 0)
+    	return -1;
+
+    List<List<Pair>> graph = new ArrayList<>();
+    this.buildGraph(graph, n, flights);
+
+    Queue<City> pQueue = new PriorityQueue<>((City c1, City c2) -> c1.costFromSrc - c2.costFromSrc);
+    pQueue.offer(new City(src, 0, 0));
+    
+    HashMap<Integer, Integer> seen = new HashMap<>(); //mandatory to reduce time complexity
+    
+    int totalCost = 0;
+
+    while (!pQueue.isEmpty()) {
+    	City top = pQueue.poll();
+
+        if(seen.containsKey(top.city) && seen.get(top.city)<=top.distFromSrc)
+            continue;
+        seen.put(top.city, top.distFromSrc);
+        
+    	if (top.city == dst) {
+    		return top.costFromSrc;
+    	}
+
+    	if (top.distFromSrc > K) {
+    		continue;
+    	}
+
+    	List<Pair> neighbors = graph.get(top.city);
+    	for (Pair neighbor: neighbors) {
+    		pQueue.offer(new City(neighbor.city, top.distFromSrc + 1, top.costFromSrc + neighbor.cost));
+    	}
+    }
+
+    return -1;
+}
+
+private void buildGraph(List<List<Pair>> graph, int n, int[][] flights) {
+	for (int i = 0; i < n; i++) {
+		graph.add(new ArrayList<>());
+	}
+
+	for (int[] flight: flights) {
+		graph.get(flight[0]).add(new Pair(flight[1], flight[2]));
+	}
+}
+}
+--------------------------------------------------------------------------------------
+# Euler Tour Concept-> It helps us to find whether a node is in subtree of other node.
+For this while traversing through DFS Algorithm just find the inTime and outTime of each node.
+now if we want to check whether x is in subtree of y then we have to check that.
+
+(in[x]>in[y] && out[x]<out[y]) if this gives true then x is in subtree of y.
+
+public static void DFS(boolean[]vis,int node,int[]in,int[]out,ArrayList<ArrayList<Integer>>graph){
+        vis[node]=true;
+        in[node]=timer++;
+        for(int an:graph.get(node)){
+            if(!vis[an]){
+                DFS(vis,an,in,out,graph);
+            }
+        }
+        out[node]=timer++;
+    }
+--------------------------------------------------------------------------------------
+36. Oliver and the Game
+
+static int timer = 1;
+
+	public static void OliverAndGame(int n, ArrayList<ArrayList<Integer>> graph) {
+		int[] in = new int[n+1];
+		int[] out = new int[n+1];
+
+		boolean[] vis = new boolean[n+1];
+		
+		DFS(vis, 1, in, out, graph);
+
+		// run for q queries
+
+		int q = scn.nextInt();
+		while (q-- > 0) {
+			int type = scn.nextInt();
+			int x = scn.nextInt();
+			int y = scn.nextInt();
+			if (!checkForSubtree(x, y, in, out) && !checkForSubtree(y, x, in, out)) {
+				System.out.println("NO");
+				continue;
+			}
+
+			if (type == 0 && checkForSubtree(x, y, in, out)) {
+				System.out.println("YES");
+			} else if (type == 1 && checkForSubtree(y, x, in, out)) {
+				System.out.println("YES");
+			} else {
+				System.out.println("NO");
+			}
+		}
+	}
+--------------------------------------------------------------------------------------
+# Ford-Fulkerson Algorithm for Maximum Flow Problem
 	
