@@ -131,8 +131,14 @@ private int maxSumSubArray(int[] a , int k){
 19. Ford-Fulkerson Algorithm for Maximum Flow Problem
 	
 -------------------------------------------------------------------------------------
+20. Longest path in an undirected tree.
+-> Apply 2 Bfs two times 
+1. choose any node apply bfs to find the longest distance let this node be y.
+2. Now from y apply bfs to find the longest path. which is the diamter of the tree.
 -------------------------------------------------------------------------------------
+21. Maximum Binary Tree (Leetcode-654)
 -------------------------------------------------------------------------------------
+22. Cycle sort
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
