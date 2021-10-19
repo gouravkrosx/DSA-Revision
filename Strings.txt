@@ -346,7 +346,7 @@ public static void main (String[] args) {
                 }
                 
                 if(b<0){
-                    b=1;
+                    b=1;   //because after getting close bracket you reversed it to open bracket which makes b=1
                     c++;
                 }
             }
