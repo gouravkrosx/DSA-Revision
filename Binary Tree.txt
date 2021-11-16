@@ -1076,7 +1076,7 @@ private static BinaryTreeNode<Integer> bfsToMapParents(BinaryTreeNode<Integer> r
                     q.offer(node.right);
                 }
 
-                if(mpp.get(node) != null && vis.get(mpp.get(node)) == null) {
+                if(mpp.get(node) != null && vis.get(mpp.get(node)) == null) { //for burning parent node.
                     fl = 1;
                     vis.put(mpp.get(node), 1);
                     q.offer(mpp.get(node));

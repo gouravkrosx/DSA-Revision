@@ -1089,6 +1089,8 @@ public int[][] floodFill(int[][] image, int sr, int sc, int newColor) {
     }
 --------------------------------------------------------------------------------------
 17. M-Coloring Problem -O(M^N)
+Intuition-> Color every node with each color 
+(Backtracking)
 
 //node=0; is passed.
  public static boolean M_ColoringProblem(List<Integer>[]G,int[]color,int node,int m,int n){
@@ -1101,7 +1103,7 @@ public int[][] floodFill(int[][] image, int sr, int sc, int newColor) {
                 if(M_ColoringProblem(G,color,node+1,m,n)){
                     return true;
                 }
-                color[node]=0;
+                color[node]=0;  //backtrack
             }
         }
         return false;
@@ -1255,7 +1257,7 @@ ans[adjnode]=ans[node]+1;
 in the queue.
 ->Logic -> we have to find the cycle in directed graph.
 --------------------------------------------------------------------------------------
-23. Snake and Ladder
+23. Snake and Ladder -> https://www.youtube.com/watch?v=zWS2fCJGxmU
 
  public int snakesAndLadders(int[][] board) {
         int n=board.length;
@@ -1333,7 +1335,7 @@ public void shortest_distance(int[][] matrix)
 25. Number of Triangles in directed and undirected Graph.
 
 Logic-> we will run three loops for 2 nodes of triangle , each loop will be from (0 to n-1)
-Now whenever there will be and edge among them means (arr[i]==arr[j]==arr[k]==1) then count++
+Now whenever there will be and edge among them means (arr[i][j]==arr[j][k]==arr[k][i]==1) then count++
 it will be mentioned that the given graph is directed or not. 
 If Directed graph-> ans=count/3;
 If Undirected graph-> ans=count/6; 
@@ -1603,9 +1605,9 @@ public static String AlienOrder(String[] words) {
 				if (ch1 != ch2) {
 					HashSet<Character> set = new HashSet<>();
 					if (graph.containsKey(ch1)) {
-						HashSet<Character> st = graph.get(ch1);
+						HashSet<Character> set = graph.get(ch1);
 
-						if (!st.contains(ch2)) {
+						if (!set.contains(ch2)) {
 							set.add(ch2);
 							indegree.put(ch2, indegree.get(ch2) + 1);
 							graph.put(ch1, set);
@@ -1621,8 +1623,8 @@ public static String AlienOrder(String[] words) {
 				}
 			}
 
-			if (!flag && curr.length() > next.length()) {
-				return "";
+			if (!flag && curr.length() > next.length()) {  //edge case given in question that if not mismatch then give min length first but 
+				return "";                             // here curr have already larger length than next.   
 			}
 		}
 		// now applying Kahn's algo (toposort)
@@ -1663,7 +1665,11 @@ public static String AlienOrder(String[] words) {
 
 --------------------------------------------------------------------------------------
 35. Cheapest Flights Within K Stops
-->Simply used Dijkstra algoclass Pair {
+->Simply used Dijkstra algo
+
+//dry run the code to understand 
+
+class Pair {
 	int city, cost;
 
 	Pair(int city, int cost) {
@@ -1695,21 +1701,22 @@ public int findCheapestPrice(int n, int[][] flights, int src, int dst, int K) {
     pQueue.offer(new City(src, 0, 0));
     
     HashMap<Integer, Integer> seen = new HashMap<>(); //mandatory to reduce time complexity
-    
-    int totalCost = 0;
 
     while (!pQueue.isEmpty()) {
     	City top = pQueue.poll();
 
-        if(seen.containsKey(top.city) && seen.get(top.city)<=top.distFromSrc)
-            continue;
+        if(seen.containsKey(top.city) && seen.get(top.city)<=top.distFromSrc) //Just checking whether the we visited it before and the number of stops that 
+		continue; 						    //we covered before was low than the current route, then following the 
+								          //current route is not a good idea, so we skip it
+            
         seen.put(top.city, top.distFromSrc);
         
     	if (top.city == dst) {
-    		return top.costFromSrc;
+    		return top.costFromSrc;  
     	}
 
-    	if (top.distFromSrc > K) {
+    	if (top.distFromSrc > K) {  //because here we can say that we exceeded value ok k, since at above condition we have max value of stops == k 
+				    //which is not giving the destination
     		continue;
     	}
 

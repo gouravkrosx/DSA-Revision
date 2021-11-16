@@ -331,7 +331,7 @@ public static long CoinCombinationI(int[] coin, int val, int n) {
         
         Arrays.fill(dp,amount+1);
         dp[0]=0;
-        for(int i=0;i<=amount;i++){
+        for(int i=1;i<=amount;i++){
             for(int j=0;j<coins.length;j++){
                 if(coins[j]<=i){
                     dp[i]=Math.min(dp[i],1+dp[i-coins[j]]);
@@ -405,6 +405,10 @@ https://www.pepcoding.com/resources/online-java-foundation/dynamic-programming-a
 
 		for (int i = 3; i < dp.length; i++) {
 			dp[i] = (dp[i - 1] + ((i - 1) * dp[i - 2]) % M) % M;
+		//if i wants to be single then dp[i-1] will be called to find out in how many ways i-1 can be single or paired up
+		// if i wants to pair up then it can be paired up with i-1 leaving itself, now if it get paired up then 
+		//remaining members will be i-2 they can be single or paired up (through dp[i-2]) <- it will give ans for those, since this call will be 
+		//called i-1 times therefore we multiplied this.
 		}
 		
 		return dp[n];
@@ -947,8 +951,8 @@ dps(c1mc2)=2*dps(m)-dps(m')
                     if(str.charAt(i)!=str.charAt(j)){
                         dp[i][j]=((dp[i+1][j]+dp[i][j-1])%m-dp[i+1][j-1])%m;
                     }else{
-                        int n=next[i];
-                        int p=prev[j];
+                        int n=next[i];  //next of start
+                        int p=prev[j];  //prev of end
                         if(n>p){ //0 same character in mid
                             dp[i][j]=(2*dp[i+1][j-1]%m+2)%m;
                         }else if(n==p){ //1 same character
@@ -986,7 +990,7 @@ now if(c1!=c2){  //ans can't lie in set4
 but lps(s2) represents ->(s1,s2), and similarly lps(s3) represents (s1,s3)
 so ans=Max(lps(s2),lps(s3))
 }else{ //ans only lies in set 4
-lps=lps(mid)+2
+lps=lps(mid)+2  //extra 2 for ending characters
 }
 
  public int longestPalindromeSubseq(String s) {
@@ -1201,6 +1205,11 @@ M2) Binary Search->
 ------------------------------------------------------------------------------------------------
 34. Max Sum of Rectangle No larger Than K (Leetcode 363)  //try to understand this using dry run
 Same below Question but use this->
+
+-> below there we are finding ceiling value of (presum-k) / (can also find (presum-k)<- as sum can be equal to k
+-> but treeset doesn't have get function ) because that will be the value which can be deleted to make sure that the sum is less than k.
+Presum=x+k <- this x should be deleted from presum so that we get atleast k.
+
 private int maxSumSubArray(int[] a , int k){
 
     int max = Integer.MIN_VALUE;
