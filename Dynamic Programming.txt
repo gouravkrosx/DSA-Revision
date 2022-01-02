@@ -194,8 +194,11 @@ public int LCsSpaceOptimised(String s1, String s2) {
 	}
 ------------------------------------------------------------------------------------------------
 6. Palindromic Partitions/cuts 
+-> Time Complexity (N^3) -> (N^2)
 ->BLog because we did some further optimization in this question  
 https://leetcode.com/problems/palindrome-partitioning-ii/discuss/1267844/JAVA-or-Recursion-%2B-Memoization-or-Optimized-Matrix-Chain-Multiplication-Approach-with-Code-(MCM)
+
+// we are cutting prefixes here
 
 public int PalindromicpartitionscutTD(String str, int si, int ei, int[][] strg) {
 		if (strg[si][ei] != -1) {
@@ -783,6 +786,10 @@ Tabulation->
 23. Longest Common Substring
 Logic-> compare all prefixes of string 1 with prefixes of string 2 and find longest common suffix (which is ultimately longest common substring)
 *some substring is always a suffix of some prefix , this is the intuition
+
+pqabcxy <-compare all prefixes of both and find longest common suffix-> xyzabcp
+# At point when we compare pqabc with xyzabc thats where we get our longest common suffix hence longest common substring.
+-> abc here is suffix of these above prefixes in both <- intuition
 ->Dry run bottom up approach for better understanding.
 
  int longestCommonSubstr(String s1, String s2, int n, int m){
@@ -1208,7 +1215,7 @@ Same below Question but use this->
 
 -> below there we are finding ceiling value of (presum-k) / (can also find (presum-k)<- as sum can be equal to k
 -> but treeset doesn't have get function ) because that will be the value which can be deleted to make sure that the sum is less than k.
-Presum=x+k <- this x should be deleted from presum so that we get atleast k.
+Presum=k+x <- this x should be deleted from presum so that we get atleast k.
 
 private int maxSumSubArray(int[] a , int k){
 

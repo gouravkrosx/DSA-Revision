@@ -570,8 +570,15 @@ private static void MergeOverlappingIntervals(int[][] arr) {
 	}
 ---------------------------------------------------------------------------------------------------
 21. Petrol Filling Circular Tour ->https://www.youtube.com/watch?v=nTKdYm_5-ZY
+
 Logic-> we are taking two variables here
-(sum, diff ) sum stores how much surplus we have of petrol and diff stores how much deficit we have of petrol, basically we are storing deficit so that we do not need to traverse again for the circular path ,pet={1,2,3,4,5} | dist={3,4,5,1,2} so in this case we get our first surplus at 4th index here upto 4th index deficit was getting stored so that at last we can check whether the amount of surplus we have is more that or equal to deficit to complete the circular path upto that first surplus station here 4th index.
+(sum, diff ) sum stores how much surplus we have of petrol and diff stores how much deficit we have of petrol, 
+basically we are storing deficit so that we do not need to traverse again for the 
+circular path ,pet={1,2,3,4,5} | dist={3,4,5,1,2} so in this case we get our 
+first surplus at 4th index here upto 4th index deficit was getting stored so that at last we can check whether 
+the amount of surplus we have is more that or equal to deficit to complete the circular path upto that first surplus 
+station here 4th index.
+
 private static int CircularTour(int[] pet, int[] dis) {
 		int start = 0;
 		int sum = 0; // surplus in petrol
@@ -1126,6 +1133,25 @@ static void printMax(int arr[], int n, int k)
 			}
 		}
 		return st.pop();
+	}
+---------------------------------------------------------------------------------------------------
+33. Stock Span
+public static int[] stockspan(int[] arr) throws Exception {
+		Dynamicstack s = new Dynamicstack();
+		int[] ans = new int[arr.length];
+		for (int i = 0; i < arr.length; i++) {
+			while (!s.isEmpty() && arr[s.top()] < arr[i]) {
+				s.pop();
+			}
+			if (s.isEmpty()) {
+
+				ans[i] = i + 1;
+			} else
+				ans[i] = i - s.top();
+
+			s.push(i);
+		}
+		return ans;
 	}
 ---------------------------------------------------------------------------------------------------
 ## Arithmetic Expression Evaluation-> see youtube videos to learn all the conversions

@@ -95,6 +95,60 @@ static int c5 = 1;
 		}
 		return true;
 	}
+
+-> Optimised
+
+ public List<List<String>> solveNQueens(int n) {
+    
+        char[][]board=new char[n][n];
+        for(int i=0;i<n;i++){
+            for(int j=0;j<n;j++){
+                board[i][j]='.';
+            }
+        }
+        
+        List<List<String>>res=new ArrayList<>();
+        
+        //taking these arrays for quickly checking the safe cell (hashing concept)
+        int[]leftRow=new int[n];
+        int[]upperD=new int[2*n-1]; //upper left diagonal
+        int[]lowerD=new int[2*n-1]; //lower left diagonal
+        
+        NQueens(0,n,board,leftRow,upperD,lowerD,res);
+        return res;
+        
+    }
+    public void NQueens(int col,int n,char[][]board,int[]lr,int[]ud,int[]ld,List<List<String>>res){
+        if(col==n){
+            res.add(construct(board));
+        }
+        
+        //at each row we searching for row to place
+        for(int row=0;row<n;row++){
+            if(lr[row]==0 && ld[row+col]==0 && ud[(n-1)+(col-row)]==0){
+                board[row][col]='Q';
+                lr[row]=1;
+                ld[row+col]=1;
+                ud[(n-1)+(col-row)]=1;
+                NQueens(col+1,n,board,lr,ud,ld,res);
+                lr[row]=0;
+                ld[row+col]=0;
+                ud[(n-1)+(col-row)]=0;
+                board[row][col]='.';
+            }
+        }
+        
+    }
+    
+    public List<String> construct(char[][]board){
+        List<String>list=new ArrayList<>();
+        
+        for(int i=0;i<board.length;i++){
+            String str = new String(board[i]);
+            list.add(str);
+        }
+        return list;        
+    }
 --------------------------------------------------------------------------------------------
 3. Sudoku Solver
 public static void Sudokusolver(int[][] arr, int row, int col) {
@@ -440,12 +494,12 @@ public static void main(String[] args) throws java.lang.Exception {
 12. Remove Invalid Parentheses->(Leetcode 301)
 Intuition-> We remove every single parenthesis then check is it valid if valid then add it into ans
  List<String>ans=new ArrayList<>();
-    Set<String>setA= new HashSet<>();
+    Set<String>setA= new HashSet<>();  //this set is for checking if this some type of parenthesis have been called earlier.
     
     public List<String> removeInvalidParentheses(String s) {
         int mra=getMinRemovals(s);
         //minimum removals allowed
-        Set<String>set=new HashSet<>();
+        Set<String>set=new HashSet<>();   //this set is for storing the valid parenthesis.
         solution(mra,set,s);
         return ans;
     }

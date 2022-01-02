@@ -45,6 +45,28 @@ public void RPR() {
 		curr.next = prev;
 	}
 
+-> Another Method
+
+public ListNode reverseList(ListNode head) {
+       if(head==null)
+           return head;  
+          ListNode p=solve(head);
+           p.next=null;
+        return glob;
+    }
+    static ListNode glob=null;
+    
+      
+    public ListNode solve(ListNode node){
+     if(node.next==null){
+         glob=node;
+         return node;
+     }
+        ListNode temp = solve(node.next);  
+        temp.next=node;
+        return node;
+    } 
+
 --------------------------------------------------------------------------------------------------------
 2. Detect Loop in LinkedList.->https://www.youtube.com/watch?v=LUm2ABqAs1w
 #Floyd cycle detection algorithm
@@ -191,7 +213,7 @@ Node DeleteNodeRightLarger(Node head){
 8. Add two linked list in S(1)
 public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
         
-         ListNode head=l1;  //we wil store the ans in l1
+         ListNode head=l1;  //we will store the ans in l1
          ListNode prev=null; //this will help to join the link if l1 is smaller than l2
         
         int carry=0;

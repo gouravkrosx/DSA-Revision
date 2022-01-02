@@ -19,7 +19,7 @@ public static long FirstOcc(long[]arr,int x){
 			}
 		}
 		return idx;
-                              }
+             }
 
 ------------------------------------------------------------------------------------------------------
 2. Search in sorted and rotated array O(logn)

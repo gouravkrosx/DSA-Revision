@@ -124,6 +124,25 @@ public List<Integer> rightSideView(TreeNode root) {
 		}
         return ans;
     }
+
+-> Recursive way easier 
+public List<Integer> rightSideView(TreeNode root) {
+        List<Integer> result = new ArrayList<Integer>();
+        rightView(root, result, 0);
+        return result;
+    }
+    
+    public void rightView(TreeNode curr, List<Integer> result, int currDepth){
+        if(curr == null){
+            return;
+        }
+        if(currDepth == result.size()){
+            result.add(curr.val);
+        }
+        
+        rightView(curr.right, result, currDepth + 1);
+        rightView(curr.left, result, currDepth + 1);   
+    }
 -----------------------------------------------------------------------------------	
 7. Left Side view of Binary Tree
 public List<Integer> rightSideView(TreeNode root) {
@@ -217,6 +236,70 @@ private class VDPair implements Comparable<VDPair> {
 # For Diagonal Traversal , just put (hlevel-vlevel) in map instead of vlevel only.
 #For Top view just put FIRST element of vertical order traversal  in ANS Arraylist.
 #For Bottom view just put LAST element of vertical order traversal  in ANS Arraylist.
+
+//Top View
+->
+//Function to return a list of nodes visible from the top view 
+    //from left to right in Binary Tree.
+    static ArrayList<Integer> topView(Node root)
+    {
+        ArrayList<Integer> ans = new ArrayList<>(); 
+        if(root == null) return ans;
+        Map<Integer, Integer> map = new TreeMap<>();
+        Queue<Pair> q = new LinkedList<Pair>();
+        q.add(new Pair(root, 0)); 
+        while(!q.isEmpty()) {
+            Pair it = q.remove();
+            int hd = it.hd; 
+            Node temp = it.node; 
+            if(map.get(hd) == null) map.put(hd, temp.data); 
+            if(temp.left != null) {
+                
+                q.add(new Pair(temp.left, hd - 1)); 
+            }
+            if(temp.right != null) {
+                
+                q.add(new Pair(temp.right, hd + 1)); 
+            }
+        }
+    
+        for (Map.Entry<Integer,Integer> entry : map.entrySet()) {
+            ans.add(entry.getValue()); 
+        }
+        return ans; 
+    }
+
+-> Bottom view
+
+//Function to return a list containing the bottom view of the given tree.
+    public ArrayList <Integer> bottomView(Node root)
+    {
+        ArrayList<Integer> ans = new ArrayList<>(); 
+        if(root == null) return ans;
+        Map<Integer, Integer> map = new TreeMap<>();
+        Queue<Node> q = new LinkedList<Node>();
+        root.hd = 0;  //hd = the division line tha axis ( left side it is negative, right side it is positive, root side its 0)
+        q.add(root); 
+        while(!q.isEmpty()) {
+            Node temp = q.remove();
+            int hd = temp.hd; 
+            map.put(hd, temp.data); // at last updated hd->(value) it will get the bottom view node
+            if(temp.left != null) {
+                temp.left.hd = hd - 1; 
+                q.add(temp.left); 
+            }
+            if(temp.right != null) {
+                temp.right.hd = hd + 1; 
+                q.add(temp.right); 
+            }
+        }
+        
+        for (Map.Entry<Integer,Integer> entry : map.entrySet()) {
+            ans.add(entry.getValue()); 
+        }
+        return ans;    
+    }
+
 -----------------------------------------------------------------------------------	
 9. Lowest Common Ancestor -O(N)
 public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
@@ -276,6 +359,31 @@ public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
 			}
 		}
         return ans;
+    }
+
+-> Using one Queue only
+ public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
+        Queue<TreeNode> queue = new LinkedList<TreeNode>();
+        List<List<Integer>> wrapList = new LinkedList<List<Integer>>();
+        
+        if(root == null) return wrapList;
+        
+        queue.offer(root);
+        boolean flag = true;   //for changing direction 
+        while(!queue.isEmpty()){
+            int levelNum = queue.size();
+            List<Integer> subList = new ArrayList<Integer>(levelNum);
+            for(int i=0; i<levelNum; i++) {
+                int index = i;
+                if(queue.peek().left != null) queue.offer(queue.peek().left);
+                if(queue.peek().right != null) queue.offer(queue.peek().right);
+                if(flag == true) subList.add(queue.poll().val);
+                else subList.add(0, queue.poll().val);
+            }
+            flag = !flag; 
+            wrapList.add(subList);
+        }
+        return wrapList;
     }
 -----------------------------------------------------------------------------------	
 11. Balanced Binary Tree
@@ -343,6 +451,8 @@ static int ms=Integer.MIN_VALUE;
     }
 -----------------------------------------------------------------------------------	
 13. Contruct Binary Tree from preorder and inorder traversal
+# without traversing everytime you can just add every element of inorder in a hashmap and get it in constant time
+
 private TreeNode constructPreIn(int[] pre, int plo, int phi, int[] in, int ilo, int ihi) {
 		if (plo > phi || ilo > ihi) {
 			return null;
@@ -350,7 +460,7 @@ private TreeNode constructPreIn(int[] pre, int plo, int phi, int[] in, int ilo, 
 
 		TreeNode nn = new TreeNode();
 		nn.val = pre[plo];
-		int si = -1;
+		int si = -1;   //can use hashmap to get this idx in constant time.
 		for (int i = ilo; i <= ihi; i++) {
 			if (in[i] == nn.val) {
 				si = i;
@@ -728,7 +838,65 @@ public boolean node2rootpath(TreeNode node,int item,ArrayList<TreeNode>list){
 	CollectKlevelDown(node.left,k-1,blocker,ans);
 	CollectKlevelDown(node.right,k-1,blocker,ans);
 }
-			
+
+-> Striver explaination
+
+* Mark each node to its parent to traverse upwards
+* We will do a BFS traversal starting from the target node
+* As long as we have not seen our node previously, Traverse up, left, right until reached Kth distance
+* when reached Kth distance, break out of BFS loop and remaining node's values in our queue is our result
+
+->
+ private void markParents(TreeNode root, Map<TreeNode, TreeNode> parent_track, TreeNode target) {
+        Queue<TreeNode> queue = new LinkedList<TreeNode>();
+        queue.offer(root);
+        while(!queue.isEmpty()) { 
+            TreeNode current = queue.poll(); 
+            if(current.left != null) {
+                parent_track.put(current.left, current);
+                queue.offer(current.left);
+            }
+            if(current.right != null) {
+                parent_track.put(current.right, current);
+                queue.offer(current.right);
+            }
+        }
+    }
+    public List<Integer> distanceK(TreeNode root, TreeNode target, int k) {
+        Map<TreeNode, TreeNode> parent_track = new HashMap<>();
+        markParents(root, parent_track, root); 
+        Map<TreeNode, Boolean> visited = new HashMap<>(); 
+        Queue<TreeNode> queue = new LinkedList<TreeNode>();
+        queue.offer(target);
+        visited.put(target, true);
+        int curr_level = 0;
+        while(!queue.isEmpty()) { /*Second BFS to go upto K level from target node and using our hashtable info*/
+            int size = queue.size();
+            if(curr_level == k) break;
+            curr_level++;
+            for(int i=0; i<size; i++) {
+                TreeNode current = queue.poll(); 
+                if(current.left != null && visited.get(current.left) == null) {
+                    queue.offer(current.left);
+                    visited.put(current.left, true);
+                }
+                if(current.right != null && visited.get(current.right) == null ) {
+                    queue.offer(current.right);
+                    visited.put(current.right, true);
+                }
+                if(parent_track.get(current) != null && visited.get(parent_track.get(current)) == null) {
+                    queue.offer(parent_track.get(current));
+                    visited.put(parent_track.get(current), true);
+                }
+            }
+        }
+        List<Integer> result = new ArrayList<>(); 
+        while(!queue.isEmpty()) {
+            TreeNode current = queue.poll(); 
+            result.add(current.val);
+        }
+        return result;
+    }
 -----------------------------------------------------------------------------------
 26. Flip Equivalent Binary Trees (Isomorphic Trees)
   public boolean flipEquiv(TreeNode n1, TreeNode n2) {
@@ -990,6 +1158,29 @@ w/Recursion
         
         return ms_straight;
     }
+
+-> Striver's explaination
+-> At each node we are making the curve path ( finding left_max_sum_path and right_max_sum_path) then 
+ max =Math.max(max, left_sum + right_sum + node.data) and we are sending the max sum path at each node like 
+ return node.data +Math.max(left_sum,right_sum); (since for the parent child can give the max path covering node + either left path or right path)
+
+ public int maxPathSum(TreeNode root) {
+        int[] max =new int[1];
+        max[0]=Integer.MIN_VALUE;
+        FindMaxPathSum(root,max);
+        return max[0];
+    }
+    public int FindMaxPathSum(TreeNode node, int[]max){
+        if(node==null){
+            return 0;
+        }
+        
+        int leftMaxSum=Math.max(0,FindMaxPathSum(node.left,max));
+        int rightMaxSum=Math.max(0,FindMaxPathSum(node.right,max));  //comparing with 0 to avoid negative sum 
+        
+        max[0]=Math.max(max[0],leftMaxSum+rightMaxSum+node.val);
+        return node.val+Math.max(rightMaxSum,leftMaxSum);
+    }
 --------------------------------------------------------------------------------------------------
 35. Second Minimum Node in Binary Tree/BST
  public int findSecondMinimumValue(TreeNode root) {
@@ -1086,4 +1277,206 @@ private static BinaryTreeNode<Integer> bfsToMapParents(BinaryTreeNode<Integer> r
         }
         return maxi;
     }
+-----------------------------------------------------------------------------------------------
+37. Root to Node Path
+
+ private boolean getPath(TreeNode root, ArrayList<Integer> arr, int x) {
+        if(root == null) {
+            return false; 
+        }
+        arr.add(root.val);
+        if(root.val == x) {
+            return true; 
+        }
+
+        if(getPath(root.left, arr, x) || getPath(root.right, arr, x)) {
+            return true; 
+        }
+
+        arr.remove(arr.size() - 1); 
+        return false; 
+    }
+    public ArrayList<Integer> solve(TreeNode A, int B) {
+        ArrayList<Integer> arr = new ArrayList<>(); 
+        if(A == null) return arr; 
+        getPath(A, arr, B); 
+        return arr; 
+    }
+-----------------------------------------------------------------------------------------------
+38. Maximum width of a binary tree
+-> Width = No of nodes in a level between any two non null nodes on the same level
+( first non-null node in that level <-> last non-null node in that level)
+
+Intuition ->  we can give index to nodes by going level wise and left to right. after that we just have to take max of all the
+(last idx - first idx + 1 ) in every level.
+-> It may be possible that there will not be any node between two nodes of same level for that take care of index in such a way that we hypothetically considering that nodes to get the answer.
+we can maintain the indexing for that cases and for the normal case by using 
+for 0's based indexing->(parent = i, left child = 2*i+1, right child = 2*i+2);
+But In case of Skewed tree this multiplication thing will give overflow when everytime you multiply by two.
+ 
+-> to handle this case just do one thing whenever you get i just make it i=i-(min value idx at that level) and treat this i to find idx of children 2*i+1, 2*i+2.
+
+class pair{
+        TreeNode node;
+        int idx;
+        public pair(TreeNode n, int i){
+            node=n;
+            idx=i;
+        }
+    }
+    public int widthOfBinaryTree(TreeNode root) {
+        
+        if(root==null){
+            return 0;
+        }
+        int ans=0;
+        
+        Queue<pair>q=new LinkedList<>();
+        q.offer(new pair(root,0)); 
+        
+        while(!q.isEmpty()){
+            int size=q.size();
+            int min=q.peek().idx; //to avoid overflow and make the idx starting from 0
+            int first=0,last=0;
+            for(int i=0;i<size;i++){
+                int curr_idx=q.peek().idx-min;
+                TreeNode rn=q.peek().node;
+                q.poll();
+                
+                if(i==0)first=curr_idx;
+                if(i==size-1)last=curr_idx;
+                
+                if(rn.left!=null)q.offer(new pair(rn.left,curr_idx*2+1));
+                if(rn.right!=null)q.offer(new pair(rn.right,curr_idx*2+2));
+                }
+            ans=Math.max(ans,last-first+1);
+        }
+              
+        return ans;
+    }
+-----------------------------------------------------------------------------------------------
+39. Children sum property of a binary tree.
+* if both children sum is less than parent, make children's value to parent's value.
+* if both children values sum is greater than or equal to parent, make parent's value to children's sum.
+* recursively go left and right. Traversal type: DFS.
+* when coming back up the tree, take children sum and replace it in parent.
+* at any point we reach null, just return (base case)
+* Intuition: while going down, increase the children values to max possible so we make sure to never fall short, then all we have to do is sum both children and replace it in parent.
+
+public static void changeTree(BinaryTreeNode < Integer > root) {
+        if(root == null) return; 
+        int child = 0;
+        if(root.left != null) {
+            child += root.left.data; 
+        }
+        if(root.right != null) {
+            child += root.right.data; 
+        }
+
+        if(child >= root.data) root.data = child; 
+        else {
+            if(root.left != null) root.left.data = root.data; 
+            else if(root.right != null) root.right.data = root.data; 
+        }
+
+        changeTree(root.left); 
+        changeTree(root.right); 
+
+        int tot = 0; 
+        if(root.left != null) tot += root.left.data; 
+        if(root.right != null) tot+= root.right.data; 
+        if(root.left != null || root.right != null) root.data = tot;  
+    }
+-----------------------------------------------------------------------------------------------
+40. Count total nodes in a complete binary tree in O(Log^2 N)
+
+public int countNodes(TreeNode root) {
+        if(root == null) return 0;
+        
+        int left = getHeightLeft(root);
+        int right = getHeightRight(root);
+        
+        //If left and right are equal it means that the tree is complete and hence go for 2^h -1.
+        if(left == right) return ((1<<(left)) -1);
+            
+        //else recursively calculate the number of nodes in left and right and add 1 for root.
+        else return countNodes(root.left)+ countNodes(root.right)+1;
+    }
+    
+    
+    public int getHeightLeft(TreeNode root){
+        int count=1;
+        while(root.left!=null){
+            count++;
+            root = root.left;
+        }
+        return count;
+    }
+    
+    
+    public int getHeightRight(TreeNode root){
+        int count=1;
+        while(root.right!=null){
+            count++;
+            root = root.right;
+        }
+        return count;
+    }
+-----------------------------------------------------------------------------------------------
+41. Serialize and Deserialize Binary Tree 
+-> You can use any traversal, here i have used inorder traversal.
+O(n) s(n)
+
+ // Encodes a tree to a single string.
+    public String serialize(TreeNode root) {
+        if(root==null)return "";
+        
+        Queue<TreeNode>q = new LinkedList<>();
+        StringBuilder sb = new StringBuilder();
+        q.offer(root);
+        
+        while(!q.isEmpty()){
+            TreeNode rn = q.poll();
+            if(rn==null){
+                sb.append("n "); //null
+                continue;
+            }
+            
+            sb.append(rn.val+" ");
+            q.offer(rn.left);
+            q.offer(rn.right);
+        }
+        return sb.toString();
+    }
+    
+    // Decodes your encoded data to tree.
+    public TreeNode deserialize(String data) {
+        if(data.equals(""))return null;
+        
+        Queue<TreeNode>q = new LinkedList<>();
+        String[] values = data.split(" ");
+        TreeNode root = new TreeNode(Integer.parseInt(values[0]));
+        q.offer(root);
+        
+        for(int i=1;i<values.length;i++){
+            TreeNode node = q.poll();
+            if(!values[i].equals("n")){ //first value for left
+                TreeNode ln=new TreeNode(Integer.parseInt(values[i]));
+                node.left=ln;
+                q.offer(ln);
+            }
+            
+            if(!values[++i].equals("n")){ //next value for right
+                TreeNode rn=new TreeNode(Integer.parseInt(values[i])); 
+                node.right=rn;
+                q.offer(rn);
+            }
+        }
+
+        return root;   
+    }
+
+-----------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------------------
 	

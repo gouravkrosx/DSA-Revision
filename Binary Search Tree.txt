@@ -306,6 +306,20 @@ b)Preorder->static int idx=0;
         nn.right=bstFrompre(preorder,nn.val,rr);
         return nn;
     }
+
+-> using single range (striver's solution)
+public TreeNode bstFromPreorder(int[] A) {
+        return bstFromPreorder(A, Integer.MAX_VALUE, new int[]{0});
+    }
+
+    public TreeNode bstFromPreorder(int[] A, int bound, int[] i) {
+        if (i[0] == A.length || A[i[0]] > bound) return null;
+        TreeNode root = new TreeNode(A[i[0]++]);
+        root.left = bstFromPreorder(A, root.val, i);
+        root.right = bstFromPreorder(A, bound, i);
+        return root;
+    }
+
 c)Postorder->
 public TreeNode bstFromPostorder(int[] postorder) {
         idx=postorder.length-1;
@@ -362,7 +376,9 @@ Binary Search Tree to Greater Sum Tree  (LeetCode 1038)
 
 -------------------------------------------------------------------------------------------------
 14.  Morris Traversal for Inorder and Preorder in O(N) and S(1)
-->Intuition-> we make thread for every node and this thread attaches the current node with its inorder successor such that if node wants to go back to the parent node this thread will help. and if we again reaches to the parent(through thread (cycle)) that means the segment containing that node is traversed. 
+->Intuition-> we make thread for every node and this thread attaches the current node with its inorder successor 
+such that if node wants to go back to the parent node this thread will help. and if we again reaches to the 
+parent(through thread (cycle)) that means the segment containing that node is traversed. 
 
 	private void MorrisTraversalInorder(Node root) {
 		Node curr = root;
@@ -673,6 +689,58 @@ public static Node getNextFromNormalInorder(Stack<TPair>st) {
     return null;
 }
 
+-> Striver solution (easiest Approach)
+# Pre-requisite = Binary Search Iterator.
+
+public class BSTIterator {
+    private Stack<TreeNode> stack = new Stack<TreeNode>();
+    boolean reverse = true; 
+    
+    public BSTIterator(TreeNode root, boolean isReverse) {
+        reverse = isReverse; 
+        pushAll(root);
+    }
+
+    /** @return whether we have a next smallest number */
+    public boolean hasNext() {
+        return !stack.isEmpty();
+    }
+
+    /** @return the next smallest number */
+    public int next() {
+        TreeNode tmpNode = stack.pop();
+        if(reverse == false) pushAll(tmpNode.right);
+        else pushAll(tmpNode.left); 
+        return tmpNode.val;
+    }
+    
+    private void pushAll(TreeNode node) {
+        while(node != null) {
+             stack.push(node);
+             if(reverse == true) {
+                 node = node.right; 
+             } else {
+                 node = node.left; 
+             }
+        }
+    }
+}
+class Solution {
+    public boolean findTarget(TreeNode root, int k) {
+        if(root == null) return false; 
+        BSTIterator l = new BSTIterator(root, false); 
+        BSTIterator r = new BSTIterator(root, true); 
+        
+        int i = l.next(); 
+        int j = r.next(); 
+        while(i<j) {
+            if(i + j == k) return true; 
+            else if(i + j < k) i = l.next(); 
+            else j = r.next(); 
+        }
+        return false; 
+    }
+}
 -------------------------------------------------------------------------------------------------
 22. Count pairs from 2 BST whose sum is equal to given value "X"
  public static int countPairs(Node root1, Node root2, int x)
@@ -700,3 +768,90 @@ public static Node getNextFromNormalInorder(Stack<TPair>st) {
         return count;
     }
 -------------------------------------------------------------------------------------------------
+23. Validate a Binary Search Tree
+-> Just give everynode a range if it lies in the given range then we can say it follows bst property, do this for all nodes.
+ public boolean isValidBST(TreeNode root) {
+        
+        return ValidateBST(root,Long.MIN_VALUE, Long.MAX_VALUE);
+    }
+    public boolean ValidateBST(TreeNode node, long min, long max){
+        if(node==null){
+            return true;
+        }
+        if(node.val>=max||node.val<=min)return false;
+        
+        return ValidateBST(node.left,min,node.val)&&ValidateBST(node.right,node.val,max);
+    }
+--------------------------------------------------------------------------------------------
+24. Binary Search Tree Iterator
+Time:  approx O(1) {suppose you are putting n element and there are n next calls so n/n=1}
+Space: O(H)
+
+Stack<TreeNode> st = new Stack<>();
+    public BSTIterator(TreeNode root) {
+        pushAll(root);
+    }
+    
+    public int next() {
+        TreeNode node = st.pop();
+        pushAll(node.right);
+        return node.val;
+    }
+    
+    public boolean hasNext() {
+        return !(st.isEmpty());
+    }
+    
+    public void pushAll(TreeNode node){
+        for(;node!=null;st.push(node),node=node.left);
+    }
+---------------------------------------------------------------------------------------------------------
+25. Recover BST 
+-> Two cases are there
+i) Swapped nodes are adjacent ( there will not be second violation-> swap(first violation,pre of first violation)
+ii) Swapped nodes are not adjacent. (there will be second violation -> swapt(first violation, second violation)
+
+class Solution {
+    
+    TreeNode first;
+    TreeNode middle;
+    TreeNode last;
+    TreeNode prev;
+        
+    public void recoverTree(TreeNode root) {
+        first=middle=last=null;
+        prev=new TreeNode(Integer.MIN_VALUE);
+        
+        inorder(root);
+        
+        if(first!=null && last!=null){
+            int temp=first.val;
+            first.val=last.val;
+            last.val=temp;
+        }else if(first!=null && middle!=null){
+            int temp=first.val;
+            first.val=middle.val;
+            middle.val=temp;
+        }
+    }
+    
+    public void inorder(TreeNode node){
+        if(node==null)return;
+        
+        inorder(node.left);
+        
+        if(prev!=null && prev.val>node.val){
+            
+            //first violation
+            if(first==null){
+                first=prev;
+                middle=node;
+            }else{  //second violation
+                last=node;
+            }
+        }
+        prev=node;
+        inorder(node.right);
+    }
+}
+

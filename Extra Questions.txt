@@ -148,8 +148,31 @@ private int maxSumSubArray(int[] a , int k){
 -------------------------------------------------------------------------------------
 26. House Robber 2
 -------------------------------------------------------------------------------------
+27. House Robber 3
 -------------------------------------------------------------------------------------
+28.
 -------------------------------------------------------------------------------------
+29. Subset II (Leetcode 90)
+->
+public List<List<Integer>> subsetsWithDup(int[] nums) {
+      List<List<Integer>>ans=new ArrayList<>();        
+        Arrays.sort(nums);
+        
+        powerSet(nums,0,new ArrayList<>(),ans);
+        return ans;
+    }
+    public void powerSet(int[]nums,int idx,List<Integer>list,List<List<Integer>>ans){
+        ans.add(new ArrayList<>(list));
+
+        for(int i=idx;i<nums.length;i++){
+            if(i!=idx && nums[i]==nums[i-1]) // for i = idx (first item of that subset)
+                continue; 
+             list.add(nums[i]);
+            powerSet(nums,i+1,list,ans);
+             list.remove(list.size()-1);
+        }
+        return;
+    }
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------

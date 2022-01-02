@@ -886,5 +886,26 @@ r=0,str=2d character array but with variable length of column, sen =empty senten
     } 
 -----------------------------------------------------------------------------------
 30. Why strings are immutable in Java?
+-> An immutable object is an object whose internal state remains constant after it has been entirely created. This means that once the object has been assigned to a variable, we can neither update the reference nor mutate the internal state by any means.
+
+The String is the most widely used data structure. Caching the String literals and reusing them saves a lot of heap space because different String variables refer to the same object in the String pool. String intern pool serves exactly this purpose.
+
+Java String Pool is the special memory region where Strings are stored by the JVM. Since Strings are immutable in Java, the JVM optimizes the amount of memory allocated for them by storing only one copy of each literal String in the pool. This process is called interning:
+
+
+String s1 = "Hello World";
+String s2 = "Hello World";
+         
+assertThat(s1 == s2).isTrue();
+
+Because of the presence of the String pool in the preceding example, two different variables are pointing to same String object from the pool, thus saving crucial memory resource.
+
+The String is widely used in Java applications to store sensitive pieces of information like usernames, passwords, connection URLs, network connections, etc. It's also used extensively by JVM class loaders while loading classes.
+
+Hence securing String class is crucial regarding the security of the whole application in general.
+
+
+
+Conclusion->Strings are immutable precisely so that their references can be treated as a normal variable and one can pass them around, between methods and across threads, without worrying about whether the actual String object it's pointing to will change.
 -----------------------------------------------------------------------------------
 

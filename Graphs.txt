@@ -1255,7 +1255,7 @@ ans[adjnode]=ans[node]+1;
 22. Find whether it is possible to finish all tasks or not from given dependencies/ Course schedule on leetcode
 -> in this question toposort with dfs won't work but toposort with bfs works because in bfs we can count the elements which get entered 
 in the queue.
-->Logic -> we have to find the cycle in directed graph.
+->Logic -> we have to find the cycle in directed graph.( so use logic -> dfs on directed graph)
 --------------------------------------------------------------------------------------
 23. Snake and Ladder -> https://www.youtube.com/watch?v=zWS2fCJGxmU
 
