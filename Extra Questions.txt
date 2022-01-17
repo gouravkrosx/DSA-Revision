@@ -14,6 +14,95 @@ public static void toh(int n, int t1id, int t2id, int t3id){
     }
 -------------------------------------------------------------------------------------
 2. Do All variations of buy and sell stock
+
+-> https://www.youtube.com/watch?v=MyqDgMy-Kew
+
+a) Buy & Sell Stock -> part 1 and 2 in dp and arrays
+
+b) Buy and sell stock with transaction fee (LeetCode 714)
+->  public int maxProfit(int[] prices, int fee) {
+        if(prices.length==0){
+            return 0;
+        }
+        // at any ith day we have 2 options
+        // if you don't own a stock-> 2 options either buy or not
+        // if you own a stock -> 2 options either sell or not
+        
+        // as soon as i buy ->  - (prices[i]+fee);
+        // as soon as i sell -> + prices[i] 
+    
+        int[][]dp=new int[prices.length][2];
+        for(int[]dpp:dp){
+            Arrays.fill(dpp,-1);
+        }
+        
+        //since initally i don't own a stock so passing 0 for owning means not owning
+        return BuyNSellStockWithFee(0,prices,fee,0,dp);
+    }
+    public int BuyNSellStockWithFee(int idx, int[]prices,int fee,int own,int[][]dp){
+        if(idx==prices.length)return 0;
+        
+        if(dp[idx][own]!=-1){
+            return dp[idx][own];
+        }
+        
+        if(own==1){
+            int op1 = prices[idx]+BuyNSellStockWithFee(idx+1,prices,fee,0,dp); //sell
+            int op2 = BuyNSellStockWithFee(idx+1,prices,fee,1,dp); //not sell
+            return dp[idx][own]=Math.max(op1,op2);
+        }else{
+            int op1 = -(prices[idx]+fee)+BuyNSellStockWithFee(idx+1,prices,fee,1,dp); //buy
+            int op2 = BuyNSellStockWithFee(idx+1,prices,fee,0,dp); //not buy
+            return dp[idx][own]=Math.max(op1,op2);
+        }
+    }
+
+c) Buy and Sell Stock with Cooldown ( LeetCode 309)
+
+(for Buy and sell stock 3 & 4 you can refer kartik arora solution which is very intuitive as well)
+
+d) Buy and Sell Stock III (in dp section)
+
+e) Buy and Sell Stock IV (k transactions allowed) (in dp section)
+->
+class Solution {
+    public int maxProfit(int[] prices) {
+        //intuition : 
+        // we will have 3 states i) index ii) own or now own iii) cooldown or not cooldown
+        // cooldown only give problem while buying not with selling.
+        
+        // else the explaination remains same as buy and sell stock with transaction fee.
+        
+        int[][][]dp=new int[prices.length][2][2];
+        
+        for(int [][]dpp:dp){
+            for(int[]dppp:dpp){
+                Arrays.fill(dppp,-1);
+            }
+        }
+        //since intially we don't have the cooldown
+        return BuyNSellStockCooldown(0,0,0,prices,dp);
+    }
+    
+    public int BuyNSellStockCooldown(int idx, int own ,int cooldown,int[]prices,int[][][]dp){
+        if(idx==prices.length)return 0;
+        
+        
+        if(dp[idx][own][cooldown]!=-1){
+            return dp[idx][own][cooldown];
+        }
+        
+        if(own==0){
+            int op1 = (cooldown==1)?0: -(prices[idx]) + BuyNSellStockCooldown(idx+1,1,0,prices,dp);
+            int op2 = BuyNSellStockCooldown(idx+1,0,0,prices,dp);
+            return dp[idx][own][cooldown]=Math.max(op1,op2);
+        }else{
+            int op1 = prices[idx] + BuyNSellStockCooldown(idx+1,0,1,prices,dp); //as soon as i sell there will be cooldown.
+            int op2= BuyNSellStockCooldown(idx+1,1,0,prices,dp);
+            return dp[idx][own][cooldown]=Math.max(op1,op2);
+        }
+    }
+}
 -------------------------------------------------------------------------------------
 3. Permutations (leetcode 46)
 ->Time complexity->(n!*n)
@@ -146,11 +235,72 @@ private int maxSumSubArray(int[] a , int k){
 -------------------------------------------------------------------------------------
 25. Divide Chocolate (Leetcode 1231) Premium**
 -------------------------------------------------------------------------------------
-26. House Robber 2
+26. Combinations (LeetCode 77)
+->  public static List<List<Integer>> combine(int n, int k) {
+		List<List<Integer>> combs = new ArrayList<List<Integer>>();
+		combine(combs, new ArrayList<Integer>(), 1, n, k);
+		return combs;
+	}
+	public static void combine(List<List<Integer>> combs, List<Integer> comb, int start, int n, int k) {
+		if(k==0) {
+			combs.add(new ArrayList<Integer>(comb));
+			return;
+		}
+		for(int i=start;i<=n;i++) {
+			comb.add(i);
+			combine(combs, comb, i+1, n, k-1);
+			comb.remove(comb.size()-1);
+		}
+	}
 -------------------------------------------------------------------------------------
-27. House Robber 3
+27. House Robber 3 -> https://leetcode.com/problems/house-robber-iii/discuss/79330/Step-by-step-tackling-of-the-problem
+
+->  we are just checking whether we would rob root or not.
+
+public int rob(TreeNode root) {
+    return robSub(root, new HashMap<>());
+}
+
+private int robSub(TreeNode root, Map<TreeNode, Integer> map) {
+    if (root == null) return 0;
+    if (map.containsKey(root)) return map.get(root);
+    
+    int val = 0;
+    
+    if (root.left != null) {
+        val += robSub(root.left.left, map) + robSub(root.left.right, map);
+    }
+    
+    if (root.right != null) {
+        val += robSub(root.right.left, map) + robSub(root.right.right, map);
+    }
+    
+    val = Math.max(val + root.val, robSub(root.left, map) + robSub(root.right, map));
+    map.put(root, val);
+    
+    return val;
+}
+
+-> More optimised
+public int rob(TreeNode root) {
+    int[] res = robSub(root);
+    return Math.max(res[0], res[1]);
+}
+
+private int[] robSub(TreeNode root) {
+    if (root == null) return new int[2];
+    
+    int[] left = robSub(root.left);
+    int[] right = robSub(root.right);
+    int[] res = new int[2];
+
+    res[0] = Math.max(left[0], left[1]) + Math.max(right[0], right[1]);
+    res[1] = root.val + left[0] + right[0];
+    
+    return res;
+}
 -------------------------------------------------------------------------------------
-28.
+28. 
 -------------------------------------------------------------------------------------
 29. Subset II (Leetcode 90)
 ->
@@ -174,6 +324,46 @@ public List<List<Integer>> subsetsWithDup(int[] nums) {
         return;
     }
 -------------------------------------------------------------------------------------
+30. Burst Ballons 
+  // we have n! ways to burst the ballons 
+    // for eg) {2 3 5} -> a) 2 3 5 , b) 2 5 3 , c) 3 5 2 , d) 3 2 5 , e) 5 2 3 , f) 5 3 2    => 3! = 6 ways
+ /*   
+    Intuition -> https://www.youtube.com/watch?v=YzvF8CqPafI
+    
+    1. We know that if only one ballon remains then the coins which we will get is  1*nums[i]*1;
+    2. So we can say that we already know the ans for last ballon which get bursted.
+    3. Hence we say that for each i we are considering that all the ballons in its left and right already get bursted means 
+    it is the last ballon to get burst then what will be the max coins which we can collect.
+    4. We are saying this because we know that there is no relation with the already bursted ballons.
+   
+   dp[i][j] stores that we you burst a range (i,j){ in a definite order } out of the whole array leaving 
+   other left and right elements as it is then what is the max coins you can collect.
+   
+   [a1,a2,a3,a4,(ai,ai1,ai2,ai3,....aj),an-2,an-1,an] <- so here suppose you have ai->aj range.
+   Now for this we say that we are bursting 'ai' and (ai1->aj) is already bursted so coins we will get is (a4*ai*an-2);
+   when we burst 'ai3', we consider that it is the last ballon to be bursted in the range (ai->aj)<- already bursted.
+   so in this case we get coins =>(a4*ai3*an-2);   
+ */   
+
+public int maxCoins(int[] nums) {
+        return BurstBallons(nums,0,nums.length-1,new int[nums.length][nums.length]);
+    }
+    public int BurstBallons(int[]nums,int start,int end,int[][]dp){
+        if(start>end) return 0;
+        
+        if(dp[start][end]>0) return dp[start][end];
+        
+        int ans = 0;
+        for(int i=start;i<=end;i++){
+            int left=(start>0)?nums[start-1]:1;
+            int right=(end<nums.length-1)?nums[end+1]:1;
+            
+            int sum=left*nums[i]*right + BurstBallons(nums,start,i-1,dp) + BurstBallons(nums,i+1,end,dp);
+            ans=Math.max(sum,ans);
+        }
+        
+        return dp[start][end] = ans;    
+    }
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------

@@ -39,7 +39,7 @@ SOLUTIONS OF THESE QUESTIONS ARE EITHER ON GFG OR ON LEETCODE.
 2. Chocolate Distribution Problem, Minimum Cost of ropes , Rearrange characters in a string such that no two adjacent are same -> These 3 questions are already done in some previous section of problems.
 ---------------------------------------------------------------------------------
 3. N meetings in one room ->Also known as Activity Selection Problem
-Intuition-> the earlier the meeting will end the more we call organize. that's why in this question we sorted the array accoding to the end time.
+Intuition-> the earlier the meeting will end the more we can organize. that's why in this question we sorted the array accoding to the end time.
 static class meeting {
 		int start;
 		int end;
