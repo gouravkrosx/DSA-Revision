@@ -178,7 +178,7 @@ private Node additemsreturn(Node node, int item) {
     }
 -------------------------------------------------------------------------------------------------
 7. Inorder Sucessor and Predecessor in O(H)
-Logic for O(N)-> store inorder traversal in some list and check where the key is return its ahead value.
+Logic for O(N)-> store inorder traversal in some list and check where the key is & return its ahead value.
 
 Inorder Sucessor->
 Logic->
@@ -854,4 +854,7 @@ class Solution {
         inorder(node.right);
     }
 }
-
+--------------------------------------------------------------
+26. Split BSt
+-> https://www.programmerall.com/article/6536574897/
+--------------------------------------------------------------

@@ -23,6 +23,33 @@ public void RPI() {
 		tail = temp;
 		tail.next = null;
 	}
+
+-> if tail is not there
+
+public ListNode reverseList(ListNode head) {
+        if(head==null){
+            return null;
+        }else if(head.next==null){
+            return head;
+        }
+        
+        ListNode prev= head;
+        ListNode curr=head.next;
+        ListNode ahead;
+        while(curr!=null){
+            ahead=curr.next;
+            curr.next=prev;
+            prev=curr;
+            curr=ahead;
+        }
+        ListNode temp=head;
+        head=prev;
+        prev=temp;
+        prev.next=null;
+        
+    return  head;
+    }
+
 -> Recursively
 public void RPR() {
 		RPR(head, head.next);

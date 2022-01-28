@@ -3,6 +3,11 @@
 3)Heavy weight knapsack
 
 
+*) Whenever there will be relation like dp[i-1], dp[i-2] there can always be space optimization like
+curr = accoding to question
+prev2=prev;
+prev=curr;
+-> If there is a prev row & prev column, we can space optimise it.
 
 SOLUTIONS OF THESE QUESTIONS ARE EITHER ON GFG OR ON LEETCODE.
 ---------------------------------------DYNAMIC PROGRAMMING-----------------------------------------

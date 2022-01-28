@@ -3,3 +3,6 @@ Just go through all the  ALGORITHMS (in eclipse) while revising
 #Important discussions of leetcode
 
 ->https://leetcode.com/problems/subsets/discuss/27281/A-general-approach-to-backtracking-questions-in-Java-(Subsets-Permutations-Combination-Sum-Palindrome-Partitioning)
+
+Trees all questions -> https://medium.com/techie-delight/binary-tree-interview-questions-and-practice-problems-439df7e5ea1f
+
