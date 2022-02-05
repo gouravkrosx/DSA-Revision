@@ -1,6 +1,5 @@
 1) sort and array using recursion
-2)DP question-> https://www.youtube.com/watch?v=VT4bZV24QNo
-3)Heavy weight knapsack
+2)Heavy weight knapsack
 
 
 *) Whenever there will be relation like dp[i-1], dp[i-2] there can always be space optimization like
@@ -8,6 +7,9 @@ curr = accoding to question
 prev2=prev;
 prev=curr;
 -> If there is a prev row & prev column, we can space optimise it.
+
+& if there is array concept in space optimization then make it front array and next array and after work just set front array = next array
+
 
 SOLUTIONS OF THESE QUESTIONS ARE EITHER ON GFG OR ON LEETCODE.
 ---------------------------------------DYNAMIC PROGRAMMING-----------------------------------------
@@ -319,7 +321,7 @@ Using One state only->
 		return dp[val];
 	}
 
-CoinCombinationI (Permutation) (CSES) 
+CoinCombinationI (Permutation) (CSES) -> Leetcode:377 (Combination Sum IV) 
 public static long CoinCombinationI(int[] coin, int val, int n) {
 		long[] dp = new long[val + 1];
 		dp[0] = 1; // if no sum then we can leave and this could be a way
@@ -369,6 +371,49 @@ public boolean SubsetSum(int nums[], int vidx, int sum, int total,HashMap<String
 		state.put(current,ans);
 		return ans;
 	}
+
+Striver's way ->
+
+ public boolean canPartition(int[] nums) {
+        int sum=0;
+        for(int num:nums){
+            sum+=num;
+        }
+        
+        if(sum%2!=0)return false;
+        
+        int n = nums.length;
+        
+        int[][]dp = new int[n+1][sum/2 +1];
+        
+        for(int[]dpp:dp){
+            Arrays.fill(dpp,-1);
+        }
+        int tar = sum/2;
+        return partitionEqualSubsetSum(n-1,tar,nums,dp);
+    }
+    
+    public boolean partitionEqualSubsetSum(int idx, int tar,int[]nums,int[][]dp){
+        if(tar==0)return true;
+        
+        if(idx==0)return (nums[0]==tar);
+    
+        if(dp[idx][tar]!=-1){
+            return (dp[idx][tar]==1)?true:false;
+        }
+        
+        boolean pick = false;
+        if(tar>=nums[idx]){
+            pick = partitionEqualSubsetSum(idx-1,tar-nums[idx],nums,dp);    
+        }
+        
+        boolean notPick = partitionEqualSubsetSum(idx-1,tar,nums,dp);
+
+        boolean ans = pick || notPick;
+        
+        dp[idx][tar] = ((ans)? 1:2);
+        return ans;
+    }
 
 ------------------------------------------------------------------------------------------------
 12. Target Sum Subset ->(Kind of 0-1 Knapsack Problem)
@@ -788,7 +833,7 @@ Tabulation->
 		return dp[0][0];
 	}
 ------------------------------------------------------------------------------------------------
-23. Longest Common Substring
+23. Longest Common Substring / Maximum Length of Repeated Subarray (LeetCode 718)
 Logic-> compare all prefixes of string 1 with prefixes of string 2 and find longest common suffix (which is ultimately longest common substring)
 *some substring is always a suffix of some prefix , this is the intuition
 
@@ -2174,9 +2219,10 @@ public static int harrypottercolormixturesTD(int[] arr, int si, int ei, int[][] 
 	}
 
 ------------------------------------------------------------------------------------------------
-62. Word Wrap
+62. Maximum Sum Non Adjacent elements
+-> https://www.youtube.com/watch?v=VT4bZV24QNo
 ------------------------------------------------------------------------------------------------
-
+63. Word Wrap
 ------------------------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------------------------

@@ -5,3 +5,24 @@
 5. Kmp ALgo, Rabin karp Algo
 
 #. All Graph Algos like(Bfs, Dfs, Cycle Detection in )
+-------------------------------------------------------------------------------------
+1. Stable partitioning with repect to pivot (order doesn't change)
+static class stableSort implements Comparator<Integer> {
+
+		int pivot;
+
+		public stableSort(int p) {
+			pivot = p;
+		}
+
+		@Override
+		public int compare(Integer a, Integer b) {
+
+			if ((a < pivot && b >= pivot) || (a == pivot && b > pivot)) {
+				return -1;
+			}
+			return 1;
+		}
+
+	}
+-------------------------------------------------------------------------------------------------

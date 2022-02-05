@@ -1705,9 +1705,9 @@ public int findCheapestPrice(int n, int[][] flights, int src, int dst, int K) {
     while (!pQueue.isEmpty()) {
     	City top = pQueue.poll();
 
-        if(seen.containsKey(top.city) && seen.get(top.city)<=top.distFromSrc) //Just checking whether the we visited it before and the number of stops that 
-		continue; 						    //we covered before was low than the current route, then following the 
-								          //current route is not a good idea, so we skip it
+//Just checking whether the we visited it before and the number of stops that we covered before was low than the current route, then following the current route is not a good idea, so we skip it
+        if(seen.containsKey(top.city) && seen.get(top.city)<=top.distFromSrc) 
+		continue; 					
             
         seen.put(top.city, top.distFromSrc);
         
@@ -1715,8 +1715,8 @@ public int findCheapestPrice(int n, int[][] flights, int src, int dst, int K) {
     		return top.costFromSrc;  
     	}
 
-    	if (top.distFromSrc > K) {  //because here we can say that we exceeded value ok k, since at above condition we have max value of stops == k 
-				    //which is not giving the destination
+    	if (top.distFromSrc > K) {  //because here we can say that we exceeded value ok k, since at above condition we have max value of stops == k which is not giving the destination
+
     		continue;
     	}
 

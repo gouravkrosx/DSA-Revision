@@ -72,6 +72,17 @@ public int minDepth(TreeNode root) {
 
 		return sdp;
 	}
+
+-> 
+private int height(TreeNode node, int[] diameter) {
+        if (node == null) {
+            return 0;
+        }
+        int lh = height(node.left, diameter);
+        int rh = height(node.right, diameter);
+        diameter[0] = Math.max(diameter[0], lh + rh);
+        return 1 + Math.max(lh, rh);
+    }
 -----------------------------------------------------------------------------------	
 5. Invert the Tree
 public TreeNode invertTree(TreeNode node) {
@@ -1477,6 +1488,112 @@ O(n) s(n)
     }
 
 -----------------------------------------------------------------------------------------------
-42. Closest leaf to given node in a binary tree.
+42. Print Same Distance Nodes from Target Node
+
+M1) Map the node with their parents and store it in map, then apply bfs through the target node then for each distance just print those nodes.
+
+M2) Without using map, just stacks and queues.
+-> here were are just going left in the tree and push it in stack. and then if left is not there then right and then left if both are null then we just pop() it from the stack, we dont need to traverse the same node again so we will add two boolean leftdone and rightdone for each node.
+when we get our target node we just break from the loop of stack.
+->At top of the stack we have target value node.
+->Now, we make use of two queues, we are just putting left node right node and from stack top the parent node.
+-> We are also using set so that we can take account of the visited nodes.
+
+O(N), S(N)
+public void printSameDistanceNodesFromTarget(int tar) {
+
+		Node root = this.root;
+
+		Stack<pair> st = new Stack<>();
+		st.push(new pair(root, false, false));
+
+		while (!st.isEmpty()) {
+
+			pair peek = st.peek();
+			if (st.peek().node.val == tar) {
+				break;
+			}
+
+			if (peek.node.left != null && !peek.ld) {
+				peek.ld = true;
+				st.push(new pair(peek.node.left, false, false));
+			} else if (peek.node.right != null && !peek.rd) {
+				peek.rd = true;
+				st.push(new pair(peek.node.right, false, false));
+			} else {
+				int x = st.pop().node.val;
+			}
+
+		}
+
+		// at this stage i have the all level parents of target node.
+
+		ArrayList<ArrayList<Integer>> ans = new ArrayList<>();
+		int dis = 0;
+
+		Queue<Node> q = new LinkedList<>();
+		Queue<Node> hq = new LinkedList<>();
+
+		ArrayList<Integer> temp = new ArrayList<>();
+		int val = st.peek().node.val;
+		temp.add(val);
+		ans.add(temp);
+
+		Node goal = st.pop().node;
+
+		q.add(goal);
+
+		Set<Node> set = new HashSet<>();
+		set.add(goal);
+
+		while (!st.isEmpty() || !q.isEmpty() || !hq.isEmpty()) {
+
+			Node rn = q.poll();
+			
+		// here we also check for { hq.isEmpty() } so that it only take once from stack for a particular distance.
+		// because there might be a condition when q is not empty and we don't reach to point where update that q using hq.
+		// so it may happen that at some iteration of this q we again get this below function. so had we not checked for this  					// condition it could have poped Node again from the stack (which is of another distance (currdistance+1)).
+ 
+			if (!st.isEmpty() && !set.contains(st.peek().node) && hq.isEmpty()) {
+				hq.add(st.pop().node);
+			}
+
+			if (rn.left != null && !set.contains(rn.left)) {
+				hq.add(rn.left);
+			}
+
+			if (rn.right != null && !set.contains(rn.right)) {
+				hq.add(rn.right);
+			}
+
+			if (q.isEmpty() && hq.isEmpty() && st.isEmpty())
+				break;
+
+			if (q.isEmpty()) {
+				ArrayList<Integer> list = new ArrayList<>();
+
+				while (!hq.isEmpty()) {
+					Node item = hq.poll();
+					set.add(item);
+					q.offer(item);  // getting the elements from the helper queue
+					list.add(item.val);
+				}
+				ans.add(list);
+			}
+
+		}
+
+		int dist = 0;
+		for (int i = 0; i < ans.size(); i++) {
+			System.out.println("Nodes At dis = " + dis + " - > ");
+			for (int j = 0; j < ans.get(i).size(); j++) {
+				System.out.print(ans.get(i).get(j) + " ");
+			}
+			dis++;
+			System.out.println();
+		}
+
+		System.out.println("-----------------");
+	}
 -----------------------------------------------------------------------------------------------
 	

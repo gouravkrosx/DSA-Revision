@@ -152,7 +152,24 @@ Space optimised->
 
 -------------------------------------------------------------------------------------
 5. Contiguous Array ( Leetcode 525 )
+M1)
+ public int findMaxLength(int[] nums) {
+        Map<Integer, Integer> map = new HashMap<>();
+        int max = 0;
+        int zero = 0;
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] == 0) zero++;
+            else zero--;
+            if (zero == 0) max = i + 1;
+            if (!map.containsKey(zero)) map.put(zero, i);
+            else max = Math.max(max, i - map.get(zero));
+        }
+        return max;
+    }
 
+M2)
+-> Just add 1 in case of 0 and -1 in case of 1 and find the largest subarray with sum 0
+-> i mean the below solution.
 -------------------------------------------------------------------------------------
 6. Largest Subarray with sum 0 
  public static int LargestSubarrayWithSum0(int[]arr,int n){
@@ -193,8 +210,60 @@ private int maxSumSubArray(int[] a , int k){
     }
     return max;
 }
+
+# Longest subarray with sum k
+->
+static int lenOfLongSubarr(int[] arr, int n, int k)
+      {
+             // HashMap to store (sum, index) tuples
+             HashMap<Integer, Integer> map = new HashMap<>();
+             int sum = 0, maxLen = 0;
+ 
+             // traverse the given array
+             for (int i = 0; i < n; i++) {
+                 
+                  // accumulate sum
+                  sum += arr[i];
+                 
+                  // when subarray starts from index '0'
+                  if (sum == k)
+                      maxLen = i + 1;
+ 
+                  // make an entry for 'sum' if it is
+                  // not present in 'map'
+                  if (!map.containsKey(sum)) {
+                      map.put(sum, i);
+                  }
+ 
+                  // check if 'sum-k' is present in 'map'
+                  // or not
+                  if (map.containsKey(sum - k)) {
+                       
+                      // update maxLength
+                      if (maxLen < (i - map.get(sum - k)))
+                          maxLen = i - map.get(sum - k);
+                  }
+             }
+              
+             return maxLen;            
+      }
 -------------------------------------------------------------------------------------
 8. Subarray Sum Equals K (pepcoding)
+ public int subarraySum(int[] nums, int k) {
+        int sum = 0, result = 0;
+        Map<Integer, Integer> preSum = new HashMap<>();
+        preSum.put(0, 1);
+        
+        for (int i = 0; i < nums.length; i++) {
+            sum += nums[i];
+            if (preSum.containsKey(sum - k)) {
+                result += preSum.get(sum - k);
+            }
+            preSum.put(sum, preSum.getOrDefault(sum, 0) + 1);
+        }
+        
+        return result;
+    }
 -------------------------------------------------------------------------------------
 9. Word Break (pepcoding)->https://www.youtube.com/watch?v=2NaaM_z_Jig
 
@@ -203,7 +272,41 @@ private int maxSumSubArray(int[] a , int k){
 -------------------------------------------------------------------------------------
 11. Predict the winner
 -------------------------------------------------------------------------------------
-12. Min jump game 2 Leetcode 
+12. Frog Jump (LeetCode 403)
+
+ public boolean canCross(int[] stones) {
+        
+        int n = stones.length;
+        
+        HashMap<Integer,HashSet<Integer>>map = new HashMap<>();
+        
+        
+        for(int i=0;i<n;i++){
+            map.put(stones[i],new HashSet<>());
+        }
+        //since from 0 we can take 1 jump only
+        map.get(stones[0]).add(1);
+        
+        for(int i=0;i<n;i++){
+            int currStone = stones[i];
+            
+            HashSet<Integer> jumps = map.get(currStone);
+            
+            for(int jump: jumps){
+                int pos = currStone + jump;
+                
+                if(pos == stones[n-1])return true;
+                
+                if(map.containsKey(pos)){
+                    if(jump-1>0)map.get(pos).add(jump-1);
+                    map.get(pos).add(jump);
+                    map.get(pos).add(jump+1);
+                }
+                
+            }          
+        }
+        return false;
+    }
 -------------------------------------------------------------------------------------
 13. Longest Arithmetic Subsequence of Given Difference (Leetcode 1218)
 -------------------------------------------------------------------------------------
@@ -230,6 +333,61 @@ private int maxSumSubArray(int[] a , int k){
 22. Cycle sort
 -------------------------------------------------------------------------------------
 23. Cherry Pickup (Leetcode 741)
+
+// we are starting both journies form (0,0) itself and not like one from 0,0 and than return journey from (n-1,n-1)
+    // and this is because the possible path combination from (0,0) to (n-1,n-1) is same as (n-1,n-1) to (0,0) even if there
+    // are thorns (hurdles)
+
+
+public int cherryPickup(int[][] grid) {
+        int[][][] dp = new int[grid.length][grid.length][grid.length];
+
+        return Math.max(0, helper(grid, dp, 0, 0, 0));  // return 0 if there is no path from 0,0 to n-1,n-1
+    }
+
+    // Instead of going once from 0,0 to n-1,n-1 and then back, we simply go twice from 0,0 to n-1,n-1 because every path from n-1,n-1 to 0,0 can be interpreted as a path from 0,0 to n-1,n-1
+    // Note that the one person can never cross the past path of the other person (they can only meet at the same position) so we don't need to worry about one person picking up an already picked up cherry from the past
+    // What does a state represent? dp[r1][c1][c2] represents the max number of cherries that can be collected by 2 people going from r1,c1 and r2,c2 to n-1,n-1
+    // Transitions between states? we collect cherries on current positions of the two people (r1,c1 and r2,c2), then we go through all possible next states and choose the best one (max number of cherries) as the next state (we do this by adding the number of cherries of the best next state to the number of cherries we picked up on the current two positions of the people). In the end, the state dp[0][0][0] will contain the max number of cherries that can be picked up by going from 0,0 to n-1,n-1 and back.
+
+    private int helper(int[][] grid, int[][][] dp, int r1, int c1, int  c2) {
+
+        // we can deduce r2 because r1 + c1 == r2 + c2, since with each move either r or c of a person gets incremented by exactly one (Manhattan distance to origin stays equal)
+        // this way we reduce the 4D dp problem to a 3D one (we save space by reducing the number of things we store in a state)
+        int r2 = r1 + c1 - c2;
+
+        // check if current state is out of bounds or on thorns
+        if (r1 >= grid.length || c1 >= grid.length || r2 >= grid.length || c2 >= grid.length || grid[r1][c1] == -1 || grid[r2][c2] == -1) {
+            return Integer.MIN_VALUE;   // current state should not be included in the solution
+        }
+
+        // check if we have already computed a solution for this state
+        if (dp[r1][c1][c2] != 0) return dp[r1][c1][c2];
+
+        // check if we reached the end state (note that if r1,c1 reached the end, this implies that r2,c2 also reached the end)
+        if (r1 == grid.length - 1 && c1 == grid.length - 1) {
+            return grid[r1][c1];
+        }
+
+        // compute and return answer for current state
+        int result = grid[r1][c1];
+
+        // in case the second person is on the same position, don't pick up the same cherry twice. Note that r1 == r2 <--> c1 == c2 (eg. they can't be on the same row without also being on the same column) 
+        if (r1 != r2) {
+            result += grid[r2][c2];
+        }
+
+        // pick best possible next state
+        int bestNextState = Math.max(helper(grid, dp, r1 + 1, c1, c2),  // down, down 
+                                    helper(grid, dp, r1, c1 + 1, c2 + 1));  // right, right    
+        bestNextState = Math.max(bestNextState, helper(grid, dp, r1 + 1, c1, c2 + 1));   // down, right
+        bestNextState = Math.max(bestNextState, helper(grid, dp, r1, c1 + 1, c2));   // right, down
+
+        result += bestNextState;
+        dp[r1][c1][c2] = result;    // store current state such that it can be re-used
+
+        return result;
+    }
 -------------------------------------------------------------------------------------
 24. Split Array Largest Sum (Leetcode 410) Premium**
 -------------------------------------------------------------------------------------
@@ -300,7 +458,53 @@ private int[] robSub(TreeNode root) {
     return res;
 }
 -------------------------------------------------------------------------------------
-28. 
+28. Permutation in String (Leetcode : 567)
+
+-> Sliding window approach that can be used in various other questions also.
+
+public boolean checkInclusion(String s1, String s2) {
+        
+        if(s1.length()>s2.length()) return false;
+        
+        HashMap<Character,Integer>map = new HashMap<>();
+        
+        int psize = s1.length();
+        int size = s2.length();
+        
+        for(int i=0;i<psize;i++){
+            char ch = s1.charAt(i); 
+            map.put(ch,map.getOrDefault(ch,0)+1);
+        }
+        
+        int begin = 0, end = 0;
+        
+        int counter = map.size(); //taking map size because string can also have duplicates.
+        
+        while(end<size){
+            char c = s2.charAt(end);
+            if(map.containsKey(c)){
+                map.put(c,map.get(c)-1);
+                if(map.get(c)==0)counter--;
+            }
+            
+            end++;
+            
+            while(counter==0){
+                char temp = s2.charAt(begin);
+                if(map.containsKey(temp)){
+                    map.put(temp,map.get(temp)+1);
+                    if(map.get(temp)>0)counter++;
+                }
+                
+                if(end-begin == psize){
+                    return true;
+                }
+                begin++;
+            } 
+        }
+        
+        return false;
+    }
 -------------------------------------------------------------------------------------
 29. Subset II (Leetcode 90)
 ->
@@ -365,8 +569,428 @@ public int maxCoins(int[] nums) {
         return dp[start][end] = ans;    
     }
 -------------------------------------------------------------------------------------
+31. Rotate Array (in place)
+-> Complexity should be O(N).
+   
+The basic idea is that, for example, nums = [1,2,3,4,5,6,7] and k = 3, first we reverse [1,2,3,4], it becomes[4,3,2,1]; then we reverse[5,6,7], it becomes[7,6,5], finally we reverse the array as a whole, it becomes[4,3,2,1,7,6,5] ---> [5,6,7,1,2,3,4].
+
+Reverse is done by using two pointers, one point at the head and the other point at the tail, after switch these two, these two pointers move one position towards the middle.
+    
+    public void rotate(int[] nums, int k) {
+        
+        int n = nums.length;
+        
+        k = k % n;
+        
+       reverse(nums,0,n-k-1);
+       reverse(nums,n-k,n-1);
+       reverse(nums,0,n-1); 
+    }
+    public void reverse(int[]nums,int l,int h){
+        while(l<h){
+            
+            int temp = nums[l];
+            nums[l]=nums[h];
+            nums[h]=temp;
+
+            l++;
+            h--;
+        }
+    }
+-------------------------------------------------------------------------------------
+32. Closest Leaf to a given node in a binary tree
+O(N)-S(H)
+
+ public static int INF = 1000000;
+
+    // Function that returns the distance of the closest leaf in the sub tree.
+    public static int closestLeafNodeInSubtree(BinaryTreeNode<Integer> root) {
+        if (root == null) {
+            return INF;
+        }
+
+        if (root.left == null && root.right == null){
+            // Node is a leaf node.
+            return 0;
+        }
+
+        int distLeft = closestLeafNodeInSubtree(root.left);
+        int distRight = closestLeafNodeInSubtree(root.right);
+
+        return (1 + Math.min(distLeft, distRight));
+    }
+
+    private static int ans;
+
+    // Helper function to calculate the closest leaf distance of the node.
+    public static int findClosestLeafNodeDistanceHelper(BinaryTreeNode<Integer> root, int x){
+        if (root == null){
+            return INF;
+        }
+
+        // If the required node is found, calculate the distance of the closest leaf node.
+        if (root.data == x){
+            ans = closestLeafNodeInSubtree(root);
+            return 0;
+        }
+
+        int distLeft = findClosestLeafNodeDistanceHelper(root.left, x);
+        if (distLeft != INF) {
+            // Node X is present in left subtree.
+            int dist = (distLeft + 2) + closestLeafNodeInSubtree(root.right);
+            ans = Math.min(ans, dist);
+            return (1 + distLeft);
+        }
+
+        int distRight = findClosestLeafNodeDistanceHelper(root.right, x);
+        if (distRight != INF) {
+            // Node X is present in right subtree.
+            int dist = (distRight + 2) + closestLeafNodeInSubtree(root.left);
+            ans = Math.min(ans, dist);
+            return (1 + distRight);
+        }
+
+        // Node X not found in the subtree.
+        return INF;
+    }
+
+-------------------------------------------------------------------------------------
+33. Split BST
+
+public TreeNode[] splitBST(TreeNode root, int V) {
+        if (root == null)
+            return new TreeNode[]{null, null};
+        if (root.val == V) {
+            TreeNode right = root.right;
+            root.right = null;
+            return new TreeNode[]{root, right};
+        }
+        else if (root.val > V) {
+            TreeNode[] nodes = splitBST(root.left, V);
+            TreeNode left = nodes[0];
+            TreeNode right = nodes[1];
+            root.left = right;
+            return new TreeNode[]{left,root};
+        } else {
+            TreeNode[] nodes = splitBST(root.right, V);
+            TreeNode left = nodes[0];
+            TreeNode right = nodes[1];
+            root.right=left;
+            return new TreeNode[]{root, right};
+        }
+    }
+-------------------------------------------------------------------------------------
+34. Given a binary search tree and a range [L, R], delete all elements which are not in the range.
+O(N)
+ private static Node removeOutsideRange(Node root,
+                                           int min, int max)
+    {
+        // BASE CASE
+        if(root == null)
+        {
+            return null;
+        }
+         
+        // FIRST FIX THE LEFT AND
+        // RIGHT SUBTREE OF ROOT
+        root.left = removeOutsideRange(root.left,
+                                       min, max);
+        root.right = removeOutsideRange(root.right,
+                                        min, max);
+         
+        // NOW FIX THE ROOT. THERE ARE
+        // TWO POSSIBLE CASES FOR THE ROOT
+        // 1. a) Root's key is smaller than
+        // min value(root is not in range)
+        if(root.key < min)
+        {
+            Node rchild = root.right;
+            root = null;
+            return rchild;
+        }
+         
+        // 1. b) Root's key is greater than
+        // max value (Root is not in range)
+        if(root.key > max)
+        {
+            Node lchild = root.left;
+            root = null;
+            return lchild;
+        }
+         
+        // 2. Root in range
+        return root;
+    }
+-------------------------------------------------------------------------------------
+35. Kth Ancestor of a binary tree
+
+-> https://www.youtube.com/watch?v=PE-kQVZxvWA&t=1895s
+
+  // O(logn) <- for query S(nlogn)
+    
+   
+  int[][] jump;
+    int maxPow;
+
+    public TreeAncestor(int n, int[] parent) {
+        // log_base_2(n)
+        maxPow = (int) (Math.log(n) / Math.log(2)) + 1;
+        jump = new int[maxPow][n];
+        jump[0] = parent;
+        for (int p = 1; p < maxPow; p++) {
+            for (int j = 0; j < n; j++) {
+                int pre = jump[p - 1][j];
+                jump[p][j] = pre == -1 ? -1 : jump[p - 1][pre];
+            }
+        }
+    }
+
+    public int getKthAncestor(int node, int k) {
+        int maxPow = this.maxPow;
+        while (k > 0 && node > -1) {
+            if (k >= 1 << maxPow) {
+                node = jump[maxPow][node];
+                k -= 1 << maxPow;
+            } else
+                maxPow -= 1;
+        }
+        return node;
+    }
+-------------------------------------------------------------------------------------
+36. A tree is considered special if the sums of all the nodes at each level are in an Arithmetic Progression (AP).
+Given the root note of a binary tree. Return an array representing the minimum number that can be added at each level to make that tree special.
+
+We need to solve it in O(N) time and O(1) space.
+Bonus : We can't store the sums at each level.
+
+Example -
+Input 1:
+
+          3
+        /   \
+       2     7
+        \
+	 15
+
+Output: [0, 0, 0] since the sums were already in AP. {3, 9, 15}
+
+Input 2:
+
+          1
+        /   \
+      11     5
+      / \     \
+     2   15    10
+     \
+      50
+
+Output: [0, 0, 4, -4].
+
+
+Approach:
+
+ 	  1 - 1
+        /   \
+      11     5 - 16
+      / \     \ 
+      2  15    10 - 27
+       \
+        50           -50
+
+1. At each level i (total levels here l = 4) am storing the sum, and also through complete traversal i am finding the total sum of the Tree, Here it is 94
+
+2. Now, generalizing the term as An = a + (n-1)d => a = An - (n-1)d.
+
+3. Sum formula  = level/2 * (2a + (level - 1)d) =>
+
+4. Converted Sum formula  => level/2 * (2an + (level - 2*currlevel + 1)d) 
+
+5. At each level we just equate the total sum leaving d as it is and then find the value of d (in case of decimal then two values will be there floor and ceil)for both the values find the sum which is the closest to the actual total sum take that as d in this way we get the d which gives closest sum.
+
+6. So minimum diff between the sum which we get through formula vs the total sum, the d which gives the min that would be our final d
+
+7. At last we have a, d, currlevel just find An th term (equals to sum of that level) and see the actual sum which is present in the tree then take the difference.
+
+Exact sum = [1,16,27,50] , our sum through our a and d = [1,15,31,46], so the output will be [0,0,4,-4].
+ 
+Total Sum =94
+Each level sum = [1,16,27,50].
+ 
+All level calculations in order to find the perfect d.
+Level 1 =  2*( 2 + 3*d) = 4+ 6d  = 94
+			d = 14 ~ 88
+			d = 15 ~ 94
+Level 2 = 2*(32 + d) = 94
+		d = 15 ~ 94 
+
+Level 3 = 2*(54 - d) = 94
+     		d = 3 ~102
+		d = 4 ~100
+
+Level 4 = 2(100 - 3d) = 94
+	d = 17 ~ 98
+	d = 18 ~ 92
+
+
+Through all the levels i got my d as 15 which gives the closest (here exact) sum of the AP.
+-------------------------------------------------------------------------------------
+38. Dungeon Game (LeetCode 174)
+
+class Solution {
+    // For this approach refer the below discuss article and dry run the code (for 2x2 matrix) for a clear understanding.
+  //  https://leetcode.com/problems/dungeon-game/discuss/745340/post-Dedicated-to-beginners-of-DP-or-have-no-clue-how-to-start
+    
+    public int calculateMinimumHP(int[][] dungeon) {
+        int m = dungeon.length;
+        int n = dungeon[0].length;
+        
+        int[][]dp = new int[m][n];
+        
+        for(int[]dpp:dp){
+            Arrays.fill(dpp,-1);
+        }
+        
+        // 1 is the min energy that must be given because if at any cell king energy becomes <=0 then he dies.
+        return  minEnergy(dungeon,0,0,m,n,dp);
+    }
+    
+    public int minEnergy(int[][]cell,int i,int j, int m,int n,int[][]dp){
+        if(i==m || j==n)return 100000000;
+        
+        if(i==m-1 && j==n-1){
+            return (cell[i][j]>0)?1:-(cell[i][j])+1;
+        }
+        
+        if(dp[i][j]!=-1)return dp[i][j];
+        
+        int minEnergyRequired = 0;
+        
+        int goRight = minEnergy(cell,i,j+1,m,n,dp);
+        int goDown = minEnergy(cell,i+1,j,m,n,dp);
+        
+        minEnergyRequired = Math.min(goRight,goDown) - cell[i][j];
+        
+        return (dp[i][j] = (minEnergyRequired<=0)?1:minEnergyRequired);
+    }
+}
+-------------------------------------------------------------------------------------
+39. Simplify Path (LeetCode 71)
+-> Stack based approach
+ public String simplifyPath(String path) {
+    
+        Deque<String>deq = new ArrayDeque<>();
+        Set<String> skip = new HashSet<>(Arrays.asList("",".",".."));
+        
+        for(String str: path.split("/")){
+           if(!deq.isEmpty() && str.equals("..")){
+               deq.poll();
+           }else if(!skip.contains(str)){
+               deq.push(str);
+           } 
+        }
+        
+        if(deq.isEmpty())return "/";
+        
+        StringBuilder sb = new StringBuilder();
+        while(!deq.isEmpty()){
+            sb.append("/").append(deq.pollLast());
+        }
+        
+        return sb.toString();
+    }
+-------------------------------------------------------------------------------------
+40. Maximum Side length of a Square with sum less than or equal to threshold. (leetcode 1292)
+
+M1) O(m*n)
+
+ public int maxSideLength(int[][] mat, int threshold) {
+      	// print both the arrays (sum & mat) and also dry run to understand how this prefix sum is
+		// being made.
+		// sum[i][j] represents the sum of all the elements which makes the rectangle
+		// having coordinates -> (0,0),(0,j),(i,0),(i,j);
+
+		int m = mat.length;
+		int n = mat[0].length;
+		int[][] sum = new int[m + 1][n + 1];
+
+		int res = 0;
+		int len = 1;
+
+		for (int i = 1; i <= m; i++) {
+			for (int j = 1; j <= n; j++) {
+				 // -sum[i-1][j-1] to remove the overlapping part.
+				sum[i][j] = sum[i - 1][j] + sum[i][j - 1] - sum[i - 1][j - 1] + mat[i - 1][j - 1];
+
+		// +sum[i-len][j-len] to add the part which got deleted two times due to overlapping;
+		if (i >= len && j >= len && sum[i][j] - sum[i - len][j] - sum[i][j - len] 
+						+ sum[i - len][j - len] <= threshold){  
+					res = len;
+					len++;
+				}
+
+			}
+		}
+		return res;
+   	 }
+
+M2) O(m*n*log(min(m,n)))
+-> Binary Search and prefix sum.
+-> Firstly just like above make a prefix array but not check in the that loop itself.
+-> for that take lo = 0, hi = min(m,n) and then apply binary search and in the black box of binary search
+check for the condition which has been checked in the above approach in the latter part of the loop.
+-> if possible then lo=mid+1 else hi=mid-1;
+
+-------------------------------------------------------------------------------------
+41. Avoid Flood in the City (Leetcode 1488)
+->
+    // Read this approach if any doubt- >https://leetcode.com/problems/avoid-flood-in-the-city/discuss/716206/Java-Well-explained-O(n2)
+    
+    public int[] avoidFlood(int[] rains) {
+       //this map will store the rain corresponds to the prev last index of its occurence
+        HashMap<Integer,Integer>map = new HashMap<>();
+       
+//Dont try to find the zero in treeset as floor(i) for the curr rain which has been previously visited, in this way you
+// are ignoring this case -> [0,1,1] here when 1 comes for the first time you just put it in the set and second time when you first 
+// when you perform thr function for it to find the prev zero that won't work as it is not a valid case. 
+// Instead find the location ahead of the previous occurence of the current rain in the zero treeset as described in the below soln.
+       
+       
+        //this stores the location of zeros in sorted order
+        TreeSet<Integer>zeros = new TreeSet<>();
+        int n = rains.length;
+        int[]res = new int[n];
+        
+        for(int i=0;i<n;i++){
+            if(rains[i]==0){
+                zeros.add(i);
+                res[i]=1;  //in case this zero could not used.
+            }else{
+                if(map.containsKey(rains[i])){
+                    // find the location of zero that can be used to empty rains[i]
+                    Integer next = zeros.ceiling(map.get(rains[i]));
+                    //if next is null so you cant dry the lake means there will be flood.
+                    if(next==null){
+                        return new int[0];
+                    }
+                    zeros.remove(next); //since this 0 has been used now.
+                    res[next]=rains[i];
+                }
+                res[i]=-1; //according to the problem
+                map.put(rains[i],i);
+            }
+        }
+        return res;
+    } 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
+
+  

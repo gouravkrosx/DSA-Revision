@@ -141,7 +141,7 @@ static int c5 = 1;
             res.add(construct(board));
         }
         
-        //at each row we searching for row to place
+        //at each column we searching for row to place the queen
         for(int row=0;row<n;row++){
             if(lr[row]==0 && ld[row+col]==0 && ud[(n-1)+(col-row)]==0){
                 board[row][col]='Q';
@@ -627,6 +627,49 @@ Intuition-> We remove every single parenthesis then check is it valid if valid t
 			set2.remove(set2.size() - 1);
 		}
 	}
+
+Striver Approach - >
+
+public static int minSubsetSumDifference(int[] arr, int n) {
+        
+        int tar = 0;
+        for(int num:arr){
+            tar+=num;
+        }
+       
+        boolean[][]dp = new boolean[n][tar+1];
+		
+        //adding base cases
+        for(int i=0;i<n;i++){
+            dp[i][0]=true;
+        }
+        if(arr[0]<=tar){
+        	dp[0][arr[0]]=true;    
+        }
+        
+        for(int i=1;i<n;i++){
+            for(int j=1;j<=tar;j++){
+                boolean take = false;
+                if(j>=arr[i]){
+                 take = dp[i-1][j-arr[i]];	                    
+                }
+                boolean noTake = dp[i-1][j];            
+                dp[i][j] = (take || noTake);
+            }
+        }
+// here are basically checking all the valid targets which can be achived with the all the elements of the array.
+// and if its valid then check the sum at which its valid, and then find the another subset so that both sum makes the total sum of the array. and then for each valid case check the absolute minDiff.
+        
+        int minDiff = Integer.MAX_VALUE;
+        for(int i=0;i<=tar/2;i++){
+            if(dp[n-1][i]){
+                int s1 = i;
+                int s2 = tar-s1;
+                minDiff=Math.min(minDiff,Math.abs(s1-s2));
+            }
+        }
+        return minDiff;     
+    }
 --------------------------------------------------------------------------------------------
 14. Longest Possible Route in a Matrix with Hurdles
 static int maxdis = Integer.MIN_VALUE;
