@@ -1,4 +1,4 @@
-			                        			Some Extra Questions
+              			Some Extra Questions
 
 ------------------------------------------------------------------------------------
 1. Tower of Hanoi ->https://www.youtube.com/watch?v=QDBrZFROuA0
@@ -149,7 +149,28 @@ Space optimised->
 
 -------------------------------------------------------------------------------------
 4. Subarray Product less than K (leetcode 713)
+-> //for every iteration,we try to get the longest subarray with product < k ending with nums[j]; 
+ public int numSubarrayProductLessThanK(int[] nums, int k) {
+        long pro=1l;
+        int ans=0;
 
+        int i=0,j=0;
+        
+        while(j<nums.length ){
+            pro = pro * nums[j];
+            
+            while(i<=j && pro>=k){
+                pro/=nums[i];
+                i++;
+            }
+            ans+=(j-i+1);  // dry run you will get the flow that how it is calculating 
+            j++;
+        }
+        return ans;
+    }
+
+
+-> Similar approach problem -> Number of Smooth Descent Periods of a Stock (Leetcode 2110)
 -------------------------------------------------------------------------------------
 5. Contiguous Array ( Leetcode 525 )
 M1)
@@ -263,6 +284,29 @@ static int lenOfLongSubarr(int[] arr, int n, int k)
         }
         
         return result;
+    }
+Binary Subarrays with Sum (Leetcode 930)
+->  public int numSubarraysWithSum(int[] nums, int k) {
+
+ // atMostK(nums,k)<- this will give subarray sum <=k | atMostK(nums,k-1) <= this will give subarray sum <=k-1       // the diff atMostK(nums,k) - atmostK(nums,k-1) <- this will give subarray sum exactly  == k.
+
+        return SubarraySumAtMostK(nums,k) - SubarraySumAtMostK(nums,k-1);     
+     }
+    public int SubarraySumAtMostK(int[]nums,int k){
+        int sum=0;
+        int i=0;
+        int j=0;
+        int ans=0;
+        
+        while(j<nums.length){
+            sum+=nums[j];
+            while(i<=j && sum>k){
+                sum-=nums[i++];
+            }
+            ans+=(j-i+1);
+            j++;
+        }
+        return ans;
     }
 -------------------------------------------------------------------------------------
 9. Word Break (pepcoding)->https://www.youtube.com/watch?v=2NaaM_z_Jig
@@ -982,15 +1026,304 @@ check for the condition which has been checked in the above approach in the latt
         return res;
     } 
 -------------------------------------------------------------------------------------
+42. Distinct Subsequences (Leetcode 115)
+->  public int numDistinct(String s, String t) {
+        int m = s.length();
+        int n = t.length();
+        
+        int[][]dp = new int[m][n];
+        for(int[]dpp:dp){
+            Arrays.fill(dpp,-1);
+        }
+        return distinctSubsequences(s,t,0,0,m,n,dp);
+    }
+    public int distinctSubsequences(String s,String t, int i,int j,int m,int n,int[][]dp){
+        if(j==n){
+            return 1;
+        }
+        if(i==m){
+            if(j==n){
+                return 1;
+            }
+            return 0;
+        }
+        
+        if(dp[i][j]!=-1){
+            return dp[i][j];
+        }        
+        
+        char c1 = s.charAt(i);
+        char c2 = t.charAt(j);
+        
+        int op1=0,op2=0,op3=0;
+        if(c1==c2){
+            op1 = distinctSubsequences(s,t,i+1,j+1,m,n,dp);
+            op2 = distinctSubsequences(s,t,i+1,j,m,n,dp);
+        }else{
+            op3 = distinctSubsequences(s,t,i+1,j,m,n,dp);
+        }
+        return dp[i][j] = op1+op2+op3;
+    }
 -------------------------------------------------------------------------------------
+43. Minimum Difference in sums after removal of elements (Leetcode 2163)
+-> Basically the goal is the get the min sum of n/3 elements for the first part and max sum of n/3 elements in the
+second part to minimize the difference and the ans will be the min difference of elements lies between (n/3->2*n/3)
+
+public long minimumDifference(int[] nums) {
+        int n=nums.length;  //length of nums
+        int len3=n/3;       // 1/3 length
+        long res=Long.MAX_VALUE; // final result;
+        //Try to make first part as min as possible;
+        //first[m] store the value, the min value of the size=len3, from[0,1,..., m];  
+        long[] first=new long[n]; 
+        //Try to make second part as max as possible;
+        //second[m] store the value, the max value of the size=len3, from[m,...,n-1];  
+        long[] second=new long[n];
+        
+//--------------------for first part compute -------------------------------------
+        //Build max heap for first part;
+        PriorityQueue<Integer> max=new PriorityQueue<Integer>(Comparator.reverseOrder());
+        
+        long sum=0;
+
+        // Initialize with the first 1/3 n part.
+        for(int i=0;i<len3;i++){
+            sum+=nums[i];
+            max.add(nums[i]);
+        }
+        //For the second part between 1/3 ~ 2/3. When we move to next index.
+        //we keep the sum as total 1/3n size: each time poll the max one and add the new one;
+        //And we keep tracking the exchange by long[] first;
+        //
+        for(int i=len3;i<=2*len3;i++){
+            first[i]=sum;     //add sum from  1/3
+            max.add(nums[i]); //put new one in queue;
+            sum+=nums[i];     //sum + new one;
+            sum-=max.poll();  //sum - max one;
+        }
+//--------------------for second part compute -----------------------
+        sum=0;
+        //Build min heap for first part;
+        PriorityQueue<Integer> min=new PriorityQueue<Integer>();
+        // Initialize with the last 1/3 n part.
+        for(int i=0;i<len3;i++){
+            sum+=nums[n-1-i];
+            min.add(nums[n-1-i]);
+        }
+        //For the second part between 2/3~1/3 When we move to next index:
+        // we keep update the sum with(+ new element, - min element), and update second;
+        for(int i=len3;i<=2*len3;i++){
+            second[n-i]=sum;
+            min.add(nums[n-1-i]);
+            sum+=nums[n-1-i];
+            sum-=min.poll();
+        }
+//-----------------compute the final result------------
+
+        //find the max value in second part [ i,..., n-1];
+        //find the min value in first part [0,....,i];
+        // find the result;
+        for(int i=len3;i<=2*len3;i++){
+            res=Math.min(res,first[i]-second[i]);
+        }
+        
+        return res;
+    }
 -------------------------------------------------------------------------------------
+44. Replace the substring for balanced String (leetcode 1234)
+Approach Reference -> https://leetcode.com/problems/replace-the-substring-for-balanced-string/discuss/409017/JAVA-Sliding-Window-Solution-with-Explanation
+
+So Basically we are storing the freq of each character Q,W,E,R and then applying sliding window.
+How Sliding window? -> String will be balanced when each of the above characters have exactly n/4 freq.
+-> So we just move our right pointer and when we move, we just check that whether the each (freq<=n/4).
+-> if yes then it means that we are at our valid substring we can make our ans. 
+-> But if not satisfied then keep on decrementing. 
+-> let the string be "WQWRWEQW" the first satisfied condition occurs when we have WQW in the window. here it can be replaced by RQE or its any permutation.
+-> Since this is valid substring and we can make our ans as min(ans,j-i+1).
+-> the window again shrinked by incrementing the freq from left indices.
+
+-> By this approach the problem boils down to minimum length substring containing a certain number of each character.  and the certain number is (all character having freq <=n/4)
+
+    // It is a tricky question just dry run to understand it better for the case "WQWRWEQW"-> 3 is the ans.
+    public int balancedString(String s) {        
+        
+        int[] count = new int[128];
+        int n = s.length(), res = n, left = 0, k = n / 4;
+        for (int j = 0; j < n; j++) {
+            count[s.charAt(j)]++;
+        }
+        for (int right = 0; right < n; right++) {
+            count[s.charAt(right)]--;
+            while (left < n && count['Q'] <= k && count['W'] <= k && count['E'] <= k && count['R'] <= k) {
+                res = Math.min(res, right - left + 1);
+                count[s.charAt(left++)]++;
+            }
+        }
+        return res;
+    }
 -------------------------------------------------------------------------------------
+45. Longest Substring without Repeating Characters (Leetcode 3)
+-> Sliding window approach
+
+public int lengthOfLongestSubstring(String s) {
+        int n = s.length();
+        
+        int i=0,j=0;
+        Set<Character>set = new HashSet<>();
+        
+        int res=0;
+        
+        while(j<n){
+            char ch = s.charAt(j);
+            if(!set.contains(ch)){
+                set.add(ch);
+                res = Math.max(res,j-i+1);
+                j++;
+            }else{
+                while(set.contains(ch) && i<j){
+                    set.remove(s.charAt(i));
+                    i++;
+                }
+            }
+        }
+        return res;
+    }
 -------------------------------------------------------------------------------------
+46. Longest Continuous Subarray with Absolute Diff less then Equal to Limit
+-> Basically "Absolute difference between min and max elements of subarray"
+
+-> Why are we shrinking when we get difference greater than limit?
+=> Because the max Deque now contains max element in ith-jth window now if any element comes if smaller then the difference will not decrease(means the peekFirst will not change) but if bigger then difference will increase.
+Similarly for the min Deque the peekFirst of this can also be changed when the curr element is even smaller than the peekFirst & if it happens then the min becomes more min resulting the difference will increase. 
+That's why we are shrinking.
+
+
+ public int longestSubarray(int[] nums, int limit) {
+        int n = nums.length;
+        int i =0,j=0;
+        
+        Deque<Integer>max = new LinkedList<>();
+        Deque<Integer>min = new LinkedList<>();
+
+        int res=0;
+        
+        while(j<n){
+            
+            while(!max.isEmpty() && nums[j]>max.peekLast()){
+                max.pollLast();
+            }
+            while(!min.isEmpty() && nums[j]<min.peekLast()){
+                min.pollLast();
+            }
+            
+            min.addLast(nums[j]);
+            max.addLast(nums[j]);
+            
+            while(max.peekFirst()-min.peekFirst()>limit){
+              if(max.peekFirst()==nums[i])max.pollFirst();
+              if(min.peekFirst()==nums[i])min.pollFirst();
+              i++;
+            }
+            res = Math.max(res,j-i+1);            
+            j++;
+        }
+        
+        return res;
+    }
 -------------------------------------------------------------------------------------
+47. Frequency of the most frequent element (Leetcode-1838)
+
+M1) Sliding window approach 
+Sort the input array.
+
+the key is to find out the valid condition:
+k + sum >= size * max  <- just take a dry run to understand this part.
+which is
+k + sum >= (j - i + 1) * A[j]
+
+public int maxFrequency(int[] nums, int k) {
+        Arrays.sort(nums);
+        
+        int n = nums.length;
+        int i=0,j=0;
+        int res = 0 ;
+        long sum = 0;
+                
+        while(j<n){
+            sum+=nums[j];
+            while(sum+k < (j-i+1)*nums[j]){
+                sum-=nums[i];
+                i++;
+            }
+            res = Math.max(res,j-i+1);
+            j++;
+        }
+        return res;
+    }
+
+
+M3) Binary Search <- little bit complex
+-> https://leetcode.com/problems/frequency-of-the-most-frequent-element/discuss/1175181/JavaPython-Prefix-Sum-and-Binary-Search-O(NlogN)
 -------------------------------------------------------------------------------------
+48. Reduce array size to the half (Leetcode-1338)
+
+M1) Use priorityQueue and map, and remove all the occurence of the most freq and then pop from priorityQueue and do this for all until the count becomes greater than equal to array size/2.
+the elements we be added int the set or we can maintain another count.
+
+
+M2) Using Kind of Bucket
+
+public int minSetSize(int[] arr) {
+	Map<Integer, Integer> map = new HashMap<>();
+	ArrayList<Integer>[] list = new ArrayList[arr.length + 1];
+	
+	for (int num : arr) {
+		map.put(num, map.getOrDefault(num, 0) + 1);
+	}
+
+	for (int num : map.keySet()) {
+		int count = map.get(num);
+		if (list[count] == null) {
+			list[count] = new ArrayList<Integer>();
+		}
+		list[count].add(num);  
+	}
+	
+	int steps = 0, res = 0;
+	for (int i = arr.length; i > 0; i--) {
+		List<Integer> cur = list[i];
+		if (cur == null || cur.size() == 0) continue;
+		for (int num : cur) {
+			steps += i;	// at this freq there can be multiple elements that's why adding i
+			res++;
+			if (steps >= arr.length / 2)
+				return res;
+		}
+	}
+	return arr.length;
+}
 -------------------------------------------------------------------------------------
+49.
 -------------------------------------------------------------------------------------
+50.
+-------------------------------------------------------------------------------------
+51.
 -------------------------------------------------------------------------------------
 
+-------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------
 
   

@@ -200,6 +200,61 @@ public String reorganizeString(String S) {
         return sb.toString();        
         
         }
+
+-> Very Similar problem 
+(Longest Happy String Leetcode-1405)
+
+public String longestDiverseString(int a, int b, int c) {
+        PriorityQueue<pair> pq = new PriorityQueue<>((x,y)->(y.count - x.count));
+        
+        if(a>0)pq.add(new pair('a',a));
+        if(b>0)pq.add(new pair('b',b));
+        if(c>0)pq.add(new pair('c',c));
+
+        StringBuilder ans = new StringBuilder();
+        while(pq.size()>1){
+            pair first = pq.poll();
+            
+            if(first.count>=2){
+                ans.append(first.ch);
+                ans.append(first.ch);
+                first.count-=2;    
+            }else{
+                ans.append(first.ch);
+                first.count-=1;
+            }
+                        
+            pair second = pq.poll();
+            
+            if(second.count>=2 && first.count<second.count){
+                ans.append(second.ch);
+                ans.append(second.ch);
+                second.count-=2;
+            }else{
+                ans.append(second.ch);
+                second.count-=1;
+            }
+            
+            if(first.count>0) pq.add(first);
+            
+            if(second.count>0) pq.add(second);
+
+        }
+        
+        if(!pq.isEmpty()){
+            pair rp = pq.poll();
+            if(rp.count>=2){
+                ans.append(rp.ch);
+                ans.append(rp.ch);
+                rp.count-=2;
+            }else{
+                ans.append(rp.ch);
+                rp.count-=1;
+            }
+        }
+        
+        return ans.toString();
+    }
 -------------------------------------------------------------------------------------------------
 
 ***Important Point-> when we build heap from array we only have to deal with internal nodes, because for heapify left subtree and right subtree should be in heap, we don't care about leaf nodes as they are already follow the heap property. 
@@ -486,6 +541,42 @@ long minCost(long arr[], int n)
         }
         return (double)max.peek();
     }
+
+# Very Similar problem 
+-> Sliding Window Median (Leetcode 480)
+ 
+
+    //Not taking PriorityQueue because it will take o(k) time in removal of element other than peek
+    //But TreeSet take O(logK) in the worst case also.
+    // Storing indexes not values just to maintain order of the duplicates too.
+    
+    public double[] medianSlidingWindow(int[] nums, int k) {
+        double[]res = new double[nums.length-k+1];
+        
+	// Basically both are in ascending order and for lo we find max through last element.
+	// for hi we find min through first element
+        TreeSet<Integer>lo = new TreeSet<>((a,b)->nums[a]!=nums[b]?Integer.compare(nums[a],nums[b]):a-b);    
+        TreeSet<Integer>hi = new TreeSet<>((a,b)->nums[a]!=nums[b]?Integer.compare(nums[a],nums[b]):a-b);
+        
+        int right=0,left=0;
+        
+        while(left<nums.length){
+            // Did below 3 lines just to maintain the size just like in heap we maintained when finding meadian of data stream.
+            lo.add(left);
+            hi.add(lo.pollLast());
+            if(hi.size()>lo.size())lo.add(hi.pollFirst());
+            
+            if(lo.size()+hi.size()==k){
+                res[right]=(lo.size()==hi.size())?nums[lo.last()]/2.0+nums[hi.first()]/2.0:nums[lo.last()]/1.0;
+                
+                if(!lo.remove(right))hi.remove(right);
+                right++;
+            }
+            left++;
+        }
+        return res;
+    }
+
 -------------------------------------------------------------------------------------------------
 17. Furtheset Building you can reach
 

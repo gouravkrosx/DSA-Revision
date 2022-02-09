@@ -1,8 +1,8 @@
 1) sort and array using recursion
 2)Heavy weight knapsack
 
-
-*) Whenever there will be relation like dp[i-1], dp[i-2] there can always be space optimization like
+Important Concetps
+1) Whenever there will be relation like dp[i-1], dp[i-2] there can always be space optimization like
 curr = accoding to question
 prev2=prev;
 prev=curr;
@@ -10,6 +10,12 @@ prev=curr;
 
 & if there is array concept in space optimization then make it front array and next array and after work just set front array = next array
 
+2) If there is any problem related to subsets for eg)
+-> Count partitions with given difference s1-s2=d => total =s1+s2 => s2 = (total-d)/2;
+-> Count subsets with sum k
+-> Partition Equal subset sum => make total sum then find subset having sum total/2
+-> Partition A set into two subsets with minimum Abs sum differece -> Q13) in Backtracking file
+=> These all problems boils down to same. just by modifying the target.
 
 SOLUTIONS OF THESE QUESTIONS ARE EITHER ON GFG OR ON LEETCODE.
 ---------------------------------------DYNAMIC PROGRAMMING-----------------------------------------
@@ -61,6 +67,27 @@ public static int KnapsackTD(int[] wt, int[] price, int vidx, int cap, int[][] s
         return dp[n][cap];
     }
 
+-> Extreme Space Optimised with just 1D array (Striver's solution)
+
+// here below we can't move w from 0 to capacity because if we do so then the prev values of dp array will be 
+override and as we know that for each w we are dependent on prev values of dp to compute the current ans.
+
+public int solve(int[] weights, int[] values, int capacity) {
+        int n = values.length;
+        int[]dp = new int[capacity+1];
+
+        for(int idx = 0; idx<n; idx++){
+            for(int w = capacity; w>=0; w--){
+                int notTake = dp[w];
+                int take = Integer.MIN_VALUE;
+                if(w>=weights[idx]){
+                    take = values[idx] + dp[w-weights[idx]]; 
+                }
+                dp[w]=Math.max(take,notTake);
+            }
+        }
+        return dp[capacity];
+    }
 ----------------- -------------------------------------------------------------------------------
 2. Matrix Chain Multiplication
 public static int MCMTD(int[] matrix, int si, int ei, int[][] strg) {
@@ -1616,8 +1643,33 @@ public class JobScheduling {
     }
 
 }
+#) Very Similar Problem but solved using Heap only.
+-> Two Best Non-Overlapping Events (Leetcode 2054)
 
+->{startTime,endTime,Value}
+-> Sort with respect to start time, and for the heap sort with respect to end time. so that we get the min end time
+in logN time.
 
+ public int maxTwoEvents(int[][] events) {
+     int n = events.length;
+        
+     Arrays.sort(events, (a, b) -> a[0] != b[0] ? a[0] - b[0] : a[1] - b[1]);   
+     PriorityQueue<int[]>pq = new PriorityQueue<>((a,b)->a[1]-b[1]);
+     
+     int max = 0;
+     int res = 0;
+     for(int i=0; i<n; i++){
+         int start = events[i][0];
+       
+         while(!pq.isEmpty() && pq.peek()[1] < start){
+             int[]arr = pq.poll();
+             max = Math.max(max,arr[2]);
+         }
+         res = Math.max(res,events[i][2]+max);
+         pq.add(events[i]);
+     }                                             
+        return res;
+    }
 ------------------------------------------------------------------------------------------------
 47. Coin game winner where every player has three choices
 static boolean findWinner(int x, int y, int n)

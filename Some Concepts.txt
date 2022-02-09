@@ -1,0 +1,11 @@
+---------------------------------Mathematical concepts-----------------------
+1. We have to add digits until it becomes only a single digit => 38 -> 11 -> '2'
+
+In Digital Root Formula See Wikipedia:
+
+num == 0 => sum = 0
+num % 9 == 9 => sum = 9
+num % 9 != 9 =>sum = num % 9
+
+shortcut for that ->        return 1 + (n-1)%9;
+        
