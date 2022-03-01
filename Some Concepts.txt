@@ -8,4 +8,21 @@ num % 9 == 9 => sum = 9
 num % 9 != 9 =>sum = num % 9
 
 shortcut for that ->        return 1 + (n-1)%9;
-        
+ 
+----------------------------------------->
+2. Hashing
+-> Hashing works in a way like make a hashtable, and suppose if we have some key firstly we convert that key in hash using a hash function which will give the address of the given key in the hashtable for constant access. same happens in case of insert,remove,search.
+
+To Reduce Collisions in hashing
+-> we can use a prime no table size  like  Hash value of a string/integer = (hash value)%(prime no table size).
+
+Problems with String hash functions
+a) Anagrams
+-> cat, act
+b) Non uniform Distribution
+-> cat,sad,rat,bat <-this will only take small region of table, so no uniform distribution.     
+
+-> Can be resolved by making Stronger hash function h = pow(d,m-1) where m is no of letters in the character.
+-> If again collision happens then the same key will have multiple values in the form linkedList
+-> But make sure the size of linkedlist should be min as it does not exceed loading factor of hashtables.
+-> If it exceeds then there will be rehashing by double the size of hashtable.

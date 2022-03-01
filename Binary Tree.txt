@@ -950,7 +950,33 @@ static void printKPathUtil(Node root, int k)
     // Remove the current element from the path 
     path.remove(path.size() - 1); 
 } 
------------------------------------------------------------------------------------
+
+-> Another Approach
+
+
+ int total=0;
+ public int sumK(Node root,int k)
+   {
+       if(root==null)return 0;
+       Map<Integer,Integer>map=new HashMap<>();
+       map.put(0,1);
+       
+      solve(root,k,0,map);
+      return total;
+}    
+void solve(Node root,int target,int currSum,Map<Integer,Integer>map){
+   if(root==null)return;
+   currSum+=root.data;
+   if(map.containsKey(currSum-target)){
+       total+=map.get(currSum-target);
+   }
+   map.put(currSum,map.getOrDefault(currSum,0)+1);
+   solve(root.left,target,currSum,map);
+   solve(root.right,target,currSum,map);
+   map.put(currSum,map.get(currSum)-1);
+   return;
+} 
+----------------------------------------------------------------------------------
 28.  Find if tree contains duplicate subtrees of size two or more
 int DuplicateSubtrees(Node root) {
     HashMap<String,Integer>map=new HashMap<>();
@@ -1040,6 +1066,30 @@ public boolean isSubtree(TreeNode root, TreeNode subRoot) {
         }
         return false;
     }
+
+#) Optimised O(N) S(N) Method
+-> Firstly we collect inorder and preorder traversals of both the trees in an arraylist.
+-> We know that inorder and preorder uniquely defines a binary tree that's why we are using this.
+-> Now we just check that inorder of substree is a subarray of big tree and same with preorder.
+-> This can be checked using "KMP" for optimised solution.
+-> It may happen that even after having both the subarray still we can say that small tree is not a subtree of Big.
+(        Tree1
+          x 
+        /    \
+      a       b
+     /        
+    c         
+
+
+        Tree2
+          x 
+        /    \
+      a       b
+     /         \
+    c            d
+)
+-> So to avoid this condition we just return any character say '$' when node becomes null while collecting inorder or preorder.
+-> So to become a subtree both of its inorder and preorder should be subarrays of Big tree.
 -----------------------------------------------------------------------------------
 31.  Construct a Binary tree from String
      int start=0;
@@ -1486,9 +1536,60 @@ O(n) s(n)
 
         return root;   
     }
-
 -----------------------------------------------------------------------------------------------
-42. Print Same Distance Nodes from Target Node
+42. Kth ancestor of the node
+M1) Take a list and store all the ancestors of the given node and finally traverse it to find the kth ancestor.
+
+M2) Binary Lifting <- in Extra questions section.
+
+M3) Easy Approach
+->
+public int kthAncestor(Node root, int k, int node)
+    {
+        
+        int[] K = new int[]{k};
+        Node ans = KthAncestor(root,K,node);
+        
+    
+        if(ans==null || ans.data==node)return -1;
+        else return ans.data;
+    }
+    
+    public Node KthAncestor(Node root,int[] k,int tnode){
+         if(root==null)return null;
+         
+         if(root.data==tnode){
+             return root;
+         }
+         
+         Node left = KthAncestor(root.left,k,tnode);
+         Node right = KthAncestor(root.right,k,tnode);
+         
+         if(left!=null && right==null){
+             k[0]--;
+             if(k[0]<=0){
+                 //resetting k to lock the ans, since when k became 0 we got our ans.
+                 // so now setting to a value so that it never reaches 0.
+                 k[0] = Integer.MAX_VALUE;
+                 return root;
+             }
+             return left;
+         }
+         
+         if(left==null && right!=null){
+             k[0]--;
+             if(k[0]<=0){
+                 //resetting k to lock the ans, since when k became 0 we got our ans.
+                 // so now setting to a value so that it never reaches 0.
+                 k[0] = Integer.MAX_VALUE;
+                 return root;
+             }
+             return right;
+         }
+         return null;
+    }
+-----------------------------------------------------------------------------------------------
+43. Print Same Distance Nodes from Target Node
 
 M1) Map the node with their parents and store it in map, then apply bfs through the target node then for each distance just print those nodes.
 

@@ -1,0 +1,1459 @@
+Problems which were asked in Product based companies.
+
+1. Check if removing an edge can split a binary tree into two equal size trees
+-> Asked in (Amazon)
+
+Link: https://www.techiedelight.com/split-binary-tree-into-two-trees/
+
+M1) O(n*n)
+-> We firstly check the no of nodes, if even then its ok if odd return false.
+-> Then we can a function which at every node checks that (2*size(root)==n)
+-> If yes then it will return true. we can find this node in any part.
+-> At last we return (check from left)||(check from right).
+
+M2) O(n)
+-> Here also the no of nodes should be even and after that
+-> we are reducing the time complexity by just returning the size as we need it.
+
+// Update `result` to true if the size of a binary tree rooted at `root`
+    // or the size of any of its subtrees is exactly `n/2`
+    public static int checkSize(Node root, int n, AtomicBoolean result)
+    {
+        // base case: an empty tree or result already found
+        if (root == null || result.get()) {
+            return 0;
+        }
+ 
+        // check if the size of a binary tree rooted at `root` is exactly `n/2` and
+        // update the result
+        int size = 1 + checkSize(root.left, n, result) +
+                checkSize(root.right, n, result);
+        if (!result.get()) {
+            result.set(2 * size == n);
+        }
+ 
+        return size;
+    }
+---------------------------------------------------------->
+2. Find Equilibrium index of array (Arr1 + Arr2 ... Arri-1 = Arri+1 + Arri+2 ... Arrn)
+-> Asked in (Amazon)
+
+O(n)
+String equilibrium(int arr[], int n) {
+       int lsum=0;
+       int sum=0;
+       
+       for(int val:arr)sum+=val;
+       
+       for(int i=0;i<n;i++){
+           sum-=arr[i];
+           if(lsum==sum){
+               return "YES";// basically i is the index
+           }
+           lsum+=arr[i];
+       }
+        return "NO";
+    }
+---------------------------------------------------------->
+3. Max sum in the configuration (max sum of all configuration of rotations)
+-> Asked in (Amazon)
+
+-> So here we are firstly calculating array sum and first rotation sum,
+-> After that the sum of next rotation can be calculated using the previous one
+-> Since the current element will be at last so it has be to multiplied by (n-1).
+-> Other terms index decreases by one so for that case
+-> We are removing the whole array sum and for the last term since it was not there earlier (index=0),so it got
+substracted extra, so for now we will multiply the curr term (last term for next rotation) with n instead of n-1.
+int max_sum(int arr[], int n)
+    {
+	   int allSum = 0;
+	   int arrSum = 0;
+	   
+	   for(int i=0;i<n;i++){
+	       arrSum+=arr[i];
+	       allSum+=arr[i]*i;
+	   }
+	   int max=allSum;
+	   int currSum=allSum;
+	   for(int i=0;i<n;i++){
+	       currSum = currSum - arrSum + arr[i]*n;
+	       max = Math.max(max,currSum);
+	   }
+	   
+	   return max;
+    }
+---------------------------------------------------------->
+4. Kth Smallest element in the BST
+-> Asked in (Amazon)
+
+-> O(h), S(h)
+
+-> Here, lcount is in node structure, and it represents the no of nodes in the left subtree of the current Node.
+
+// Function to find k'th largest element in BST
+    // Here count denotes the number of
+    // nodes processed so far
+    public static Node kthSmallest(Node root, int k)
+    {
+        // base case
+        if (root == null)
+            return null;
+     
+        int count = root.lCount + 1;
+        if (count == k)
+            return root;
+     
+        if (count > k)
+            return kthSmallest(root.left, k);
+     
+        // else search in right subtree
+        return kthSmallest(root.right, k - count);
+    }
+---------------------------------------------------------->
+5. Distribute n candies among k people
+-> Asked in (Amazon)
+
+M1) O(N)
+public int[] distributeCandies(int candies, int num) {
+        int[]res = new int[num];
+        
+        for(int i=0;candies>0;i++){
+            res[i%num]+=Math.min(candies,i+1);
+            candies-=i+1;
+        }
+        return res;
+    }
+
+M2) -> https://leetcode.com/problems/distribute-candies-to-people/discuss/324215/Java-O(num_people)-one-pass-Math-Solution-solving-quadratic-function
+---------------------------------------------------------->
+6. Given a matrix of ‘O’ and ‘X’, replace ‘O’ with ‘X’ if surrounded by ‘X’
+-> Asked in (Amazon)
+
+-> So here we first replace all the ‘O’ with ‘-’
+-> Then for a) 1st col every row b) last col every row c) 1st row every col d) last row every col
+-> We will apply flood fill algo where prevV = ‘-’ & newV = ‘O’.
+-> At last replace the remaining ‘-’ with ‘X’.
+
+Intuition -> we are basically applying dfs to each boundry since problem says that when ‘O’ is surrounded with ‘X’ in all directions then only replace it with ‘X’. and boundry is the place we are sure for that it is not surrounded and for the places where it does not reach because of surroundings we then replace it with ‘X’.
+
+
+static void floodFillUtil(char mat[][], int x,
+                              int y, char prevV,
+                              char newV)
+    {
+        // Base cases
+        if (x < 0 || x >= M ||
+            y < 0 || y >= N)
+            return;
+             
+        if (mat[x][y] != prevV)
+            return;
+     
+        // Replace the color at (x, y)
+        mat[x][y] = newV;
+     
+        // Recur for north,
+        // east, south and west
+        floodFillUtil(mat, x + 1, y,
+                      prevV, newV);
+        floodFillUtil(mat, x - 1, y,
+                      prevV, newV);
+        floodFillUtil(mat, x, y + 1,
+                      prevV, newV);
+        floodFillUtil(mat, x, y - 1,
+                      prevV, newV);
+    }
+---------------------------------------------------------->
+7. Find Minimum Insertions To Form A Palindrome
+-> Asked in (Amazon)
+
+M1) Using LCS
+-> Here just find longest common subsequence of (str, reverse of str)
+-> Ans = str.length() - LCS(str,rev(str));
+
+M2) 
+-> min insertions in string from [l....h] is
+a) If (l==h) then 0 + minIns(str,l+1,h-1);
+b) If (l!=h) then return Math.min( minIns(str,l+1,h), minIns(str,l,h-1) + 1.
+
+ static int findMinInsertions(char str[], 
+                                 int l, int h,int[][]dp)
+    {
+        // Base Cases
+        if (l > h) 
+            return Integer.MAX_VALUE;
+  
+        if (l == h) 
+            return 0;
+  
+        if (l == h - 1) 
+            return (str[l] == str[h]) ? 0 : 1;
+        
+        if(dp[l][h]!=-1)return dp[l][h];
+            
+        int a = 0;
+        if(str[l]==str[h]){
+            a = findMinInsertions(str,l+1,h-1,dp);
+        }else{
+            int x = findMinInsertions(str,l+1,h,dp);
+            int y = findMinInsertions(str,l,h-1,dp);
+            a = Math.min(x,y)+1;
+        }
+        return dp[l][h]=a;
+    }
+---------------------------------------------------------->
+8. Pairs of Songs With Total Durations Divisible by 60 (LC-1010)
+-> Asked in (Amazon)
+
+M1) Here we used combinations.
+ public int numPairsDivisibleBy60(int[] time) {
+        if(time == null || time.length == 0) return 0;
+        
+        int n = time.length;
+        int[] map = new int[60];
+        int res = 0;
+        for(int i = 0; i < n; i++){
+            int remainder = time[i] % 60;
+            map[remainder]++;
+        }
+        
+        res += (int)((long)map[0] * (map[0] - 1) / 2);
+        res += (int)((long)map[30] * (map[30] - 1) / 2);
+        for(int i = 1; i < 30; i++){
+            res += map[i] * map[60 - i];
+        }
+        
+        return (int)res;
+    }
+
+M2) Just Like Two sum problem
+public int numPairsDivisibleBy60(int[] time) {
+   int remainder[]=new int[60];
+        int n=time.length;
+        int ans=0;
+        for(int i=0;i<n;i++){
+            int rem=time[i]%60;
+            if(rem==0)
+                ans+=remainder[0];
+            else
+                ans+=remainder[60-rem];
+            remainder[rem]++;   //since we are increasing count of elements in this loop itself so							//there will be no duplicates as we are not the frequencies beforehand.
+        }
+        return ans;
+    }
+---------------------------------------------------------->
+9. Extract leaves of a binary tree in a doubly linkedList
+-> Asked in (Amazon)
+
+->https://www.codingninjas.com/codestudio/library/extract-leaves-of-a-binary-tree-in-a-doubly-linked-list
+
+-> Approach-> we will take a head of doubly linkedlist and now if we encounter a leaf node.
+-> Then we just do node.right = head, head.left = node, head = node.
+-> That's why we will traverse first right and then left.
+-> And if you want to extract this leaf doubly linkedlist from the whole tree. just return null;
+-> node.right = solve(node.right), node.left = solve(node.left);
+---------------------------------------------------------->
+10. Check if two nodes in a Binary tree are cousins or not
+(cousin are those nodes who have same levels but different parents)
+
+-> Asked in (Amazon)
+
+-> find level of both
+-> find if they are sibling or not.
+-> finally mix both above conditions and return the result.
+
+boolean isSibling(Node node, Node a, Node b)
+    {
+        // Base case
+        if (node == null)
+            return false;
+ 
+        return ((node.left == a && node.right == b) ||
+                (node.left == b && node.right == a) ||
+                isSibling(node.left, a, b) ||
+                isSibling(node.right, a, b));
+    }
+
+int level(Node node, Node ptr, int lev( lev = 1))
+    {
+        // base cases
+        if (node == null)
+            return 0;
+ 
+        if (node == ptr)
+            return lev;
+ 
+        // Return level if Node is present in left subtree
+        int l = level(node.left, ptr, lev + 1);
+        if (l != 0)
+            return l;
+ 
+        // Else search in right subtree
+        return level(node.right, ptr, lev + 1);
+    }
+
+M2) 
+-> We can do a level order traversal of the given nodes.
+-> While doing the level order traversal, we would be using a queue of pair to store the given nodes along with its parents.
+-> While traversing a level, if we find both the levels, we need to check their parents and if they are different, they are cousins.
+-> If the nodes are present at different levels, they are not cousins.
+---------------------------------------------------------->
+11. Check if a given node is present in the complete binary tree index (1-n in level order wise)
+(means if we travel level order wise then we get sorted array)
+
+-> Asked in (Amazon)
+
+-> O(LogN) 
+-> In a complete binary tree, except root, all the odd nodes are right child. and even nodes are left. 
+(condition is that the complete binary tree must be indexed from 1 - n level order wise)
+
+// Function to store the
+	// list of the directions
+	public static ArrayList<Integer> findSteps(Node root, int data) {
+		ArrayList<Integer> steps = new ArrayList<Integer>();
+
+		// While the root is not found
+		while (data != 1) {
+			// If it is the right
+			// child of its parent
+			if (data / 2.0 > data / 2) {
+
+				// Add right step (1)
+				steps.add(1);
+			} else {
+
+				// Add left step (-1)
+				steps.add(-1);
+			}
+
+			// int parent = data / 2;
+
+			// Repeat the same
+			// for its parent
+			data = data / 2;
+		}
+		// Reverse the steps list
+		Collections.reverse(steps);
+
+		// Return the steps
+		return steps;
+	}
+
+	// Function to find
+	// if the key is present or not
+	public static boolean findKey(Node root, int data) {
+		// Get the steps to be followed
+		ArrayList<Integer> steps = findSteps(root, data);
+
+		// Taking one step at a time
+		for (Integer cur_step : steps) {
+
+			// Go left
+			if (cur_step == -1) {
+
+				// If left child does
+				// not exist return false
+				if (root.left == null)
+					return false;
+
+				root = root.left;
+			}
+
+			// Go right
+			else {
+
+				// If right child does
+				// not exist return false
+				if (root.right == null)
+					return false;
+
+				root = root.right;
+			}
+		}
+
+		// If the entire array of steps
+		// has been successfully
+		// traversed
+		return true;
+	}
+---------------------------------------------------------->
+12. Subarrays with K Different Integers (LeetCode 992)
+-> Asked in (Amazon)
+
+->  exact(k) = atmost(k) - atmost(k-1).
+
+ public int atmost(int[]nums,int k){
+        HashMap<Integer,Integer>map = new HashMap<>();
+        int i=0,j=0;
+        
+        int result=0;
+        while(j<nums.length){
+            int val = nums[j];
+            map.put(val,map.getOrDefault(val,0)+1);
+            j++;
+            while(map.size()>k && i<j){
+                int temp = map.get(nums[i]);
+                if(temp==1){
+                    map.remove(nums[i]);
+                }else{
+                    map.put(nums[i],map.get(nums[i])-1);
+                }
+                i++;
+            }
+            result += j-i+1;
+        }
+        return result;
+    }
+
+
+Similar problem -> 
+# Longest Substring with at most k distinct characters
+---------------------------------------------------------->
+13. Populating Next Right Pointers in Each Node (LeetCode 116)
+-> Asked in (Amazon)
+
+M1) We can use Level order traversal using Queue and for a given level just place next pointer for each node.
+-> O(N) , S(N)
+
+M2) Use of Recursion O(N) but S(1) -> only stack space used
+
+public Node connect(Node root) {
+        dfs(root, null);        
+        return root;
+    }
+    
+    private void dfs(Node curr, Node next) {
+        if (curr == null) return;
+        curr.next = next;
+        dfs(curr.left, curr.right);
+        dfs(curr.right, curr.next == null ? null : curr.next.left);
+    }
+
+
+M3) Just traverse and make linkedlist at each level (just dry run the code to understand better)
+-> O(N), S(1)
+ public Node connect(Node root) {
+     
+    Node level_start = root;
+        
+    while(level_start!=null){
+        Node curr = level_start;
+
+        while(curr!=null){
+
+//this makes the link from left subtree to right subtree
+            if(curr.left!=null) curr.left.next = curr.right;
+ 
+//Although we need not to check curr.right because it is a perfect binary tree.
+
+//through this we go to right side.
+            if(curr.right!=null && curr.next!=null) curr.right.next = curr.next.left; 
+ 
+            curr = curr.next; //now going to right subtree 
+        }
+        level_start = level_start.left; //since we link every level starting from extreme left.
+    }
+        
+        return root;
+    }
+
+---------------------------------------------------------->
+14. Find height of a special binary tree whose leaf nodes are connected in a circular doubly linkedlist
+-> Asked in (Amazon)
+
+-> Approach is simple just find the height as usual
+-> When you get node == null return 0;
+-> when you return leaf just return 1 height;
+-> return 1 + Math.max(h(node.left),h(node.right));
+
+
+-> Though below we need not to check for both left and right because it is a doubly linkedlist
+ static boolean isLeaf(Node node)
+    {
+        // If given node's left's right is pointing to given
+        // node and its right's left is pointing to the node
+        // itself then it's a leaf
+        return (node.left != null && node.left.right == node
+                && node.right != null
+                && node.right.left == node);
+    }
+---------------------------------------------------------->
+15. No. of Connected components in a graph using DSU
+-> Asked in (Amazon)
+
+// DSU with all the cases
+	// 1. Without Path compression -> O(M*N)
+	// 2. With Path compression but without union by rank -> O(N + M*LogN)
+	// 3. With Path compression and with union by Rank -> O( N + M * (amortized
+	// LogN)) => O(N+M)
+
+	public static int noOfConnectedComponents(int vertices, int[][] edges) {
+		n = vertices;
+		makeSet(); // this will make the parent and rank array 
+		for (int[] edge : edges) {
+			union(edge[0], edge[1]);
+		}
+		Set<Integer> set = new HashSet<>();
+		for (int i = 0; i < vertices; i++) {
+			set.add(findPar(i));
+		}
+		return set.size();
+	}
+
+---------------------------------------------------------->
+16. Car Pooling (LeetCode 1094) / Meeting Rooms ii (LC- 253)
+-> Asked in Amazon
+
+M1) O(N) S(N)
+  public boolean carPooling(int[][] trips, int capacity) {
+        
+        int[]prefix=new int[1001];
+        
+        for(int i=0;i<trips.length;i++){
+            int numP=trips[i][0];
+            int from=trips[i][1];
+            int to=trips[i][2];
+            prefix[from]+=numP;
+            prefix[to]+=-numP;
+        }
+        // method 1
+//         for(int i=1;i<prefix.length;i++){
+//             prefix[i]=prefix[i]+prefix[i-1];
+//         }
+        
+//         for(int i=0;i<prefix.length;i++){
+//             if(prefix[i]>capacity){
+//                 return false;
+//             }
+//         }
+
+        //method 2
+          for (int i = 0; capacity >= 0 && i < 1001; ++i) capacity -= prefix[i];
+        
+        return capacity>=0;
+    }
+M2) O(NLogN) S(N)
+
+public boolean carPooling(int[][] trips, int capacity) {
+        Map<Integer, Integer> m = new TreeMap<>();
+        for (int[] t : trips) {
+            m.put(t[1], m.getOrDefault(t[1], 0) + t[0]);
+            m.put(t[2], m.getOrDefault(t[2], 0) - t[0]);
+        }
+        for (int v : m.values()) {
+            capacity -= v;
+            if (capacity < 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+---------------------------------------------------------->
+17. Check if a binary tree is subtree of another binary tree
+-> Asked in (Amazon)
+
+-> So there are two methods ->(first one is in Binary tree file)
+
+#) Optimised O(N) S(N) Method
+-> Firstly we collect inorder and preorder traversals of both the trees in an arraylist.
+-> We know that inorder and preorder uniquely defines a binary tree that's why we are using this.
+-> Now we just check that inorder of substree is a subarray of big tree and same with preorder.
+-> This can be checked using "KMP" for optimised solution.
+-> It may happen that even after having both the subarray still we can say that small tree is not a subtree of Big.
+(        Tree1
+          x 
+        /    \
+      a       b
+     /        
+    c         
+
+
+        Tree2
+          x 
+        /    \
+      a       b
+     /         \
+    c            d
+)
+-> So to avoid this condition we just return any character say '$' when node becomes null while collecting inorder or preorder.
+-> So to become a subtree both of its inorder and preorder should be subarrays of Big tree.
+---------------------------------------------------------->
+18. Find the maximum sum leaf to root path in a Binary Tree
+-> Asked in (Amazon)
+
+Approach is simple O(N), S(N)
+-> First Traversal is to find the maximum sum path.
+-> Next traversal is to find that path using below code.
+
+public boolean leaf2rootpath(TreeNode node,int sum,ArrayList<TreeNode>list){
+	if(node==null){
+	 return false;
+	}
+
+	if(node.val==sum && node.left==null && node.right==null){
+		list.add(node);
+		return true;
+	}
+	boolean lc=node2rootpath(node.left,sum-node.val,list);
+	if(lc){
+		list.add(node);
+		return true;
+	}
+
+	boolean rc=node2rootpath(node.right,sum-node.val,list);
+	if(rc){
+		list.add(node);
+		return true;
+	}
+
+	return false;
+}
+---------------------------------------------------------->
+19. Duplicate Zeros (LC-1089)
+-> Asked in (Amazon)
+
+-> Do it in O(N) & S(1)
+-> Basically we are just counting zero and that will be the length of the final array but we have to fit it in the 
+original array so that's why we are doing this
+-> We traverse from last of the array and just dry run the code to understand it better.
+
+ public void duplicateZeros(int[] arr) {
+        int countZero = 0;
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] == 0) countZero++;
+        }
+        int len = arr.length + countZero;
+        //We just need O(1) space if we scan from back
+        //i point to the original array, j point to the new location
+        for (int i = arr.length - 1, j = len - 1; i < j; i--, j--) {
+            if (arr[i] != 0) {
+                if (j < arr.length) arr[j] = arr[i];
+            } else {
+                if (j < arr.length) arr[j] = arr[i];
+                j--;
+                if (j < arr.length) arr[j] = arr[i]; //copy twice when hit '0'
+            }
+        }
+    }
+---------------------------------------------------------->
+20. Decode a substring recursively endcoded as count followed by substring.
+-> Link: https://www.geeksforgeeks.org/decode-string-recursively-encoded-count-followed-substring/
+
+-> Asked in (Amazon)
+
+Time Complexity -> O(N)
+input - > abbbababbbababbbab  
+output - > 3[a3[b]1[ab]]
+
+-> Here in this question, we push if we encounter character, digit or '['.
+-> If we get ']' then we will pop until we reach '[' then pop() to remove '['. and also collect append characters.
+-> Now Stack peek will be a number either 1 digit or more than 1 digit.
+-> just pop() that whole number and say it is count.
+-> now append the same string count no of times. {eg ac and count=3, then acacac will be the string)
+-> After that push all the characters of that appended string.
+-> At last empty the stack and make the string and return it.
+
+static String decodedString(String s){
+     Stack<Character> st = new Stack<>();
+		char[] ch = s.toCharArray();
+		StringBuilder sb = new StringBuilder();
+
+		for (int i = 0; i < ch.length; i++) {
+			char c = ch[i];
+			if (Character.isDigit(c) || Character.isAlphabetic(c) || c == '[') {
+				st.push(c);
+			} else {
+				while (st.peek() != '[') {
+					sb.insert(0, st.pop());
+				}
+
+				st.pop();
+
+			    String cs="";
+			    while(!st.isEmpty() && Character.isDigit(st.peek())){
+			        cs = st.pop()+cs;
+			    }
+			    int count = Integer.parseInt(cs);
+           	            count--;
+
+				String str = sb.toString();
+                
+				while (count-- > 0) {
+					sb.append(str);
+				}
+				for (char cc : sb.toString().toCharArray()) {
+					st.push(cc);
+				}
+					sb = new StringBuilder();
+			}
+		}
+		while(!st.isEmpty())sb.append(st.pop());
+		
+		return sb.reverse().toString();
+    }
+
+
+#) See the Recursive Approach also of this problem.
+-> https://www.geeksforgeeks.org/decode-a-string-recursively-encoded-as-count-followed-by-substring-set-2-using-recursion/?ref=rp
+---------------------------------------------------------->
+21. Longest ZigZag Path in a Binary Tree (LC-1372)
+-> Asked in (Amazon0
+
+-> Both solutions has O(N) T.C
+M1) 
+public int longestZigZag(TreeNode root) {
+        return Math.max(goZigZag(root.left,true,0),goZigZag(root.right,false,0));      
+    }
+    
+    public int goZigZag(TreeNode node,boolean dir, int len){
+        if(node==null)return len;
+        
+        int followZZ = 0;
+        int selfStart = 0;
+        
+        if(dir){ 		//if prev direction was left
+            followZZ = goZigZag(node.right,false,len+1); //continue follow zigzag path
+            selfStart = goZigZag(node.left,true,0);     // start your own path.
+        }else{  	      // if prev direction was right
+            followZZ = goZigZag(node.left,true,len+1); //continue follow zigzag path
+            selfStart = goZigZag(node.right,false,0);  // start your own path.
+            
+        }
+        return Math.max(followZZ,selfStart);
+    }
+    
+M2) 
+    int maxStep = 0;
+    public int longestZigZag(TreeNode root) {
+        dfs(root, true, 0);
+        // dfs(root, false, 0); // means if you give only 1 direction then also it will work.
+        return maxStep;
+    }
+    private void dfs(TreeNode root, boolean isLeft, int step) {
+        if (root == null) return;
+        maxStep = Math.max(maxStep, step); // update max step sofar
+        if (isLeft) {
+            dfs(root.left, false, step + 1); // keep going from root to left
+            dfs(root.right, true, 1); // restart going from root to right
+        } else {
+            dfs(root.right, true, step + 1); // keep going from root to right
+            dfs(root.left, false, 1); // restart going from root to left
+        }
+    }
+---------------------------------------------------------->
+22. Basic Calculator (LC-224)
+-> ASked in (Amazon)
+
+-> O(N)
+-> Dry Run the code to undertand it properly.
+ public int calculate(String s) {
+        
+       int res=0,sign=1;
+       Stack<Integer>st = new Stack<>();
+        
+       int n=s.length();
+       char[] crr = s.toCharArray();
+        
+       for(int i=0;i<n;i++){
+           char ch = crr[i];
+           
+           if(Character.isDigit(ch)){
+               int num = ch-'0';
+               while(i+1<n && Character.isDigit(crr[i+1])){
+                   num = num*10 + crr[i+1]-'0';
+                   i++;
+               }
+               res += num * sign;
+           }else if(ch=='+'){
+               sign=1;
+           }else if(ch=='-'){
+               sign=-1;
+           }else if(ch=='('){
+               st.push(res);
+               st.push(sign);
+               res=0; // to get the new number inside the parenthesis.
+               sign=1;
+           }else if(ch==')'){
+               res = res * st.pop() + st.pop();
+           }
+       } 
+       return res; 
+    }
+---------------------------------------------------------->
+23. Longest Common Prefix
+-> Asked in (Amazon)
+
+public String longestCommonPrefix(String[] strs) {
+        if (strs == null || strs.length == 0)
+            return "";
+        
+        Arrays.sort(strs);  //lexicographically
+        String first = strs[0];
+        String last = strs[strs.length - 1];
+        int c = 0;
+        while(c < first.length())
+        {
+            if (first.charAt(c) == last.charAt(c))
+                c++;
+            else
+                break;
+        }
+        return c == 0 ? "" : first.substring(0, c);
+    }
+---------------------------------------------------------->
+24. Longest Palindromic Substring
+
+public String longestPalindrome(String s) {
+        int start = 0;
+        int end = 0;
+        for (int i = 0; i < s.length(); i++) {
+            //StringBuffer sb = new StringBuffer();
+            //sb.append(s.charAt[i]);
+            char c = s.charAt(i);
+            int left = i;
+            int right = i;
+
+// go to extreme boundaries in case of duplicate characters in left and right.
+
+            while (left >= 0 && s.charAt(left) == c) {
+                left--;
+            }
+
+            while (right < s.length() && s.charAt(right) == c) {
+                right++;
+            }
+
+            while (left >= 0 && right < s.length()) {
+                if (s.charAt(left) != s.charAt(right)) {
+                    break;
+                }
+                left--;
+                right++;
+            }
+
+
+           // left + 1 and right - 1 are actually the start and end index of the Palindromic string
+            // we don't set "right" because String.substring function required end index exclusively
+            left = left + 1;
+            if (end - start < right - left) {
+                start = left;
+                end = right;
+            }
+        }
+
+        return s.substring(start, end);
+    }
+---------------------------------------------------------->
+25) Next Greater Element 2 (LC-503)
+-> Asked in (Amazon)
+
+-> Basically array is circular here so we just traverse 2n length.
+
+ public int[] nextGreaterElements(int[] nums) {
+        int n = nums.length;
+        int[]res = new int[n];
+        Arrays.fill(res,-1);
+        Stack<Integer>st = new Stack<>();
+        
+        for(int i=0;i<2*n;i++){
+            while(!st.isEmpty() && nums[i%n]>nums[st.peek()]){
+                res[st.pop()]=nums[i%n];
+            }
+            st.push(i%n);
+        }
+       
+        return res;
+    }
+
+#) Next Greater Element 3 (LC-556)
+---------------------------------------------------------->
+26) Find K-th Smallest Pair Distance (LC-719)
+-> Asked in () 
+
+-> Here, we are applying binary search on ans (which is our absolute diff of pairs).
+-> For every mid we are checking how many pairs can be possible less than equal to mid.
+-> To check the above condition i.e no of pairs we just used sliding window technique.
+
+ public int smallestDistancePair(int[] nums, int k) {
+        int n = nums.length;
+        
+        Arrays.sort(nums);
+        
+        int lo = 0;
+        int hi=nums[n-1];
+        
+        while(lo<hi){
+            int mid = (lo+hi)/2;
+            if(checkAbsDiffCount(nums,mid)<k){
+                lo=mid+1;
+            }else{
+                hi=mid;  // because the elements of array are not distinct. (dry run to understand this case)
+            }
+        }
+        return lo;
+    }
+    
+    public int checkAbsDiffCount(int[]nums,int diff){
+       int count=0;
+       
+        int i=0,j=0;
+        while(j<nums.length){
+            int d = nums[j]-nums[i];
+            while(i<nums.length && nums[j]-nums[i]>diff){
+                i++;
+            }
+            count+=j-i;
+            j++;
+        }
+        return count;       
+    }
+---------------------------------------------------------->
+27) Nuts And Bolts Problem
+-> Asked in (Amazon)
+
+ public void MatchPairs(char[]nuts,char[]bolts,int low,int hi){
+        if(low<hi){
+            int pivot=partition(nuts,low,hi,bolts[hi]);
+            
+            partition(bolts,low,hi,nuts[pivot]);
+            
+            MatchPairs(nuts,bolts,low,pivot-1);
+            MatchPairs(nuts,bolts,pivot+1,hi);
+        }
+    }
+    public int partition(char[]arr,int l,int h,char ch){
+        int i=l;
+        
+        int j=l;
+        while(j<h){
+            if(arr[j]<ch){
+                swap(arr,i,j);
+                i++;
+            }else if(arr[j]==ch){
+                swap(arr,j,h);
+                j--;
+            }
+            j++;
+        }
+        swap(arr,i,h);
+        return i;
+    }
+---------------------------------------------------------->
+28) Maximum Number of Weeks for which you can work (LC-1953)
+-> Asked in (Amazon)
+
+ public long numberOfWeeks(int[] milestones) {
+     
+       long sum = 0;
+       long max = -1;
+        for(int stones:milestones){
+            sum+=stones;
+            max = Math.max(max,stones);
+        }
+        //if sum of all the milestones of projects except maximum one + 1 <=  milestones in max project
+        // it means that all the milestones can be covered.
+        // but if not than max project milestones - sum(except max one)-1 can be done.
+        long x = sum-max;
+        
+        if(x+1>=max)return sum;
+        else return 2*x+1;
+        
+    }
+
+---------------------------------------------------------->
+29) Given a binary tree and a value k. A path is called heavy path if the sum of the elements in the path (path from root to leaf) > k remove all the paths from the tree which are not heavy i.e., tree should contain only heavy paths.
+
+ public TreeNode heavyPath(TreeNode node,int ssf,int limit){
+        if(node==null)return null;
+        
+        if(node.left==null && node.right==null){
+            if(ssf+node.val<limit){
+                return null;
+            }
+            return node;
+        }
+        
+        node.left = heavyPath(node.left,ssf+node.val,limit);
+        node.right = heavyPath(node.right,ssf+node.val,limit);
+        
+        // this below case is when you consider that when a new leaf is created it will not act as leaf.
+
+        if(node.left==null && node.right==null)return null;  
+
+        // for the case if new leaf is created, consider it as leaf. then along with this ssf+node.val<limit condition will also be checked
+        
+        return node;
+    }
+---------------------------------------------------------->
+30) Select a random number from stream, with O(1) space
+-> Asked in (Amazon)
+
+Time Complexity: O(n)
+Auxiliary Space: O(1)
+
+ //A method to randomly select a item from stream[0], stream[1], .. stream[i-1]
+    static int selectRandom(int x)
+    {
+        count++; // increment count of numbers seen so far
+         
+        // If this is the first element from stream, return it
+        if (count == 1)
+            res = x;
+        else
+        {
+             // Generate a random number from 0 to count - 1
+            Random r = new Random();
+            int i = r.nextInt(count);
+             
+            // Replace the prev random number with new number with 1/count probability
+            if(i == count - 1)
+                res = x;
+        }
+        return res;
+    }
+---------------------------------------------------------->
+31) Decode Ways (LC-91)
+-> Asked in (Amazon)
+
+public int countWays(String str,int[] dp){
+        if(str.length()==0)return 1;
+        
+        if(str.charAt(0)=='0'){
+            return 0;
+        }
+        
+        if(dp[str.length()]!=-1)return dp[str.length()];
+        
+        int sg = countWays(str.substring(1),dp);
+        
+        int db = 0;
+        
+        if(str.length()>=2){
+            int n = Integer.parseInt(str.substring(0,2));
+            if(n<=26){
+                 db = countWays(str.substring(2),dp);
+            }
+            
+        }
+        return dp[str.length()] = (sg+db)%m;
+    }
+---------------------------------------------------------->
+33) There are N people standing in a circle. On every pass, the kth person was killed. This cycle continues till only one person remains alive. Find out the alive person. (Josephus problem) 
+-> Asked in (Amazon)
+
+-> Here we just trying to find out that who will be saved for when (n-1) people remain, then we will convert
+into the actual person.
+-> We are converting to the actual person because when the function gets called when (n-1) uses as n then 
+we are starting again from 0, so for that reason we are coverting, and for the same reason we can say that the last element which will be remained is 0 only.
+
+eg) n=5, k = 3;
+0 1 2 3 4 <- 2 dies
+0 1 2 3 <- 2 dies
+0 1 2 <- 2 dies
+0 1 <- 0 dies
+0 <- alive person
+
+now going up converting the actual person
+y = (x+k)%n (n is changing, y is constant)
+-> 0->  (0+3)%1 = 0
+-> (0+3)%2 = 1
+-> (1+3)%3 = 1
+-> (1+3)%4 = 0
+-> (0+3)%5 = 3
+
+-> 3 is alive
+
+
+public static int solution(int n, int k){
+    if(n==1)return 0;
+
+    int x = solution(n-1,k);
+    int y = (x+k)%n;
+    return y;
+  }
+---------------------------------------------------------->
+34) https://www.geeksforgeeks.org/kth-largest-element-in-a-stream/
+-> Asked in (Amazon)
+
+-> Take Min heap
+-> firstly handle k-1 elements
+-> out of loop handle kth element separately 
+-> now handle another k->n elements
+---------------------------------------------------------->
+35) Minimum Add to Make Parenthesis Valid (LC-921)
+-> Asked in (Amazon)
+ 
+O(N) S(N)
+-> Same logic (minimum removals allowed to make parenthesis valid)
+public int minAddToMakeValid(String str) {
+     
+         Stack<Character>st=new Stack<>();
+        for(int i=0;i<str.length();i++){
+            char ch=str.charAt(i);
+            if(ch=='('){
+                st.push(ch);
+            }else if(ch==')'){
+                if(!st.isEmpty() && st.peek()=='('){
+                    st.pop();
+                }else{
+                    st.push(ch);
+                }
+            }
+        }
+        return st.size();
+    }
+M2) O(N) S(1)
+ public int minAddToMakeValid(String S) {
+        int left = 0, right = 0;
+        for (int i = 0; i < S.length(); ++i) {
+            if (S.charAt(i) == '(') {
+                right_Needed++;
+            } else if (right > 0) {
+                right_Needed--;
+            } else {
+                left_Needed++;
+            }
+        }
+        return left_Needed + right_Needed;
+    }
+---------------------------------------------------------->
+36) Restore IP Address (LC-93)
+-> Asked in (Amazon)
+
+-> Used Backtracking
+ public void IpAddresses(String str,String ip,int dots,List<String>ans){
+        if(str.length()==0)return;
+        
+        if(dots==3){
+        
+            if(str.length()==1){
+                ip+=str;
+                ans.add(ip);
+            }
+            else if(str.length()<=3 && str.charAt(0)!='0' && Integer.parseInt(str)<=255){
+                ip+=str;
+                ans.add(ip);    
+            }
+            return;
+        }
+        
+        for(int i=1;i<=3;i++){
+            
+            if(i>=str.length())break;
+            
+            String temp = str.substring(0,i);
+           if(i==1){
+               IpAddresses(str.substring(i),ip+temp+".",dots+1,ans);
+           }else{
+               if(str.charAt(0)=='0')break;
+               
+               if(Integer.parseInt(temp)<=255)
+               IpAddresses(str.substring(i),ip+temp+".",dots+1,ans);
+           }
+        }
+    }
+---------------------------------------------------------->
+37) Maximum Avg of Subtree of values in a given binary tree
+-> Asked in (Amazon)
+
+-> O(N), S(N)
+ public static double[] MaxAverage(
+        TreeNode root)
+    {
+ 
+        // Checks if current node is not
+        // null and doesn't have any children
+        if (root.children != null
+            && root.children.size() == 0) {
+            ans = Math.max(ans, root.val);
+            return new double[] { root.val, 1 };
+        }
+ 
+        // Stores sum of its subtree in index 0
+        // and count number of nodes in index 1
+        double[] childResult = new double[2];
+ 
+        // Traverse all children of the current node
+        for (TreeNode child : root.children) {
+ 
+            // Recursively calculate max average
+            // of subtrees among its children
+            double[] childTotal
+                = MaxAverage(child);
+ 
+            // Increment sum by sum
+            // of its child's subtree
+            childResult[0]
+                = childResult[0] + childTotal[0];
+ 
+            // Increment number of nodes
+            // by its child's node
+            childResult[1]
+                = childResult[1] + childTotal[1];
+        }
+ 
+        // Increment sum by current node's value
+        double sum = childResult[0] + root.val;
+ 
+        // Increment number of
+        // nodes by one
+        double count = childResult[1] + 1;
+ 
+        // Take maximum of ans and
+        // current node's average
+        ans = Math.max(ans, sum / count);
+ 
+        // Finally return pair of {sum, count}
+        return new double[] { sum, count };
+    }
+---------------------------------------------------------->
+38) Most frequent subtree sum in a binary tree
+-> Asked in (Amazon)
+
+Map<Integer, Integer> count = new HashMap<Integer, Integer>();
+    int maxCount = 0;
+
+    public int[] findFrequentTreeSum(TreeNode root) {
+        dfs(root);
+        List<Integer> res = new ArrayList<>();
+        for (int s : count.keySet()) {
+            if (count.get(s) == maxCount)
+                res.add(s);
+        }
+        return res.stream().mapToInt(i->i).toArray();
+    }
+
+    private int dfs(TreeNode root) {
+        if (root == null) return 0;
+        int s = dfs(root.left) + dfs(root.right) + root.val;
+        count.put(s, count.getOrDefault(s, 0) + 1);
+        maxCount = Math.max(maxCount, count.get(s));
+        return s;
+    }
+---------------------------------------------------------->
+39) Maximum Product of Splitted Binary Tree (LC-1339)
+
+
+-> Intuition: If we know the sum of a subtree, the answer is max( (total_sum - subtree_sum) * subtree_sum) in each node. (so do the post order traversal to do this)
+
+-> First find the total sum of the whole tree.
+O(N), S(H)
+public long maxProductOfSubtreeSum(TreeNode node,long tsum){
+        if(node==null)return 0;
+        
+        long left = maxProductOfSubtreeSum(node.left,tsum);
+        long right = maxProductOfSubtreeSum(node.right,tsum);
+        
+        long sbsum = left+right+node.val;
+        
+        max = Math.max(max,(tsum-sbsum)*sbsum);        
+        return sbsum;
+    }
+
+---------------------------------------------------------->
+40) Move zeros to the end of the array
+-> Asked in (Amazon)
+
+void pushZerosToEnd(int[] arr, int n) {
+       int count=0;
+       
+       for(int i=0;i<n;i++){
+           if(arr[i]!=0){
+               arr[count++]=arr[i];
+           }
+       }
+       
+       while(count<n){
+           arr[count++]=0;
+       }
+    }
+---------------------------------------------------------->
+41) Reduce the string by removing k consecutive identical characters.
+-> Asked in (Amazon)
+
+ public static String reduced_String(int k, String s)
+    {
+        // Base Case
+        if (k == 1) {
+            String ans = "";
+            return ans;
+        }
+ 
+        // Creating a stack of type Pair
+        Stack<Pair> st = new Stack<Pair>();
+ 
+        // Length of the string S
+        int l = s.length();
+        int ctr = 0;
+ 
+        // iterate through the string
+        for (int i = 0; i < l; i++) {
+ 
+            // if stack is empty then simply add the
+            // character with count 1 else check if
+            // character is same as top of stack
+            if (st.size() == 0) {
+                st.push(new Pair(s.charAt(i), 1));
+                continue;
+            }
+ 
+            // if character at top of stack is same as
+            // current character increase the number of
+            // repetitions in the top of stack by 1
+            if (st.peek().c == s.charAt(i)) {
+                Pair p = st.peek();
+                st.pop();
+                p.ctr += 1;
+                if (p.ctr == k) {
+                    continue;
+                }
+                else {
+                    st.push(p);
+                }
+            }
+            else {
+ 
+                // if character at top of stack is not
+                // same as current character push the
+                // character along with count 1 into the
+                // top of stack
+                st.push(new Pair(s.charAt(i), 1));
+            }
+        }
+ 
+        // iterate through the stack
+        // Use string(int,char) in order to replicate the
+        // character multiple times and convert into string
+        // then add in front of output string
+        String ans = "";
+        while (st.size() > 0) {
+            char c = st.peek().c;
+            int cnt = st.peek().ctr;
+            while (cnt-- > 0)
+                ans = c + ans;
+            st.pop();
+        }
+        return ans;
+    }
+---------------------------------------------------------->
+42) Number of turns to reach from one node to other in binary tree.
+-> Asked in (Amazon)
+
+Logic -> 
+a) we are firstly finding lca of both the nodes.
+b) if lca == first then we go for second node to count the turns.
+c) else if lca == second the search for first node and count the turns.
+d) if lca is not equal to any of these then we make 2 calls for both first and second.
+e) why 2 calls ? because we don't know that where is first and where is second.
+f) and for counting the turns we are maintaining a boolean called turn which will keep track of the previous turn.
+g) in this way we calculate the counts for both first and second, and at last we add one for the lca node turn.
+(this is for the case when lca is not equal to any of these)
+
+O(N)
+static int NumberOfTurns(Node root, int first, int second)
+    {
+        int[] count = new int[]{0};
+        
+        Node lca = LCA(root,first,second);
+        
+        if(lca==null)return -1;
+        
+        if(lca.data!=first && lca.data!=second){
+            countTurns(lca.left,first,true,count);
+            countTurns(lca.right,first,false,count);
+            
+            countTurns(lca.left,second,true,count);
+            countTurns(lca.right,second,false,count);
+            
+            return count[0]+1;
+        }
+        
+        if(lca.data==first){
+            countTurns(lca.left,second,true,count);
+            countTurns(lca.right,second,false,count);
+        }else{
+            countTurns(lca.left,first,true,count);
+            countTurns(lca.right,first,false,count);
+            
+        }
+        return count[0];
+    }
+    
+    public static boolean countTurns(Node node,int tar,boolean turn,int[]count){
+        if(node==null)return false;
+        
+        if(node.data==tar)return true;
+        
+        if(turn){
+            if(countTurns(node.left,tar,turn,count))return true;
+            if(countTurns(node.right,tar,!turn,count)){
+                count[0]++;
+                return true;
+            }
+        }else{
+            if(countTurns(node.right,tar,turn,count))return true;
+            if(countTurns(node.left,tar,!turn,count)){
+                count[0]++;
+                return true;
+            }
+        }
+        return false;
+    }
+---------------------------------------------------------->
+43) First Missing Positive (LC-41)
+-> Asked in (Amazon)
+
+O(N) S(1)
+
+ public int firstMissingPositive(int[] nums) {
+        int n = nums.length;
+        int i=0;
+        while(i<n){
+            if(nums[i]==i+1 || nums[i]<=0 || nums[i]>n){
+                i++;
+            }else if(nums[nums[i]-1]!=nums[i]){
+                swap(nums,nums[i]-1,i);  // this will check the duplicates
+            }else{
+                //when no swap is required.
+                i++;
+            }
+        }
+        i=0;
+        while(i<n && nums[i]==i+1)i++;
+        
+        return i+1;
+    }
+
+---------------------------------------------------------->
+
+---------------------------------------------------------->
+
+
+*) Must do at last day
+---------------------------------------------------------->
+#) Return the sum of all nodes whose Kth ancestor is even. (similar to Kth ancestor problem)
+https://leetcode.com/discuss/interview-question/1230148/amazon-online-onsite-sum-of-nodes-whose-kth-parent-is-even
+---------------------------------------------------------->
+#) Maximum Product in a binary tree (no adjacent nodes)
+---------------------------------------------------------->
+
+
+
+
+----------------------------------------------------------->
+Do these questions at last
+---------------------------------------------------------->
+#) Rotate each ring of matrix anticlockwise by K elements 
+-> https://www.geeksforgeeks.org/rotate-ring-matrix-anticlockwise-k-elements/
+---------------------------------------------------------->
+#) Count total set bits in all number from 1 to n
+-> https://www.geeksforgeeks.org/count-total-set-bits-in-all-numbers-from-1-to-n-set-2/
+---------------------------------------------------------->
+#)
+-> https://www.techiedelight.com/shortest-common-supersequence-finding-scs/
+-> https://www.techiedelight.com/shortest-common-supersequence-introduction-scs-length/
+---------------------------------------------------------->
+#) https://www.geeksforgeeks.org/find-pairs-b-array-b-k/
+---------------------------------------------------------->
+
+

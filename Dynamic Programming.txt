@@ -1,7 +1,5 @@
-1) sort and array using recursion
-2)Heavy weight knapsack
-
 Important Concetps
+
 1) Whenever there will be relation like dp[i-1], dp[i-2] there can always be space optimization like
 curr = accoding to question
 prev2=prev;
@@ -16,6 +14,15 @@ prev=curr;
 -> Partition Equal subset sum => make total sum then find subset having sum total/2
 -> Partition A set into two subsets with minimum Abs sum differece -> Q13) in Backtracking file
 => These all problems boils down to same. just by modifying the target.
+
+3) In Partition type Dp
+-> we see that we get different answers on different pattern pattern (like by different way, we get diff ans).
+-> Here we take whole block of array and solve for every possible partition and calculate ans accordingly.
+
+-> In top down suppose we call for solve(1,n-1)<=>solve(i,j)
+-> In bottom up since we write just opposite. but here is something to think about.
+-> for(int i=n-1;i>=1;i++) and for the jth loop it doesn't start 0 instead i or i+1
+-> for(int j=i+1;j<n;j++) because i can't be greater than j to get valid set of blocks of array.
 
 SOLUTIONS OF THESE QUESTIONS ARE EITHER ON GFG OR ON LEETCODE.
 ---------------------------------------DYNAMIC PROGRAMMING-----------------------------------------
@@ -495,7 +502,7 @@ https://www.pepcoding.com/resources/online-java-foundation/dynamic-programming-a
 	}
 ------------------------------------------------------------------------------------------------
 14. Binomial Coefficient Problem (nCr)
-Formula Used->   C(n, r) = C(n-1, r-1) + C(n-1, r)
+Formula Used->   C(n, r) = C(n-1, r) + C(n-1, r-1) 
  C(n, 0) = C(n, n) = 1
  public static int nCr(int n, int r) {
 		int C[][] = new int[n + 2][r + 2];
@@ -515,7 +522,7 @@ Formula Used->   C(n, r) = C(n-1, r-1) + C(n-1, r)
 
 ------------------------------------------------------------------------------------------------
 15. Permutation Coefficient Problem (nPr)
-Formula Used->P(n, k) = P(n-1, k) + k* P(n-1, k-1)
+Formula Used->P(n, r) = P(n-1, r) + r*P(n-1, r-1)
 P(n,0)=1;
 
 static int permutationCoeff(int n,
@@ -1103,7 +1110,51 @@ lps=lps(mid)+2  //extra 2 for ending characters
     } 
 ------------------------------------------------------------------------------------------------
 27.  Longest Palindromic Substring
-->Use Count palidromic substring code, and just take a max variable, when you encounter with true value just check the length of string.
+->
+M1) Use Count palidromic substring code, and just take a max variable, when you encounter with true value just check the length of string.
+
+M2) Use axis and orbit method.
+
+M3) 
+
+public String longestPalindrome(String s) {
+        int start = 0;
+        int end = 0;
+        for (int i = 0; i < s.length(); i++) {
+            //StringBuffer sb = new StringBuffer();
+            //sb.append(s.charAt[i]);
+            char c = s.charAt(i);
+            int left = i;
+            int right = i;
+
+            while (left >= 0 && s.charAt(left) == c) {
+                left--;
+            }
+
+            while (right < s.length() && s.charAt(right) == c) {
+                right++;
+            }
+
+            while (left >= 0 && right < s.length()) {
+                if (s.charAt(left) != s.charAt(right)) {
+                    break;
+                }
+                left--;
+                right++;
+            }
+
+
+           // left + 1 and right - 1 are actually the start and end index of the Palindromic string
+            // we don't set "right" because String.substring function required end index exclusively
+            left = left + 1;
+            if (end - start < right - left) {
+                start = left;
+                end = right;
+            }
+        }
+
+        return s.substring(start, end);
+    }
 ------------------------------------------------------------------------------------------------
 28. Longest Alternating Subsequence
  public int AlternatingaMaxLength(int[] arr)
@@ -1261,7 +1312,80 @@ M1)
         return dp[k][n];
     }
 M2) Binary Search->
-		
+Time Complexity: O((n * k) * logn )
+Space Complexity: O(n * k)
+
+ public int superEggDrop(int k, int n) {
+        int[][]dp=new int[k+1][n+1];
+        
+        for(int[]arr:dp){
+            Arrays.fill(arr,-1);
+        }
+        
+        return eggdrop(k,n,dp);
+    }
+    public int eggdrop(int eggs,int floors,int[][]dp){
+        if(eggs==1||floors==1){
+            return floors;
+        }
+        
+        if(floors<=0){
+            return 0;
+        }
+        if(dp[eggs][floors]>0)return dp[eggs][floors];
+        
+        int min=100000;
+        int l=1;
+        int h=floors;
+        
+        while(l<=h){
+            int mid = (l+h)/2;
+            int left = eggdrop(eggs-1,mid-1,dp);
+            int right = eggdrop(eggs,floors-mid,dp);
+            int temp = 1 + Math.max(left,right);
+            if(left<right){  // since right is more than left and we need more in worst case 
+                l = mid+1;   // so l=mid+1 to gain more temp for worst case : upward
+            }else{
+                h = mid-1;
+            }
+            min = Math.min(min,temp);
+        }
+        return dp[eggs][floors]=min;
+    }
+M3) Different approach
+-> https://leetcode.com/problems/super-egg-drop/discuss/158974/C%2B%2BJavaPython-2D-and-1D-DP-O(KlogN)
+
+# Below explanation is given by
+->https://leetcode.com/Sandermatt/
+
+-> He has turned the problem around from
+"How many moves do you need to check N floors if you have K eggs"
+to:
+"How many floors can you check given M moves available and K eggs".
+
+If you can solve this second problem than you can just increase the moves M one by one until you are able to check a number of floors larger or equal to the number N which the problem requires.
+He then defined
+dp[M][K] as the maximum number of floors that you can check within M moves given K eggs
+
+A move essentially is dropping an egg and it either breaks or doesn't break.
+Case A: The egg breaks and now you have spent 1 move (M=M-1) and also lost 1 egg (K=K-1). You can still check dp[M-1][K-1] floors, with your remaining eggs and moves.
+Case B: The egg remains and you only loose one move (M=M-1). You can still check dp[M-1][K] floors.
+Additionally you just checked a floor by dropping the egg from it.
+Therefore dp[M][K] = dp[M - 1][k - 1] + dp[M - 1][K] + 1
+As you can see we can easily calculate how many floors we can check in M moves if we know how many floors we can check in M-1 moves.
+
+However we not only have to know how many floors we can can check with one move less, but also how many we can check with one move and one egg less. Therefore we have to calculate how many moves we can check for all number off eggs from 1 to K.
+
+public int superEggDrop(int K, int N) {
+       int[][] dp = new int[N + 1][K + 1];
+        int m = 0;
+        while (dp[m][K] < N) {
+            ++m;
+            for (int k = 1; k <= K; ++k)
+                dp[m][k] = dp[m - 1][k - 1] + dp[m - 1][k] + 1;
+        }
+        return m;
+    }		
 ------------------------------------------------------------------------------------------------
 33. Optimal Strategy for a game
  public static long OptimalStrategyForAGame(int[]arr,int n){
@@ -1314,7 +1438,7 @@ instead of Kadane's algo
 35. Maximum sum rectangle in a 2D matrix
 ->
  public static int MaximumSumRectangle(int[][] mat, int row, int col) {
-		int msr = Integer.MIN_VALUE;
+	    int msr = Integer.MIN_VALUE;
 	    int[] helper = new int[col];
 		for (int s = 0; s < row; s++) {
 		    Arrays.fill(helper,0);
@@ -2269,10 +2393,9 @@ public static int harrypottercolormixturesTD(int[] arr, int si, int ei, int[][] 
 		return strg[arr.length - 1];
 
 	}
-
+-> Can also be done using subsequence type problem (take/notTake)
 ------------------------------------------------------------------------------------------------
-62. Maximum Sum Non Adjacent elements
--> https://www.youtube.com/watch?v=VT4bZV24QNo
+62. Jump Game All types (in leetcode)
 ------------------------------------------------------------------------------------------------
 63. Word Wrap
 ------------------------------------------------------------------------------------------------

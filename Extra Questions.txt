@@ -313,6 +313,32 @@ Binary Subarrays with Sum (Leetcode 930)
 
 -------------------------------------------------------------------------------------
 10. Minimum Size Subarray Sum (Leetcode 209)
+
+ public int minSubArrayLen(int x, int[] arr) {
+          // Initialize current sum and minimum length
+        int curr_sum = 0;
+        int n = arr.length;
+        int ans = n + 1;
+        // Initialize starting and ending indexes
+        int start = 0, end = 0;
+        boolean fl = false;
+        while (end < n) {
+            // Keep adding array elements while current sum
+            // is smaller than or equal to x
+            while (curr_sum < x && end < n)
+                curr_sum += arr[end++];
+            // If current sum becomes greater than x.
+            while (curr_sum >= x && start < n) {
+                fl=true;
+                // Update minimum length if needed
+                ans=Math.min(ans,end-start);
+                // remove starting elements
+                curr_sum -= arr[start++];
+            }
+        }
+        if(!fl)return 0;
+        return ans;
+    }
 -------------------------------------------------------------------------------------
 11. Predict the winner
 -------------------------------------------------------------------------------------
@@ -368,9 +394,12 @@ Binary Subarrays with Sum (Leetcode 930)
 	
 -------------------------------------------------------------------------------------
 20. Longest path in an undirected tree.
--> Apply 2 Bfs two times 
-1. choose any node apply bfs to find the longest distance let this node be y.
-2. Now from y apply bfs to find the longest path. which is the diamter of the tree.
+-> Apply 2 DFS/BFS two times 
+1. choose any node apply dfs/bfs to find the longest distance let this node be y, but return it with pair (node,distance)
+-> you will do this by putting pair(node,dis) in queue, take distance array and find distance of all. return the longest distance with node.
+2. Now from y apply dfs/bfs to find the longest path. which is the diamter of the tree.
+-> Send src node as the result of first dfs/bfs and apply same just like the first one. 
+-> this returned node is the farthest and its distance is the longest.(basically diameter) 
 -------------------------------------------------------------------------------------
 21. Maximum Binary Tree (Leetcode-654)
 -------------------------------------------------------------------------------------
@@ -484,6 +513,8 @@ private int robSub(TreeNode root, Map<TreeNode, Integer> map) {
 }
 
 -> More optimised
+O(n) 
+
 public int rob(TreeNode root) {
     int[] res = robSub(root);
     return Math.max(res[0], res[1]);
@@ -719,7 +750,7 @@ public TreeNode[] splitBST(TreeNode root, int V) {
             TreeNode[] nodes = splitBST(root.right, V);
             TreeNode left = nodes[0];
             TreeNode right = nodes[1];
-            root.right=left;
+            root.right=left;      //since we have gone to root right having values more than root.val either we get left array having values smaller than equal to v or right having greater than V but overall all nodes have values greater than curr node that's why we did this.
             return new TreeNode[]{root, right};
         }
     }
@@ -773,7 +804,7 @@ O(N)
   // O(logn) <- for query S(nlogn)
     
    
-  int[][] jump;
+    int[][] jump;
     int maxPow;
 
     public TreeAncestor(int n, int[] parent) {
@@ -800,6 +831,11 @@ O(N)
         }
         return node;
     }
+Similar problem -> 
+
+#) Return the sum of all nodes whose Kth ancestor is even.
+
+
 -------------------------------------------------------------------------------------
 36. A tree is considered special if the sums of all the nodes at each level are in an Arithmetic Progression (AP).
 Given the root note of a binary tree. Return an array representing the minimum number that can be added at each level to make that tree special.
@@ -1303,15 +1339,181 @@ public int minSetSize(int[] arr) {
 	return arr.length;
 }
 -------------------------------------------------------------------------------------
-49.
--------------------------------------------------------------------------------------
-50.
--------------------------------------------------------------------------------------
-51.
--------------------------------------------------------------------------------------
+49. Remove K Digits (Leetcode 402)
+->
+public String removeKdigits(String num, int k) {
+    Deque<Integer> st = new LinkedList<>();
 
+		for (int i = 0; i < num.length(); i++) {
+			int val = num.charAt(i) - '0';
+			while (!st.isEmpty() && st.peekLast() > val && k > 0) {
+				st.pollLast();
+				k--;
+			}
+			st.addLast(val);
+		}
+        while(!st.isEmpty() && k>0){
+            st.pollLast();
+            k--;
+        }
+        
+		StringBuilder sb = new StringBuilder();
+		while (!st.isEmpty()) {
+			int val = st.pollFirst();
+			if (val == 0 && sb.length() == 0)
+				continue;
+			sb.append(val);
+		}
+        if(sb.length()==0)return "0";
+		return sb.toString();
+    }
 -------------------------------------------------------------------------------------
+50. Minimize Deviation in Array
 
+-> Time Complexity :- BigO(NlogNlogM) where N is the highest value in the array
+-> Space Complexity :- BigO(N)
+
+public int minimumDeviation(int[] nums) {
+        // First create a priority Queue
+        // and implemented a custom comperator, which help us in making this priority queue act like a max heap
+        // concept of max heap states that, highest value should lie at the front of the queue & lowest value at the back of the queue
+        PriorityQueue<Integer> pq=new PriorityQueue<>((a,b)->b-a); // so we apply the custom comperator over here
+        
+        int min=Integer.MAX_VALUE; // creating minimum variable
+        for(int i:nums){ // add these values in priority queue
+            if(i%2==1) i*=2; // if value is odd mult. by 2 & make it even
+            min=Math.min(min,i); // find the minimum
+            pq.add(i);
+        } // now we have the value in the priority queue, where we have convert all the odd's into even
+        
+        // let's find the maximum of all the value
+        int diff=Integer.MAX_VALUE; 
+
+        while(pq.peek()%2==0){ 
+            int max=pq.remove(); // max will be at top of the queue
+            diff=Math.min(diff,max-min); // find the difference
+            min=Math.min(max/2,min);//minimum can change because, new value we are getting by half max can be lower then current minimum
+            pq.add(max/2); // add that in the queue
+        }
+        
+        return Math.min(diff,pq.peek()-min);
+    }
+-------------------------------------------------------------------------------------
+51. Generate Parenthesis (LC-22)
+->
+ public void generateParenthesis(List<String>ans,String str,int open,int close,int n){
+        
+        if(open>n || close>open)return;
+        
+        if(open==close){
+            if(open==n){
+                ans.add(str);
+                return;    
+            }
+        }
+            
+        generateParenthesis(ans,str+"(",open+1,close,n);
+        generateParenthesis(ans,str+")",open,close+1,n);
+    }
+-------------------------------------------------------------------------------------
+52. Shortest Path visting all nodes (LC-847)
+
+-> In this problem we have to find the length of shortest path that visits evey node.
+(you may revisit nodes multiple times, you may reuse edges).
+
+-> 3 points to cover
+1) We can't use normal BFS here. (because it doesn't visit visited nodes)
+2) We don't want to get stuck in cycle.
+3) We have to start with each node in order to check which yields to shortest path.
+
+-> So here basically we are storing a pair of (node, its bit) in the Queue to traverse (BFS)
+-> Here bit refers the path the current node has visited.
+-> So initially we are storing evey node acc to point 3 above.
+-> Since at starting it only visits the current path so only curr bit will be set.
+-> We are taking a Set of String in order to track of the visited path by a node (not a visited node we are focusing, instead we are more focused on visited path here acc to problem).
+-> If visited path (node-bit_Path) then continue else visit it and put in queue to traverse.
+-> In order to know that have we visited all the nodes, will be checked using the mask suppose there are 3 nodes so, at any point if we get a path. "111" which is 7 that means we have visited all nodes.
+
+
+public int shortestPathLength(int[][] graph) {
+        int n = graph.length;
+        int mask = (1<<n)-1; //represents path covering each node.
+        
+        Queue<int[]>q = new LinkedList<>();
+        Set<String>visPath = new HashSet<>();
+        
+        for(int i=0;i<n;i++){
+            q.offer(new int[]{i,1<<i});  //node-curr_bit. eg if n = 1 , bit = 010 (0 based indexing)
+            visPath.add(i+":"+(1<<i));
+        }
+        
+        int count = 0;
+        while(!q.isEmpty()){
+            int size = q.size();
+            for(int i=0;i<size;i++){
+                int[]rnode = q.poll();
+                if(rnode[1]==mask)return count;  //at any time we get the path which covers all nodes.
+                
+                for(int node:graph[rnode[0]]){
+                    int next = rnode[1] | (1<<node);
+                    if(visPath.contains(node+":"+next))continue;
+                    visPath.add(node+":"+next);
+                    q.offer(new int[]{node,next});
+                }
+            }
+            count++;
+        }
+        return count;
+    }
+-------------------------------------------------------------------------------------
+53. Swim in Rising Water (LC-778)
+-> DFS + Binary Search (can be solved using dikstra + BFS/DFS also)
+
+-> O(n*n*logn)
+   
+public int swimInWater(int[][] grid) {
+        if (grid == null || grid.length == 0) {
+            return 0;
+        }
+        int n = grid.length;
+        int start = grid[0][0];
+        int end = n * n - 1;
+        int[] dx = {0,0,-1,1};
+        int[] dy = {-1,1,0,0};
+        
+       int ans=0;
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+            int[][] visited = new int[n][n];
+            if (possible(grid, mid, 0, 0, dx, dy, visited)) {
+                ans = mid;
+                end = mid-1;
+            } else {
+                start = mid + 1;
+            }
+        }
+        return ans;
+    }
+    private boolean possible(int[][] grid, int cur, int x, int y, int[] dx, int[] dy, int[][] visited) {
+        visited[x][y] = 1;
+        for (int i = 0; i < 4; i++) {
+            int newX = x + dx[i];
+            int newY = y + dy[i];
+            if (newX >= 0 && newY >= 0 && newX < grid.length && newY < grid[0].length && visited[newX][newY] == 0 && cur >= grid[newX][newY]) {
+                if (newX == grid.length - 1 && newY == grid[0].length - 1) {
+                    return true;
+                }
+                if (possible(grid, cur, newX, newY, dx, dy, visited)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+Similar Problem -> Path with Minimum Effort (LC-1631)
+-> Exact same approach but the difference is just 
+instead of (cur>=grid[newX][newY]) -> here we will use (cur>=Math.abs(grid[newX][newY]-grid[x][y]);
 -------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------

@@ -1087,6 +1087,9 @@ public int[][] floodFill(int[][] image, int sr, int sc, int newColor) {
         fill(image, sr, sc + 1, color, newColor);
         fill(image, sr, sc - 1, color, newColor);
     }
+##) Similar problem
+-> Replace O's with X's
+-> Just apply this algo at each boundry top bottom left right. with newColor as 'X' and old as 'O'.
 --------------------------------------------------------------------------------------
 17. M-Coloring Problem -O(M^N)
 Intuition-> Color every node with each color 
@@ -1705,15 +1708,16 @@ public int findCheapestPrice(int n, int[][] flights, int src, int dst, int K) {
     while (!pQueue.isEmpty()) {
     	City top = pQueue.poll();
 
+	if (top.city == dst) {
+    		return top.costFromSrc;  
+    	}
+
 //Just checking whether the we visited it before and the number of stops that we covered before was low than the current route, then following the current route is not a good idea, so we skip it
         if(seen.containsKey(top.city) && seen.get(top.city)<=top.distFromSrc) 
 		continue; 					
             
         seen.put(top.city, top.distFromSrc);
         
-    	if (top.city == dst) {
-    		return top.costFromSrc;  
-    	}
 
     	if (top.distFromSrc > K) {  //because here we can say that we exceeded value ok k, since at above condition we have max value of stops == k which is not giving the destination
 
@@ -1790,6 +1794,7 @@ static int timer = 1;
 			}
 		}
 	}
+--------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 # Ford-Fulkerson Algorithm for Maximum Flow Problem
 	

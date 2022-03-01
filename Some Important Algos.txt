@@ -2,7 +2,8 @@
 2. bubble,insertion,selection sorting.
 3. Merge Sort
 4. Quick Sort
-5. Kmp ALgo, Rabin karp Algo
+5. Count Sort, Radix Sort
+6. Kmp ALgo, Rabin karp Algo
 
 #. All Graph Algos like(Bfs, Dfs, Cycle Detection in )
 -------------------------------------------------------------------------------------

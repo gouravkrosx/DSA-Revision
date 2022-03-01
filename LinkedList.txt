@@ -197,7 +197,8 @@ public static boolean detectLoop(Node head){
             count++;
             curr=curr.next;
         }  
-        
+To not reverse last nodes if rem node are less than k
+-------------------------------->
         while(count>=k){
             curr=pre.next;
             next=curr.next;
@@ -211,9 +212,118 @@ public static boolean detectLoop(Node head){
             count-=k;
                 
         }
+To Reverse the last nodes even if rem nodes are less than k
+-------------------------------->
+ while(count>=k){
+            if(count>=0){  // change it to k to covert it for upper task
+            curr=pre.next;
+            next=curr.next;
+            for(int i=1;i<=k-1 && curr.next!=null;i++){ //as we want to change k-1 links
+                curr.next=next.next;
+                next.next=pre.next;
+                pre.next=next;
+                next=curr.next;               
+            }
+            pre=curr;              
+            count-=k; 
+            continue;    
+          }
+            k = count;   
+            curr=pre.next;
+            next=curr.next;
+            for(int i=1;i<=k-1 && curr.next!=null;i++){ //as we want to change k-1 links
+                curr.next=next.next;
+                next.next=pre.next;
+                pre.next=next;
+                next=curr.next;               
+            }
+            pre=curr; 
+            break;                    
+        }    
+-------------------------------->
         return dummy.next;  
     }
 
+### Reverse K alternate nodes
+-> https://www.techiedelight.com/reverse-alternate-group-k-nodes-linked-list/
+
+public static Node reverse(NodeWrapper curr, int k)
+    {
+        // maintain a `prev` pointer
+        Node prev = null;
+ 
+        // traverse the list and reverse first `k` nodes
+        while (curr.node != null && k-- > 0)
+        {
+            // tricky: note the next node
+            Node next = curr.node.next;
+ 
+            // fix the `curr` node
+            curr.node.next = prev;
+ 
+            // advance the two pointers
+            prev = curr.node;
+            curr.node = next;
+        }
+ 
+        // return node at the front
+        return prev;
+    }
+ 
+    // Function to skip `k` nodes in a given linked list. Note that the
+    // linked list is passed by reference using `NodeWrapper` class.
+    public static Node skipKNodes(NodeWrapper curr, int k)
+    {
+        Node prev = null;
+ 
+        while (curr.node != null && k-- > 0)
+        {
+            prev = curr.node;
+            curr.node = curr.node.next;
+        }
+ 
+        return prev;
+    }
+ 
+    // Recursive function to reverse every alternate group of `k` nodes
+    // in a linked list
+    public static Node reverseAlternatingKNodes(Node head, int k)
+    {
+        Node prev = null;
+ 
+        // Wrap current node, so its reference can be changed inside the
+        // `reverse()` and `skipKNodes()` method
+        NodeWrapper curr = new NodeWrapper(head);
+ 
+        // traverse the whole list
+        while (curr.node != null)
+        {
+            // curr would be the last node in the reversed sublist
+            Node lastNode = curr.node;
+ 
+            // reverse next `k` nodes and get their head
+            Node frontNode = reverse(curr, k);
+ 
+            // update head pointer after first `reverse()` call
+            if (prev == null) {
+                head = frontNode;
+            }
+            // for subsequent calls to `reverse()`, link the reversed sublist
+            // with the rest of the list
+            else {
+                prev.next = frontNode;
+            }
+ 
+            // link the last node with the current node
+            lastNode.next = curr.node;
+ 
+            // skip next `k` nodes
+            prev = skipKNodes(curr, k);
+        }
+ 
+        // return head node
+        return head;
+    }
 --------------------------------------------------------------------------------------------------------
 7. Delete nodes having greater value on right
 Node DeleteNodeRightLarger(Node head){
@@ -936,9 +1046,83 @@ static int countTriplets(Node head, int x) {
 		NthNode.next = null;
 	}
 --------------------------------------------------------------------------------------------------------
-28.
+28. Swapping Nodes in LinkedList
+
+M1) Separate even list and odd list and join them alternatively <- 2 traversals
+
+M2) One Traversals using 3 pointers
+
+public ListNode swapPairs(ListNode head) {
+    ListNode dummy = new ListNode(0);
+    dummy.next = head;
+    ListNode point = dummy;
+    while (point.next != null && point.next.next != null) { 
+        ListNode swap1 = point.next;
+        ListNode swap2 = point.next.next;
+        point.next = swap2;
+        swap1.next = swap2.next;
+        swap2.next = swap1;
+        point = swap1;
+    }
+    return dummy.next;
+}
+
+M3) Using Recursion
+ public ListNode swapPairs(ListNode head) {
+        if ((head == null)||(head.next == null))
+            return head;
+        ListNode n = head.next;
+        head.next = swapPairs(head.next.next);
+        n.next = head;
+        return n;
+    } 
 -----------------------------------------------------------------------------------------------------
-29.
+29. Swapping Nodes in a Linked List
+
+-> Just find out the (prev-curr-next) of first-k and last-k node.
+-> There will be 3 cases of swapping 
+a) General case both are far away from each other.
+b) first and second crossed each other.
+c) Both are adjacent nodes.
+
+ public ListNode swapNodes(ListNode head, int k) {
+        ListNode dummy = new ListNode(-1);
+        dummy.next = head;
+
+        ListNode firstPrev = dummy;
+        for (int i = 0; i < k - 1; i++) {
+            firstPrev = firstPrev.next;
+        }
+
+        ListNode secondPrev = dummy;
+        ListNode advanced = firstPrev.next.next;
+        while (advanced != null) {
+            secondPrev = secondPrev.next;
+            advanced = advanced.next;
+        }
+
+        ListNode first = firstPrev.next;
+        ListNode second = secondPrev.next;
+        ListNode firstNodeAfter = first.next;
+        ListNode secondNodeAfter = second.next;
+        
+        if (second.next == first) {  //case when second node crossed first like eg: [5,2] and k = 2;
+            secondPrev.next = first;
+            first.next = second;
+            second.next = firstNodeAfter;
+        } else if (secondPrev == first) {  //in case of adjacent nodes.
+            firstPrev.next = second;
+            second.next = first;
+            first.next = secondNodeAfter;
+        } else {            // general case
+            firstPrev.next = second;
+            second.next = firstNodeAfter;
+            secondPrev.next = first;
+            first.next = secondNodeAfter;
+        }
+
+        return dummy.next;
+    }
 --------------------------------------------------------------------------------------------------------
 # Can we reverse a linked list in less than O(n)?
 ->https://www.geeksforgeeks.org/can-we-reverse-a-linked-list-in-less-than-on/

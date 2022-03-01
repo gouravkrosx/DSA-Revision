@@ -64,6 +64,25 @@ T(N)
         } 
         return false;
     }
+-> O(Log(m*n))
+    public boolean solve(int[][]matrix,int cr,int cc,int er,int ec,int target){
+        if(cr>er || cc>ec || cc>matrix[0].length || cr>matrix.length || er<0 || ec<0 ){
+            return false;
+        }
+        
+        int mr = (cr+er)/2;
+        int mc = (cc+ec)/2;
+        
+        if(matrix[mr][mc]==target)return true;
+        
+        if(matrix[mr][mc]<target){
+            return solve(matrix,mr+1,cc,er,ec,target) || solve(matrix,cr,mc+1,er,ec,target);
+        }else if(matrix[mr][mc]>target){
+            return solve(matrix,cr,cc,mr-1,ec,target) || solve(matrix,cr,cc,er,mc-1,target); 
+        }else{
+            return false;
+        }   
+     }
 -----------------------------------------------------------------------------------
 2b. Search element in a sorted matrix->(The first integer of each row is greater than the last integer of the previous row.)
 T(log n + log m)
@@ -258,5 +277,55 @@ Intuition-> we just break every row as a single array, simply dry run for easy e
         return low; 
     }
 -----------------------------------------------------------------------------------
-10.
+10. Set Matrix-zeros 
+-> if an element is zero, set its entire row and col=0
+
+ public void setZeroes(int[][] matrix) {
+        
+// Using the first row and column as a memory to keep track of all the 0's in the entire matrix.
+//S(1)
+        boolean fr = false;
+        boolean fc = false;
+        
+        int n=matrix.length,m=matrix[0].length;
+        for(int i=0;i<n;i++){
+            for(int j=0;j<m;j++){
+                if(matrix[i][j]==0){
+                    if(i==0)fr=true;
+                    if(j==0)fc=true;
+                    matrix[i][0]=0;
+                    matrix[0][j]=0;
+                }
+            }
+        }
+        
+        for(int i=1;i<n;i++){
+            for(int j=1;j<m;j++){
+                if(matrix[i][0]==0 || matrix[0][j]==0){
+                    matrix[i][j]=0;
+                }
+            }
+        }
+//if first row or col is true means there is atleast one element which is zero in row or col.
+// which leads to zeros in entire row or col.
+
+        if(fr){  
+            for(int j=0;j<m;j++){
+                matrix[0][j]=0;
+            }    
+        }
+        
+        if(fc){
+            for(int i=0;i<n;i++){
+                matrix[i][0]=0;
+            }
+        }
+    }
+------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------
 

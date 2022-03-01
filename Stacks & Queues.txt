@@ -239,6 +239,44 @@ static void deleteMid(Stack<Character> st,int n, int curr)
 #Items to push 8 10 6 3 7
 stack->[8 10 6 3 7]     if we get smaller element than minimum element then push it in helper stack else copy(push) the previous min.
 helper->[8 8 6 3 3]
+
+#) If you don't want to use another stack and want to made custom stack
+->
+
+class MinStack {
+	private Node head;
+        
+    public void push(int x) {
+        if (head == null) 
+            head = new Node(x, x, null);
+        else 
+            head = new Node(x, Math.min(x, head.min), head);  //in this way new head will be at top and the prev 
+    }							      // will be below it that's why new head's next is 	
+    							     // prev head.
+    public void pop() {
+        head = head.next;
+    }
+    
+    public int top() {
+        return head.val;
+    }
+    
+    public int getMin() {
+        return head.min;
+    }
+        
+    private class Node {
+        int val;
+        int min;
+        Node next;
+            
+        private Node(int val, int min, Node next) {
+            this.val = val;
+            this.min = min;
+            this.next = next;
+        }
+    }
+}
 ---------------------------------------------------------------------------------------------------
 12. Stack using queue & Queue using stack (both push and pop efficient) using 2(stacks/Queues) in both
 ->see CodingBlocksCodesRevision package in eclipse
@@ -974,7 +1012,7 @@ public int get(int key) {
 	}
 
 	dq.moveToFront(node);
-	return hashmap.get(key).value; // try changes
+	return hashmap.get(key).value; // or node.val
 
 }
 
