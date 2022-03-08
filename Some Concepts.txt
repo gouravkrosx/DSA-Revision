@@ -26,3 +26,6 @@ b) Non uniform Distribution
 -> If again collision happens then the same key will have multiple values in the form linkedList
 -> But make sure the size of linkedlist should be min as it does not exceed loading factor of hashtables.
 -> If it exceeds then there will be rehashing by double the size of hashtable.
+
+3. Shortcut
+-> to convert list into array => res.stream().mapToInt(i->i).toArray();

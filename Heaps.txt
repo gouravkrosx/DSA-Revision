@@ -569,7 +569,7 @@ long minCost(long arr[], int n)
             if(lo.size()+hi.size()==k){
                 res[right]=(lo.size()==hi.size())?nums[lo.last()]/2.0+nums[hi.first()]/2.0:nums[lo.last()]/1.0;
                 
-                if(!lo.remove(right))hi.remove(right);
+                if(!lo.remove(right))hi.remove(right); //checking window
                 right++;
             }
             left++;

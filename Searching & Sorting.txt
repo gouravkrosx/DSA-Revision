@@ -26,7 +26,7 @@ public static long FirstOcc(long[]arr,int x){
  
 public int search(int[] arr, int target) {
         
-                                     int l = 0;
+	    int l = 0;
 		int r = arr.length - 1;
 		while (l <= r) {
 			int mid = (l + r) / 2;
@@ -508,6 +508,54 @@ public static void PivotElementInRotatedAndSortedArray() {
 		}
 	}
 
+#) Min in Rotated & Sorted Arrays (unique elements)(LC-153)
+ public int findMin(int[] arr) {
+        
+        if(arr.length==1)return arr[0];
+        
+        if(arr.length==2)return Math.min(arr[0],arr[1]);
+        
+        int s = 0;
+		int e = arr.length - 1;
+		while (s < e) {
+			int mid = (s + e) / 2;
+            
+			if (mid > s && arr[mid] < arr[mid - 1]) {
+				return arr[mid];
+			}
+
+			if (mid < e && arr[mid] > arr[mid + 1]) {
+				return arr[mid+1];
+			}
+
+			if (arr[mid] > arr[s] && arr[mid]>arr[e]) {
+				s = mid + 1;
+			} else {
+				e = mid-1;
+			}
+		}
+        return arr[s];
+    }
+#) Min in Rotated & Sorted Arrays (having duplicates)(LC-154)
+
+ public int findMin(int[] arr) {
+        if(arr.length==1)return arr[0];
+         
+        int s = 0;
+		int e = arr.length - 1;
+		while (s <= e) {
+			int mid = (s + e) / 2;
+            
+			if(arr[mid]<arr[e]){
+                e=mid;
+            }else if(arr[mid]>arr[e]){
+                s=mid+1;
+            }else{
+                e--;
+            }
+		}
+        return arr[s];
+    }
 ------------------------------------------------------------------------------------------------------
 17. Aggresive cows ->Binary search
 public static void AggresiveCows() {

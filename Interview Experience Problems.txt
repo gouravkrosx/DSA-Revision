@@ -113,7 +113,7 @@ int max_sum(int arr[], int n)
 5. Distribute n candies among k people
 -> Asked in (Amazon)
 
-M1) O(N)
+M1) O(sqrt(candies) + n)
 public int[] distributeCandies(int candies, int num) {
         int[]res = new int[num];
         
@@ -697,7 +697,7 @@ static String decodedString(String s){
 -> https://www.geeksforgeeks.org/decode-a-string-recursively-encoded-as-count-followed-by-substring-set-2-using-recursion/?ref=rp
 ---------------------------------------------------------->
 21. Longest ZigZag Path in a Binary Tree (LC-1372)
--> Asked in (Amazon0
+-> Asked in (Amazon)
 
 -> Both solutions has O(N) T.C
 M1) 

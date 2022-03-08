@@ -344,6 +344,7 @@ Binary Subarrays with Sum (Leetcode 930)
 -------------------------------------------------------------------------------------
 12. Frog Jump (LeetCode 403)
 
+-> Array is sorted here in stricly increasing order
  public boolean canCross(int[] stones) {
         
         int n = stones.length;
@@ -380,9 +381,28 @@ Binary Subarrays with Sum (Leetcode 930)
 -------------------------------------------------------------------------------------
 13. Longest Arithmetic Subsequence of Given Difference (Leetcode 1218)
 -------------------------------------------------------------------------------------
-14. Longest Consecutive Sequence (Leetcode 28)
+14. All Paths From Source to Target (Leetcode 797)
+
+-> list.add(0); then call below function
+ public void dfs(List<List<Integer>>adj,int node,int n,boolean[]vis,List<Integer>list,List<List<Integer>>ans){
+        if(node==n-1){
+            ans.add(new ArrayList<>(list));
+            return;
+        }
+        
+        for(int an:adj.get(node)){
+            if(!vis[an]){
+                list.add(an);
+                vis[an]=true;
+                dfs(adj,an,n,vis,list,ans);
+                 vis[an]=false;
+                list.remove(list.size()-1);
+            }
+        }
+    }
 -------------------------------------------------------------------------------------
-15. All Paths From Source to Target (Leetcode 797)
+15. Maximum Binary Tree (Leetcode-654)
+
 -------------------------------------------------------------------------------------
 16. Path In Zigzag Labelled Binary Tree (Leetcode 1104.)
 -------------------------------------------------------------------------------------
@@ -401,7 +421,57 @@ Binary Subarrays with Sum (Leetcode 930)
 -> Send src node as the result of first dfs/bfs and apply same just like the first one. 
 -> this returned node is the farthest and its distance is the longest.(basically diameter) 
 -------------------------------------------------------------------------------------
-21. Maximum Binary Tree (Leetcode-654)
+21. Number of Ways to arrive at destination ()
+
+-> Dijkstra + Dp
+ public int countPaths(int n, int[][] roads) {
+        
+        List<List<City>>adj = new ArrayList<>();
+        
+        for(int i=0;i<n;i++){
+            adj.add(new ArrayList<>());
+        }
+        
+        for(int i=0;i<roads.length;i++){
+            int u = roads[i][0];
+            int v = roads[i][1];
+            int t = roads[i][2];
+            adj.get(u).add(new City(v,t));
+            adj.get(v).add(new City(u,t));
+        }
+        
+        int[]ways = new int[n];
+        int[]dis = new int[n];
+
+        Arrays.fill(dis,Integer.MAX_VALUE);
+        ways[0]= 1;
+        dis[0] = 0;
+        
+        PriorityQueue<City>pq = new PriorityQueue<>((a,b)->(a.time-b.time));
+        
+        pq.add(new City(0,0));//src, dis
+        
+        while(!pq.isEmpty()){
+            City rc = pq.poll();
+            
+            if(rc.time>dis[rc.city])continue;  // skip because we already got our low distance in prev iteration
+            
+            for(City ac:adj.get(rc.city)){
+                if(dis[rc.city]+ac.time<dis[ac.city]){
+                    
+                    dis[ac.city] = dis[rc.city]+ac.time;
+                    ways[ac.city] = ways[rc.city];
+                    pq.add(new City(ac.city,dis[ac.city]));
+                    
+                }else if(dis[rc.city]+ac.time==dis[ac.city]){  // if distance remains same means, we got another path hence adding.
+                    ways[ac.city] = (ways[ac.city]+ways[rc.city])%m;
+                }
+            }
+            
+        }
+        
+        return ways[n-1];
+    }
 -------------------------------------------------------------------------------------
 22. Cycle sort
 -------------------------------------------------------------------------------------
@@ -483,6 +553,9 @@ public int cherryPickup(int[][] grid) {
 			comb.remove(comb.size()-1);
 		}
 	}
+ 
+ -> Or can use pick/notPick strategy.
+
 -------------------------------------------------------------------------------------
 27. House Robber 3 -> https://leetcode.com/problems/house-robber-iii/discuss/79330/Step-by-step-tackling-of-the-problem
 
@@ -1306,6 +1379,29 @@ M3) Binary Search <- little bit complex
 M1) Use priorityQueue and map, and remove all the occurence of the most freq and then pop from priorityQueue and do this for all until the count becomes greater than equal to array size/2.
 the elements we be added int the set or we can maintain another count.
 
+ public int minSetSize(int[] arr) {
+        HashMap<Integer,Integer>map = new HashMap<>();
+        
+        for(int i=0;i<arr.length;i++){
+            map.put(arr[i],map.getOrDefault(arr[i],0)+1);
+        }
+        
+        PriorityQueue<Integer>hp = new PriorityQueue<>((a,b)->map.get(b)-map.get(a));
+        hp.addAll(map.keySet());
+        
+        int count=0;
+        int size=arr.length/2;
+        
+        Set<Integer>set = new HashSet<>();
+        while(count<size){
+            int key = hp.poll();
+            set.add(key);
+            count+=map.get(key);
+            map.remove(key);
+        }
+        return set.size();
+    }
+
 
 M2) Using Kind of Bucket
 
@@ -1515,15 +1611,144 @@ Similar Problem -> Path with Minimum Effort (LC-1631)
 -> Exact same approach but the difference is just 
 instead of (cur>=grid[newX][newY]) -> here we will use (cur>=Math.abs(grid[newX][newY]-grid[x][y]);
 -------------------------------------------------------------------------------------
+54. Arithmetic Slices (LC-413)
 
+  public int numberOfArithmeticSlices(int[] nums) {
+        int n = nums.length;
+        if(n<3)return 0;
+        
+        int pdiff = nums[1]-nums[0];
+        
+        int count=0;
+        int sum=0;
+        for(int i=2;i<n;i++){
+             int diff = nums[i]-nums[i-1];
+           
+                if(diff==pdiff){
+                    count++;
+                   sum+=count;
+                }else{
+                    count=0;
+                }
+            pdiff=diff;
+        }
+        return sum;
+    }
 -------------------------------------------------------------------------------------
+55. 132 Pattern (LC-456)
 
+   public boolean find132pattern(int[] nums) {
+// we are basically finding greatest element traversing from right.
+// and when we get the potential greatest element, the element which was on top of stack at last, is the 
+// element which is smaller than the greatest element, now we check that if nums[i]<smaller element.
+// if yes that means it is the smallest element.
+
+     Stack<Integer>st = new Stack<>();
+       int s2 = Integer.MIN_VALUE;
+        
+        for(int i=nums.length-1;i>=0;i--){
+            if(nums[i]<s2)return true;  //checking if any number is smaller than 2nd which could be 1st ele
+            
+            while(!st.isEmpty() && nums[i]>st.peek()){
+                s2=st.pop();
+            }
+            // after end of this loop we will get our potential greatest element.
+            st.push(nums[i]);
+        }
+        return false;
+    }
 -------------------------------------------------------------------------------------
+56. Champagne Tower (LC-799)
+-> Used concept of pascals triangle 
 
+  public double champagneTower(int poured, int query_row, int query_glass) {
+        double[][] quantity = new double[query_row+1][query_glass+2];
+        
+        quantity[0][0]=poured;
+        
+        for(int i=0;i<query_row;i++){
+            for(int j=0;j<query_glass;j++){
+                double rem = Math.max(quantity[i][j]-1,0.0);
+                quantity[i+1][j] += rem/2.0;
+                quantity[i+1][j+1] += rem/2.0;
+            }
+        }
+        return Math.min(quantity[query_row][query_glass],1.0);
+    }
 -------------------------------------------------------------------------------------
+57. Delete and Earn 
 
+M1) House robber Approach
+-> https://leetcode.com/problems/delete-and-earn/discuss/109891/Sharing-my-Simple-Straight-Forward-Java-O(n)-Solution-Explanation-Included
+
+ public int deleteAndEarn(int[] nums) {
+        int[] sum = new int[10002]; 
+        
+        for(int i = 0; i < nums.length; i++){
+            sum[nums[i]] += nums[i]; 
+        }
+        
+        for(int i = 2; i < sum.length; i++){
+            sum[i] = Math.max(sum[i-1], sum[i-2] + sum[i]);
+        }
+        return sum[10001];
+    }
+
+ M2) Top Down Dp
+ (take/noTake)
+ 
+  public int deleteAndEarn(int[] nums) {
+        Arrays.sort(nums);
+        
+        int[]dp = new int[nums.length];
+        Arrays.fill(dp,-1);
+        return maxPoints(nums,0,dp);
+    }
+    public int maxPoints(int[]nums,int idx,int[]dp){
+        if(idx==nums.length)return 0;
+        
+        if(dp[idx]!=-1)return dp[idx];
+        
+        int ele = nums[idx];
+        int skip = idx+1;
+        int earn = nums[idx];
+        
+        //collecting all same/duplicates elements 
+        while(skip<nums.length && nums[skip]==nums[idx]){
+            earn+=nums[idx];
+            skip++;
+        }
+        
+        //skipping the nums[i]+1 elements;
+        
+        while(skip<nums.length && nums[skip]==nums[idx]+1){
+            skip++;
+        }
+        //take
+        earn+=maxPoints(nums,skip,dp);
+        //no take
+        int notEarn = maxPoints(nums,idx+1,dp);
+        
+        return dp[idx]=Math.max(earn,notEarn);
+    
+    }   
 -------------------------------------------------------------------------------------
+58. Count all Valid Pickup and Delivery options (LC-1359)
+Explanation https://leetcode.com/problems/count-all-valid-pickup-and-delivery-options/discuss/516951/C%2B%2BJava-Simple-Math-Formula-with-Explanation
 
+-> Mathematical problem
+ public int countOrders(int n) {
+        long ans=1;
+        long mod = (long)(1e9+7);
+        
+        for(int i=2;i<=n;i++){
+            long spaces = (i-1)*2+1; // (__ P1 __ D1 __)
+            ans*=spaces*(spaces+1)/2;
+            ans%=mod;
+        }    
+        
+        return (int)ans;
+    }
 -------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------

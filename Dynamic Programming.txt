@@ -6,6 +6,8 @@ prev2=prev;
 prev=curr;
 -> If there is a prev row & prev column, we can space optimise it.
 
+-> in place of dp[i-1][j] we can write prev[j]  and in place of dp[i][j-1] we can write curr[j-1].
+
 & if there is array concept in space optimization then make it front array and next array and after work just set front array = next array
 
 2) If there is any problem related to subsets for eg)
@@ -19,8 +21,10 @@ prev=curr;
 -> we see that we get different answers on different pattern pattern (like by different way, we get diff ans).
 -> Here we take whole block of array and solve for every possible partition and calculate ans accordingly.
 
+Rules:
 -> In top down suppose we call for solve(1,n-1)<=>solve(i,j)
 -> In bottom up since we write just opposite. but here is something to think about.
+-> IN CASE OF PARTITION DP
 -> for(int i=n-1;i>=1;i++) and for the jth loop it doesn't start 0 instead i or i+1
 -> for(int j=i+1;j<n;j++) because i can't be greater than j to get valid set of blocks of array.
 
@@ -148,6 +152,17 @@ public static int MCMTD(int[] matrix, int si, int ei, int[][] strg) {
 		strg[s1.length()][s2.length()] = ans;
 		return ans;
 	}
+
+#) Minimum Insertions/Deletions to Convert String A to String B
+ -> Keep the equal portion intact.
+
+Eg) abcd , anc
+abcd -> 2 deletions + ac -> 1 insertions makes anc
+
+ -> Deletions = len(a)-lcs(a,b);
+ -> Insertions = len(b)-lcs(a,b);
+
+ -> ans = (len(a)+len(b) - 2 * LCS(A,B)); 	
 ------------------------------------------------------------------------------------------------
 4. Catalan Number to find no. of Bst's
 	public static int Catalannumberofbsts(int n, int[] strg) {
@@ -233,6 +248,32 @@ public int LCsSpaceOptimised(String s1, String s2) {
 		}
 		return strg[0];
 	}
+
+#) Printing LCS
+-> after tabulation,get the 2d dp array.
+int len = dp[n][m];
+String ans = "";
+for(int i=0;i<len;i++){
+     ans+="$";	
+}
+
+O(m+n)
+
+int idx = len-1;
+int i=n, j=m;
+while(i>0 && j>0){
+    if(s[i-1]==t[i-1]){
+	ans[idx]=s[i-1];
+	idx--;
+	i--,j--;	
+   }else if(dp[i-1][j]>dp[i][j-1]{
+	   i--;
+   }else{
+       j--;		
+   }
+ }
+ System.out.println(ans);
+
 ------------------------------------------------------------------------------------------------
 6. Palindromic Partitions/cuts 
 -> Time Complexity (N^3) -> (N^2)
@@ -1127,10 +1168,12 @@ public String longestPalindrome(String s) {
             int left = i;
             int right = i;
 
+            //to skip the duplicates
             while (left >= 0 && s.charAt(left) == c) {
                 left--;
             }
 
+            //to skip the duplicates
             while (right < s.length() && s.charAt(right) == c) {
                 right++;
             }
@@ -2394,10 +2437,65 @@ public static int harrypottercolormixturesTD(int[] arr, int si, int ei, int[][] 
 
 	}
 -> Can also be done using subsequence type problem (take/notTake)
+ public int RodCutting(int idx,int len,int[]price,int[][]dp){
+        if(idx == 0){
+            return len * price[idx];
+        }
+        
+        if(dp[idx][len]!=-1) return dp[idx][len];
+        
+        int notTake = 0 + RodCutting(idx-1,len,price,dp);
+        
+        int take = Integer.MIN_VALUE;
+        int rodLength = idx+1;
+        
+        if(rodLength <= len){
+            take = price[idx] + RodCutting(idx,len-rodLength,price,dp);
+        }
+        return dp[idx][len] = Math.max(notTake,take);
+    }
 ------------------------------------------------------------------------------------------------
-62. Jump Game All types (in leetcode)
+62. Minimum Insertion Steps to Make a String Palindrome (LC-1312)
+Intuition:
+-> We basically keep the longest palidromic portion intact.
+-> ans would be => (str.length() - longestPalindromicSubsequence(str,rev(str)));
 ------------------------------------------------------------------------------------------------
-63. Word Wrap
+63. Shortest Common SuperSequence (basically merge both of the sequence to form one sequence)
+a = brute, b = groot;
+ans = bgruoote (len=8 which is minimum)
+-> ans would be => (len(a)+len(b)-lcs(a,b));
+
+=> To Print 
+
+// after computing LCS use same logic of printing LCS.(using lcs table)
+        int i=m;
+        int j=n;
+        
+        StringBuilder sb = new StringBuilder();
+        
+        while(i>0 && j>0){
+            if(c1[i-1]==c2[j-1]){
+                sb.append(c1[i-1]);
+                i--;
+                j--;
+            }else if(dp[i-1][j]>=dp[i][j-1]){
+                sb.append(c1[i-1]);
+                i--;
+            }else if(dp[i-1][j]<dp[i][j-1]){
+                sb.append(c2[j-1]);
+                j--;
+            }
+        }
+        
+        while(i>0){sb.append(c1[i-1]);i--;};
+        while(j>0){sb.append(c2[j-1]);j--;};
+        
+        return sb.reverse().toString();
+
+------------------------------------------------------------------------------------------------
+64. Jump Game All types (in leetcode)
+------------------------------------------------------------------------------------------------
+65. Word Wrap
 ------------------------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------------------------

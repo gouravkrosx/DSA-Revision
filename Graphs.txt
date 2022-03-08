@@ -1088,7 +1088,7 @@ public int[][] floodFill(int[][] image, int sr, int sc, int newColor) {
         fill(image, sr, sc - 1, color, newColor);
     }
 ##) Similar problem
--> Replace O's with X's
+-> Replace O's with X's (gfg problem -> https://www.geeksforgeeks.org/given-matrix-o-x-replace-o-x-surrounded-x/ ) 
 -> Just apply this algo at each boundry top bottom left right. with newColor as 'X' and old as 'O'.
 --------------------------------------------------------------------------------------
 17. M-Coloring Problem -O(M^N)
@@ -1259,6 +1259,12 @@ ans[adjnode]=ans[node]+1;
 -> in this question toposort with dfs won't work but toposort with bfs works because in bfs we can count the elements which get entered 
 in the queue.
 ->Logic -> we have to find the cycle in directed graph.( so use logic -> dfs on directed graph)
+
+#) Course Schedule 2 (Leetcode 210)
+-> Just do toposort and return the linear ordering of the graph. (using BFS)
+
+#) Course Schedule 3 (Leetcode 630)
+
 --------------------------------------------------------------------------------------
 23. Snake and Ladder -> https://www.youtube.com/watch?v=zWS2fCJGxmU
 
@@ -1794,6 +1800,41 @@ static int timer = 1;
 			}
 		}
 	}
+--------------------------------------------------------------------------------------
+37. All the ancestors of a Node in a Directed Acyclic Graph
+-> Intuition : Reverse all the edges of the graph, so that a node can reach to all of its ancestor.
+-> Now, just apply Dfs for each node. separately (new-visited array every time)
+
+ public static List<List<Integer>> getAncestors(int n, int[][] edges) {
+       
+       //reverse all the edges of the graph.
+       // in this way you can reach to all the ancestors of a node.
+		List<List<Integer>> adj = makeReverseGraph(n, edges);
+
+		List<List<Integer>>ans = new ArrayList<>();
+       
+        for(int i=0;i<n;i++){
+                int[]vis=new int[n];
+                List<Integer>temp = new ArrayList<>();
+                Dfs(i,i,adj,temp,vis);
+                Collections.sort(temp);
+                ans.add(temp);
+        }
+		return ans;
+	}
+    public static void Dfs(int node,int source,List<List<Integer>>adj,List<Integer>list,int[]vis){
+       vis[node]=1; 
+        
+        if(node!=source)list.add(node);
+        
+        for(int an:adj.get(node)){
+            if(vis[an]==0){
+                vis[an]=1;
+                Dfs(an,source,adj,list,vis);
+            }
+        }
+    }
+
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 # Ford-Fulkerson Algorithm for Maximum Flow Problem
