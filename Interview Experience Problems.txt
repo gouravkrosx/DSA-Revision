@@ -866,6 +866,7 @@ public String longestPalindrome(String s) {
     }
 
 #) Next Greater Element 3 (LC-556)
+-> Exact same as (Next Permutation problem)
 ---------------------------------------------------------->
 26) Find K-th Smallest Pair Distance (LC-719)
 -> Asked in () 
@@ -1080,7 +1081,7 @@ public static int solution(int n, int k){
 -> out of loop handle kth element separately 
 -> now handle another k->n elements
 ---------------------------------------------------------->
-35) Minimum Add to Make Parenthesis Valid (LC-921)
+35a) Minimum Add to Make Parenthesis Valid (LC-921)
 -> Asked in (Amazon)
  
 O(N) S(N)
@@ -1116,6 +1117,104 @@ M2) O(N) S(1)
         }
         return left_Needed + right_Needed;
     }
+
+35b) Minimum Remove to make valid parenthesis (LC-1249)
+
+M1) Use of Stacks & Set
+->   public String minRemoveToMakeValid(String s) {
+        Stack<Integer> stack = new Stack<>();
+        for(int i=0;i<s.length();i++) {
+            char ch = s.charAt(i);
+            if(Character.isAlphabetic(ch))
+                continue;
+            if(ch == '(')
+                stack.push(i);
+            else {
+                if(!stack.isEmpty() && s.charAt(stack.peek()) == '(')
+                    stack.pop();
+                else stack.push(i);
+            }
+        }
+        
+        // if(stack.size() == 0) return "";
+        
+        StringBuilder result = new StringBuilder();
+        HashSet<Integer> set = new HashSet<>(stack);
+        for(int i=0;i<s.length();i++)
+            if(!set.contains(i))
+                result.append(s.charAt(i));
+        
+        return result.toString();
+    }
+
+M2) S(1)
+->
+// For the current parenthesis we know how many '(' come before it, and how many ')' come after it. This is all the information we need to determine whether the current parenthesis should be removed or not.
+// O(s.length()) time, O(1) space.
+public String minRemoveToMakeValid(String s) {
+    if (s == null || s.length() == 0) return s;       
+    // Number of unmatched '(' to the left and number of unmatched ')' to the right of the current index i.
+    int open = 0, closed = 0;       
+     // Count the number of ')' parenthesis. When i == 0 that's the number of unmatched ')' to the right.
+    for (int i = 0; i < s.length(); ++i) {
+        if(s.charAt(i) == ')') closed++;
+    }
+    StringBuilder result = new StringBuilder();
+    for (int i = 0; i < s.length(); ++i) {
+        if (s.charAt(i) == '(') {
+            open++;     // Increment count of '(' to the left so that a future ')' can match it.
+            if (closed > 0) {
+                closed--;
+                 // Only add the current '(' to the result if there is a ')' to the right that can match (close) it.
+                result.append(s.charAt(i));    
+            }
+        } else if (s.charAt(i) == ')') {
+            if (open > 0) {
+                open--;
+                // Only add the current ')' to the result if there is a '(' to the left that can match it.
+                result.append(s.charAt(i));
+            } else {
+                closed--;   // The current ')' hasn't been closed by a '(' to the left AND it can't be used to close future '('.
+            }
+        } else {
+            result.append(s.charAt(i));  // Simply append all non-parenthesis characters.
+        }
+    }
+    return result.toString();
+}
+
+35c) Minimum no of Swaps to make String Balanced (LC-1963)
+-> This problem is different from minimum swaps in string file ( because there we were allowed to do adjacent swaps only)
+ 
+Intuition:
+
+We can discard the balanced components from our input string as they will not matter in balancing the string. Now, after excluding them, we will find that all the unbalanced brackets look like this:
+
+]]]]]…..[[[[[…..
+
+Now, since we can swap any pair of brackets, the optimal approach is to balance 2 sets of brackets at a time using 1 swap (hinting at result = total unbalanced / 2, which we will handle for even and odd lengths together).
+For 2 unbalanced brackets = 1 swap is required
+For 1 unbalanced bracket pair = 1 swap is required
+
+so if the brackets are odd for eg 3 open and 3 close in this case there will 2 swaps required.
+if brackets are even for eg 4 open and 4 close then only 2 swap will be required.
+
+Hence final answer would be (unbalanced brackets + 1)/2;
+->
+
+public int minSwaps(String s) { 
+        int open=0;
+        
+        for(char ch:s.toCharArray()){
+            if(open>0 && ch==']'){
+                open--;
+            }else{
+                open++;
+            }
+        }
+        return (open+1)/2;
+  }
+
 ---------------------------------------------------------->
 36) Restore IP Address (LC-93)
 -> Asked in (Amazon)
@@ -1425,7 +1524,49 @@ O(N) S(1)
     }
 
 ---------------------------------------------------------->
+44) Backspace String compare (LC-844)
+-> Asked in Amazon
+M1) Using Stack
 
+M2) O(N) S(1)
+
+When we meet a char, we are not sure if it will be still there or be deleted.
+
+However, we can do a back string compare (just like the title of problem).
+If we do it backward, we meet a char and we can be sure this char won't be deleted.
+If we meet a '#', it tell us we need to skip next lowercase char.
+
+The idea is that, read next letter from end to start.
+If we meet #, we increase the number we need to step back, until back = 0
+
+public boolean backspaceCompare(String s, String t) {
+            
+        int i=s.length()-1,j=t.length()-1;
+        int countS = 0;
+        int countT = 0;
+        
+        while(i>=0||j>=0){
+            while(i>=0 && (countS>0 || s.charAt(i)=='#')){
+                if(s.charAt(i)=='#')countS++;
+                else countS--;
+                i--;
+            }
+            
+            char left = (i<0)?'@':s.charAt(i);
+            
+             while(j>=0 && (countT>0 || t.charAt(j)=='#')){
+                if(t.charAt(j)=='#')countT++;
+                else countT--;
+                j--;
+            }
+            char right = (j<0)?'@':t.charAt(j);
+            if(left!=right)return false;
+            
+            i--;
+            j--;
+        }
+        return true;
+    }
 ---------------------------------------------------------->
 
 

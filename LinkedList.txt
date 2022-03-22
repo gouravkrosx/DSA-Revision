@@ -406,6 +406,28 @@ public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
         }
         return head;
     }
+ #) Delete all occurences of duplicates  (LC-82)
+
+  public ListNode deleteDuplicates(ListNode head) {
+        if(head==null || head.next==null)return head;
+        
+    ListNode dummy = new ListNode(0), curr = head, prev = dummy;
+        prev.next = curr;
+        while(curr != null) {
+            while (curr.next != null && curr.val == curr.next.val) {
+                curr = curr.next;    //while loop to find the last node of the dups.
+            }
+            if (prev.next != curr) { //duplicates detected.
+                prev.next = curr.next; //remove the dups.
+                curr = curr.next;     //reposition the curr pointer.
+            } else { //no dup, move down both pointer.
+                prev = prev.next;
+                curr = curr.next;
+            }
+
+        }
+        return dummy.next;
+    }    
 --------------------------------------------------------------------------------------------------------
 10. Remove duplicates from Unsorted List O(N) S(N)
 //Don't use Hashmap it  will give TLE

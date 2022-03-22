@@ -296,7 +296,35 @@ void push(int a)
 	    }	    
 	    return q1.poll();
     }
-
+##) Queue using Stack (By making deQueue operation costly)
+->(in deQueue operation) moves the elements once and moves elements only if stack2 empty. So, the amortized complexity of the dequeue operation becomes \Theta (1)   . 
+ static void enQueue(Queue q, int x)
+    {
+        push(q.stack1, x);
+    }
+ 
+    /* Function to deQueue an item from queue */
+    static int deQueue(Queue q)
+    {
+        int x;
+ 
+        /* If both stacks are empty then error */
+        if (q.stack1.isEmpty() && q.stack2.isEmpty()) {
+            System.out.println("Q is empty");
+            System.exit(0);
+        }
+ 
+        /* Move elements from stack1 to stack 2 only if
+        stack2 is empty */
+        if (q.stack2.isEmpty()) {
+            while (!q.stack1.isEmpty()) {
+                x = pop(q.stack1);
+                push(q.stack2, x);
+            }
+        }
+        x = pop(q.stack2);
+        return x;
+    }
 ---------------------------------------------------------------------------------------------------
 13. Celebrity Problem (Stack)
        private static int CelebrityProblem(int[][] mat) {
@@ -431,6 +459,7 @@ public static boolean DuplicateBrackets(String str) {
 
 ---------------------------------------------------------------------------------------------------
 17. Stack Permutations (Check if an array is stack permutation of other)
+
  static boolean checkStackPermutation(int ip[], 
                                     int op[], int n) 
     {
@@ -479,7 +508,38 @@ public static boolean DuplicateBrackets(String str) {
         // permutable otherwise not.
         return (input.isEmpty() && tempStack.isEmpty());
     }
+Similar Problem
+-> Valid Stack Sequences (LC-946)
 
+M1) S(N)
+ public boolean validateStackSequences(int[] pushed, int[] popped) {
+        Stack<Integer>st = new Stack<>();
+        
+        int i=0;
+        for(int ele:pushed){
+            st.push(ele);
+            while(!st.isEmpty() && st.peek()==popped[i]){
+                st.pop();
+                i++;
+            }
+        }
+        return (st.size()==0);
+    }
+
+ M2) BigO(1) extra space, O(N) modified space
+  public boolean validateStackSequences(int[] pushed, int[] popped) {
+        int i = 0; // Intialise one pointer pointing on pushed array
+        int j = 0; // Intialise one pointer pointing on popped array
+        
+        for(int val : pushed){
+            pushed[i++] = val; // using pushed as the stack.
+            while(i > 0 && pushed[i - 1] == popped[j]){ // pushed[i - 1] values equal to popped[j];
+                i--; // decrement i
+                j++; // increment j
+            }
+        }
+        return i == 0; // Since pushed is a permutation of popped so at the end we are supposed to be left with an empty stack
+    }   
 ---------------------------------------------------------------------------------------------------
 18. Interleave-first half queue of the queue with second half
  Logic-> basically using stack we got able to access first half through stack and the second half using the given queue
@@ -1229,6 +1289,261 @@ class StockSpanner {
         return span;
     }
 }
+---------------------------------------------------------------------------------------------------
+34. Remove Duplicate Letters (LC-316)
+ public String removeDuplicateLetters(String sr) {
+
+    int[] res = new int[26]; //will contain number of occurences of character (i+'a')
+    boolean[] visited = new boolean[26]; //will contain if character (i+'a') is present in current result Stack
+    char[] ch = sr.toCharArray();
+    for(char c: ch){  //count number of occurences of character 
+        res[c-'a']++;
+    }
+    Stack<Character> st = new Stack<>(); // answer stack
+    int index;
+    for(char s:ch){ 
+        index= s-'a';
+        res[index]--;   //decrement number of characters remaining in the string to be analysed
+        if(visited[index]) //if character is already present in stack, dont bother
+            continue;
+        //if current character is smaller than last character in stack which occurs later in the string again
+        //it can be removed and  added later e.g stack = bc remaining string abc then a can pop b and then c
+        while(!st.isEmpty() && s<st.peek() && res[st.peek()-'a']!=0){ 
+            visited[st.pop()-'a']=false;
+        }
+        st.push(s); //add current character and mark it as visited
+        visited[index]=true;
+    }
+
+    StringBuilder sb = new StringBuilder();
+    //pop character from stack and build answer string from back
+    while(!st.isEmpty()){
+        sb.insert(0,st.pop());
+    }
+    return sb.toString();
+  }
+----------------------------------------------------------------------------------------------------
+35. Maximum Frequency Stack (LC-895)
+(-> when pop from stack, it gives the most freq number and if there are more than 1 most freq number then whichever is on near top of stack return that).
+-> Intuition: we are taking 2 maps, 1 for freq and other for the case when more than 1 elements are there having same freq then to solve that problem.s
+-> Taking maxFreq variable to take track of the maxFreq element and handled according to the problem
+
+class FreqStack {
+    HashMap<Integer,Integer>freq;
+    HashMap<Integer,Stack<Integer>>map;
+    int maxFreq = 0;
+    
+    public FreqStack() {
+       freq = new HashMap<>();
+       map = new HashMap<>();
+    }
+    
+    public void push(int val) {
+       
+        int f = freq.getOrDefault(val,0)+1;
+        freq.put(val,f);
+       
+        maxFreq = Math.max(maxFreq,f);
+        
+        map.computeIfAbsent(f, x-> new Stack<>()).push(val);                
+    }
+    
+    public int pop() {
+        int x = map.get(maxFreq).pop();
+        
+        if(freq.get(x)>1){
+            freq.put(x,freq.get(x)-1);
+        }else{
+            freq.remove(x);
+        }
+        
+        if(map.get(maxFreq).size()==0)maxFreq--;
+        return x;
+    }
+}
+----------------------------------------------------------------------------------------------------
+36. Sum of Subarray minimums (LC-907)
+(find the sum of min(b), where b ranges over every (contiguous) subarray of arr)
+(Somewhat similar to Largest rec in Histogram)
+
+=>{
+
+arr = [3,1,2,4]
+Subarrays are [3], [1], [2], [4], [3,1], [1,2], [2,4], [3,1,2], [1,2,4], [3,1,2,4]. 
+Minimums are 3, 1, 2, 4, 1, 1, 2, 1, 1, 1.
+Sum is 17.
+
+}
+
+-> Consider the element 3 in the following vector:
+
+                            [2, 9, 7, 8, 3, 4, 6, 1]
+			     |                    |
+	             the previous less       the next less 
+	                element of 3          element of 3
+
+After finding both NLE and PLE of 3, we can determine the
+distance between 3 and 2(previous less) , and the distance between 3 and 1(next less).
+In this example, the distance is 4 and 3 respectively.
+
+How many subarrays with 3 being its minimum value?
+The answer is 4*3.
+
+-> For more understanding of this problem refer -> https://leetcode.com/problems/sum-of-subarray-minimums/discuss/178876/stack-solution-with-very-detailed-explanation-step-by-step
+
+-> Code: 
+ public int sumSubarrayMins(int[] arr) {
+       
+        Stack<Integer>st = new Stack<>();
+     
+        int n = arr.length;
+       
+    // left is for the distance to previous less element
+    // right is for the distance to next less element
+        
+        int[] left = new int[n];
+        int[] right = new int[n];
+        
+/*        
+When Stack is empty, which means there is no previous less element for A[i], in this case, we set left[i] = i+1 by default.
+For example [7 8 4 3], there is no PLE for element 4, so left[2] = 2+1 =3.
+How many subarrays with 4(A[2]) being its minimum value?
+It's left[2]*right[2]=3*1.
+So the default value i+1 for left[i] and the default value n-i for right[i] are for counting the subarrays conveniently.
+*/
+        for(int i=0;i<n;i++)left[i]=i+1;
+        for(int i=0;i<n;i++)right[i]=n-i;
+        
+        
+        //prev less elements dis
+        for(int i=0;i<n;i++){
+            while(!st.isEmpty() && arr[st.peek()]>arr[i]){
+                st.pop();
+            }
+            
+            left[i] = (!st.isEmpty())?i-st.peek():i+1;
+            st.push(i);
+        }
+        
+        st = new Stack<>();
+        //next less elements dis
+        for(int i=0;i<n;i++){
+            while(!st.isEmpty() && arr[st.peek()]>arr[i]){
+                right[st.peek()] = i - st.peek();
+                st.pop();
+            }
+            st.push(i);
+        }
+        
+        long mod = (long) 1000000007;
+        long ans = 0;
+        for(int i=0;i<n;i++){
+            ans = (ans + (long)arr[i]*left[i]*right[i])%mod;
+        }
+        
+        return (int)ans;
+    }
+
+In this problem one should be stricly less and other should be non strictly less but we didn't do that don't know the reason though
+
+Let's Take Example : [1,5,6,5,4]
+now lets fill the left[ ] and right[ ] array for the index 2 and 4 which is arr[4]=arr[2]=5 //indexing starting from 1
+
+We will do non-strict less condition for both left and right array
+
+then left[4]=2 //which is {5,6}
+right[4]=0 //no element right of index 4 is greater or equal to arr[4]=5
+so possible subarray in this case which can be formed are - {5,6,5},{6,5},{5} //(left[4]+1)*(right[4]+1) elements
+
+Now we will calculate left[2] and right[2]
+left[2]=0 //no element left of index 2 is greater or equal to arr[2]=5
+right[2]=2 //which is {6,5}
+so possible subarray in this case which can be formed are - {5}, {5,6},{5,6,5}
+
+THUS , you can see we are adding 2 times same set of sub array which is {5,6,5} which is extra and hence we have to do 1 Strict-less searching and 1 non-strict less
+
+----------------------------------------------------------------------------------------------------
+37. Sum of Subarray Ranges (LC-2104)
+-> Same as above problem, in above problem we find min(b);
+here we find => max(b) - min(b)
+
+
+// here to handle duplicates we did one of the min for strictly less and one of max for non strictly more.
+ public long subArrayRanges(int[] nums) {
+         int n = nums.length;
+        long sum=0;
+        Stack<Integer> st = new Stack<>();
+        int[] minPrev = new int[n];
+        int[] minNext = new int[n];
+        int[] maxPrev = new int[n];
+        int[] maxNext = new int[n];
+        
+        Arrays.fill(minPrev , -1);
+        Arrays.fill(minNext , n);
+        Arrays.fill(maxPrev , -1 );
+        Arrays.fill(maxNext , n);
+        
+        
+        for(int i=0;i<n;i++){
+            while(!st.isEmpty() && nums[st.peek()] >= nums[i]){
+                st.pop();
+            }
+            if(!st.isEmpty()){
+                minPrev[i] = st.peek();
+            }
+            
+            st.push(i);
+        }
+        
+        st = new Stack<>();
+        for(int i=n-1;i>=0;i--){
+            while(!st.isEmpty() && nums[st.peek()] > nums[i]){
+                st.pop();
+            }
+            if(!st.isEmpty()){
+                minNext[i] = st.peek();
+            }
+            st.push(i);
+        }
+        
+        st = new Stack<>();
+        for(int i=0 ;i<n ;i++){
+            while(!st.isEmpty() && nums[st.peek()] <= nums[i]){
+                st.pop();
+            }
+            if(!st.isEmpty()){
+                maxPrev[i] = st.peek();
+            }
+            st.push(i);
+        }
+        
+        st = new Stack<>();
+        for(int i=n-1 ; i>=0;i--){
+            while(!st.isEmpty() && nums[st.peek()] < nums[i]){
+                st.pop();
+            }
+            
+            if(!st.isEmpty()){
+                maxNext[i] = st.peek();
+            }
+            
+            st.push(i);
+        }
+        
+        
+        for(int i=0 ;i <n;i++){
+            long leftMin = i-minPrev[i];
+            long rightMin = minNext[i]-i;
+            long leftMax = i-maxPrev[i];
+            long rightMax = maxNext[i]-i;
+            sum+= (leftMax*rightMax - leftMin*rightMin)*nums[i];
+        }
+        
+        return sum;
+    }
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
 
 ---------------------------------------------------------------------------------------------------
 ## Arithmetic Expression Evaluation-> see youtube videos to learn all the conversions

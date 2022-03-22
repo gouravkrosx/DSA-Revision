@@ -494,7 +494,7 @@ public static boolean BipartiteDfs(int v, ArrayList<ArrayList<Integer>> adj) {
 --------------------------------------------------------------------------------------
 7.Dijkstra's ALgorithm  -(Greedy Algo)
 
-//	Shortest Distance from source to every other node in Undirected Weighted Graph is known as Dijkstra Algorithm
+//	Shortest Distance from source to every other node in Undirected/Directed Weighted Graph is known as Dijkstra Algorithm
 //TC-> O((N+E)logN)
 //SC-> O(2N)
 	
@@ -513,6 +513,10 @@ public static boolean BipartiteDfs(int v, ArrayList<ArrayList<Integer>> adj) {
 
 		while (!pq.isEmpty()) {
 			pair rp = pq.poll();
+
+            if(dis[rp.node]<rp.weight)continue; //this prevents TLE
+
+
 			for (pair an : adj.get(rp.node)) {
 				if (dis[rp.node] + an.weight < dis[an.node]) {
 					dis[an.node] = dis[rp.node] + an.weight;
@@ -1264,6 +1268,20 @@ in the queue.
 -> Just do toposort and return the linear ordering of the graph. (using BFS)
 
 #) Course Schedule 3 (Leetcode 630)
+-> Greedy problem
+
+  public int scheduleCourse(int[][] courses) {
+        Arrays.sort(courses,(a,b)->a[1]-b[1]); //Sort the courses by their deadlines (Greedy! We have to deal with courses with early deadlines first)
+        PriorityQueue<Integer> pq=new PriorityQueue<>((a,b)->b-a); // to get the longest time taken course.
+        int time=0;
+        for (int[] c:courses) 
+        {
+            time+=c[0]; // add current course to a priority queue
+            pq.add(c[0]);
+            if (time>c[1]) time-=pq.poll(); //If time exceeds, drop the previous course which costs the most time. (That must be the best choice!)
+        }        
+        return pq.size();
+    }
 
 --------------------------------------------------------------------------------------
 23. Snake and Ladder -> https://www.youtube.com/watch?v=zWS2fCJGxmU

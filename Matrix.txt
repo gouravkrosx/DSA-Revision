@@ -322,7 +322,75 @@ Intuition-> we just break every row as a single array, simply dry run for easy e
         }
     }
 ------------------------------------------------------------------------------------
+11. Diagonal Traverse (LC-498)
 
+M1)
+
+->  public int[] findDiagonalOrder(int[][] mat) {
+        TreeMap<Integer,List<Integer>>map = new TreeMap<>();
+        
+        for(int i=0;i<mat.length;i++){
+            for(int j=0;j<mat[i].length;j++){
+                map.putIfAbsent((i+j),new ArrayList<>());
+                map.get(i+j).add(mat[i][j]);
+            }
+        }
+        int[]res = new int[mat.length*mat[0].length];
+        
+        int c = 1;
+        int idx=0;
+        for(int key:map.keySet()){
+            List<Integer>list = map.get(key);
+            if((c&1)==1){
+             Collections.reverse(list);   
+            }
+            
+            for(int i=0;i<list.size();i++){
+                res[idx++]=list.get(i);
+            }
+            c++;
+        }
+        return res;
+    }
+
+M2) Change of Directions S(1)
+
+public int[] findDiagonalOrder(int[][] matrix) {
+        if (matrix == null || matrix.length == 0) {
+            return new int[0];
+        }
+
+        int rows = matrix.length, cols = matrix[0].length;
+        int[] res = new int[rows * cols];
+        int r = 0, c = 0;
+    
+        for (int i = 0; i < rows * cols; i++) {
+            res[i] = matrix[r][c];
+            // even sum diagonal
+            if ((r + c) % 2 == 0) {
+                if (r - 1 >= 0 && c + 1 < cols) {
+                    r = r - 1;
+                    c = c + 1;
+                } else if (c + 1 < cols) {  // crossed row boundary
+                    c = c + 1;
+                } else {
+                    r = r + 1;   // crossed column boundary
+                }
+            }
+            // odd sum diagonal
+            else if ((r + c) % 2 != 0) {
+                if (r + 1 < rows && c - 1 >= 0) {
+                    r = r + 1;
+                    c = c - 1;
+                } else if (r + 1 < rows) {
+                    r = r + 1;
+                } else {
+                    c = c + 1;
+                }
+            }
+        }
+        return res;
+    }
 ------------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------------

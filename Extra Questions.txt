@@ -340,7 +340,28 @@ Binary Subarrays with Sum (Leetcode 930)
         return ans;
     }
 -------------------------------------------------------------------------------------
-11. Predict the winner
+11. Predict the winner (LeetCode 486)
+    
+-> Just like optimal Strategy game in Dp notes.    
+    int p1Score = predictWinner(nums,0,n-1,dp);
+    return (p1Score>=total-p1Score);
+    
+    
+    public int predictWinner(int[]nums,int i,int j, int[][]dp){
+       
+        if(i>j){
+            return 0;
+        }
+        
+        if(i==j)return nums[i];
+               
+        if(dp[i][j]!=-1)return dp[i][j];
+    
+        int case1 = nums[i] + Math.min(predictWinner(nums,i+1,j-1,dp),predictWinner(nums,i+2,j,dp));
+        int case2 = nums[j] + Math.min(predictWinner(nums,i+1,j-1,dp),predictWinner(nums,i,j-2,dp)); 
+        
+        return dp[i][j] = Math.max(case1,case2);    
+    }
 -------------------------------------------------------------------------------------
 12. Frog Jump (LeetCode 403)
 
@@ -380,6 +401,35 @@ Binary Subarrays with Sum (Leetcode 930)
     }
 -------------------------------------------------------------------------------------
 13. Longest Arithmetic Subsequence of Given Difference (Leetcode 1218)
+->
+ public int longestSubsequence(int[] arr, int diff) {
+        int[]dp = new int[arr.length];
+        
+        HashMap<Integer,Integer>map = new HashMap<>();
+               
+        int max=0;
+        for(int i=0;i<arr.length;i++){
+            if(map.containsKey(arr[i]-diff)){
+                int k = map.get(arr[i]-diff);
+                dp[i]=1+dp[k];
+            }else{
+                dp[i]=1;
+            }
+            max = Math.max(max,dp[i]);
+            map.put(arr[i],i);
+        }
+        return max;
+    }
+-> 
+public int longestSubsequence(int[] arr, int difference) {
+        HashMap<Integer, Integer> dp = new HashMap<>();
+        int longest = 0;
+        for(int i=0; i<arr.length; i++) {
+            dp.put(arr[i], dp.getOrDefault(arr[i] - difference, 0) + 1);
+            longest = Math.max(longest, dp.get(arr[i]));
+        }
+        return longest;
+    }
 -------------------------------------------------------------------------------------
 14. All Paths From Source to Target (Leetcode 797)
 
@@ -402,11 +452,95 @@ Binary Subarrays with Sum (Leetcode 930)
     }
 -------------------------------------------------------------------------------------
 15. Maximum Binary Tree (Leetcode-654)
+M1) Recursion 
 
+M2) Using stack
+-> O(N)
+-> for eg: 3,2,1,6,0,5
+
+i) 3 in the stack
+ii) 3,2 in the stack (3.right = 2)
+iii) 3,2,1 in the stack (2.right = 1)
+iv) 6 pop out all the make (6.left = 3), 6 in the stack
+v) 6,0 in the stack (6.right = 0)
+vi) 5 pop out 0 and make (5.left = 0), 6,5 in the stack
+vii) stack no empty hence (6.right = 5)
+viii) stack first element is the root.
+
+public TreeNode constructMaximumBinaryTree(int[] nums) {
+        
+        Deque<TreeNode>st = new LinkedList<>();
+        
+        for(int i=0;i<nums.length;i++){
+            TreeNode curr = new TreeNode(nums[i]);
+            
+            while(!st.isEmpty() && st.peek().val<nums[i]){
+                curr.left = st.pop(); // here the curr big node will have its left as second big node in left.
+            } 
+            
+            if(!st.isEmpty()){
+// through this any node which is smaller then peek and in right will be attached to right of peek
+                // for eg: 3.right = 2, 2.right = 1.
+                st.peek().right = curr; 
+            }
+            
+            st.push(curr);
+        }
+    
+        return (st.isEmpty())?null:st.removeLast();
+    }
 -------------------------------------------------------------------------------------
 16. Path In Zigzag Labelled Binary Tree (Leetcode 1104.)
 -------------------------------------------------------------------------------------
 17. Validate Binary Tree Nodes (Leetcode 1361)
+-> 
+M1) O(N) S(N)
+-> Firstly check root of the binary tree using both left and right arrays.
+-> Now apply bfs using root, if node.left exists and its already visited then return false, same goes with right.
+-> Only take a count variable and increase it, at last if count == n, then return true else false.
+
+public boolean validateBinaryTreeNodes(int n, int[] leftChild, int[] rightChild) {
+        boolean[] isNotRoot = new boolean[n];
+        for(int i: leftChild){
+            if(i != -1){isNotRoot[i] = true;}
+        }
+        for(int i :rightChild){
+            if(i != -1){isNotRoot[i] = true;}
+        }
+        int root = -1;
+        for(int i = 0; i < n; i++){
+            if(!isNotRoot[i]){
+                if(root != -1){ return false; } //since root can't be more than 1.
+                root = i;
+            }
+        }
+        if(root == -1){ return false; }
+        
+        Queue<Integer> queue = new LinkedList();
+        queue.add(root);
+        boolean[] seen = new boolean[n];
+        seen[root] = true;
+        int count = 0;
+        while(!queue.isEmpty()){
+            int size = queue.size();
+            for(int i = 0; i < size; i++){
+                int curr = queue.remove();
+                count++;
+                if(leftChild[curr] != -1){
+                    if(seen[leftChild[curr]]){ return false; }
+                    seen[leftChild[curr]] = true;
+                    queue.add(leftChild[curr]);
+                }
+                if(rightChild[curr] != -1){
+                    if(seen[rightChild[curr]]){ return false; }
+                     seen[rightChild[curr]] = true;
+                    queue.add(rightChild[curr]);
+                }
+            }
+        }
+        return count == n;
+    }
+M2) It uses union and find (refer to discuss section for this approach)
 -------------------------------------------------------------------------------------
 18. Biggest cycle in Directed Graph.
 -------------------------------------------------------------------------------------
@@ -1750,7 +1884,478 @@ Explanation https://leetcode.com/problems/count-all-valid-pickup-and-delivery-op
         return (int)ans;
     }
 -------------------------------------------------------------------------------------
+59. Longest Arithmetic Subsequence (LC-1027)
+
+->
+
+public int longestArithSeqLength(int[] nums) {
+        
+// dp[index][diff] equals to the length of arithmetic sequence at index with difference diff.
+        int res = 2; 
+        int n = nums.length;
+        HashMap<Integer,Integer>[] dp = new HashMap[n];
+        
+        for(int i=0;i<n;i++){
+            dp[i]=new HashMap<>();
+            for(int j=0;j<i;j++){
+                int diff = nums[i]-nums[j];
+                
+                //just as we do in LIS. 
+                dp[i].put(diff,dp[j].getOrDefault(diff,1)+1);
+                
+                res = Math.max(res,dp[i].get(diff));
+            }
+        }
+        return res;
+    }
 
 -------------------------------------------------------------------------------------
+60. Sort the Matrix Diagonally
+Time O(MNlogD), where D is the length of diagonal with D = min(M,N).
+Space O(MN)
+-> Intuition:
+-> A[i][j] on the same diagonal have same value of (i - j).
+-> For each diagonal, put its elements together, sort, and set them back.
 
-  
+public int[][] diagonalSort(int[][] mat) {
+        HashMap<Integer,PriorityQueue<Integer>> d = new HashMap<>();
+        
+        for(int i=0;i<mat.length;i++){
+            for(int j=0;j<mat[i].length;j++){
+                d.putIfAbsent(i-j,new PriorityQueue<>());
+                d.get(i-j).add(mat[i][j]);
+            }
+        }
+        
+        for(int i=0;i<mat.length;i++){
+            for(int j=0;j<mat[i].length;j++){
+                mat[i][j]=d.get(i-j).poll(); 
+                //this way getting minimum element each time using PriorityQueue
+            }
+        }
+        return mat;
+    }
+-------------------------------------------------------------------------------------
+61. Car Fleet (LC-)
+
+Logic: 
+Sort cars by the start positions pos
+Loop on each car from the end to the beginning
+Calculate its time needed to arrive the target
+cur records the current biggest time (the slowest)
+
+If another car needs less or equal time than cur,
+it can catch up this car fleet.
+
+If another car needs more time,
+it will be the new slowest car,
+and becomes the new lead of a car fleet.
+
+
+Complexity:
+O(NlogN) Quick sort the cars by position. (Other sort can be applied)
+O(N) One pass for all cars from the end to start (another direction also works).
+
+O(N) Space for sorted cars.
+O(1) space is possible if we sort pos inplace. 
+
+->
+ public int carFleet(int target, int[] pos, int[] speed) {
+        int N = pos.length, res = 0;
+        double[][] cars = new double[N][2];
+        for (int i = 0; i < N; ++i)
+            cars[i] = new double[] {pos[i], (double)(target - pos[i]) / speed[i]};
+        Arrays.sort(cars, (a, b) -> Double.compare(a[0], b[0]));
+        double cur = 0;
+        for (int i = N - 1; i >= 0 ; --i) {
+            if (cars[i][1] > cur) { // means car cannot reach target in less or equal time than its ahead car, which makes a new fleet.
+                cur = cars[i][1];
+                res++;
+            }
+        }
+        return res;
+    }   
+-------------------------------------------------------------------------------------
+62. Brick Wall (LC-554)
+
+->The idea is straightforward, since each brick length is positive, we can record all the edge index in the wall and figure out which edge index is the most common. We cut through that edge index, it will cross number of rows - most common edge count rows
+
+ public int leastBricks(List<List<Integer>> wall) {
+        Map<Integer, Integer> map = new HashMap();
+        
+        int count = 0;
+        for (List<Integer> row : wall) {
+            int sum = 0;
+            for (int i = 0; i < row.size() - 1; i++) {
+                sum += row.get(i);
+                map.put(sum, map.getOrDefault(sum, 0) + 1);
+                count = Math.max(count, map.get(sum));
+            }
+        }
+        
+        return wall.size() - count;
+    }
+-------------------------------------------------------------------------------------
+63. Length of Longest Fibonacci Subsequence (LC-873)
+-> Here dp[i][j] represents the length of longest sequence which ends with A[i] and A[j].
+
+ public int lenLongestFibSubseq(int[] arr) {
+       
+        int n = arr.length;
+        int[][]dp = new int[n][n];
+        HashMap<Integer,Integer>map = new HashMap<>();
+        
+        int max = 0;
+        
+        for(int i=0;i<n;i++){
+            
+            map.put(arr[i],i);
+            
+            for(int j=0;j<i;j++){
+                Integer k = map.get(arr[i]-arr[j]);
+                // the number arr[i]-arr[j] should be smaller than arr[j] because arr[j] is second number and 
+                // if k is found then arr[k] will be first number.
+                if(arr[i]-arr[j]<arr[j] && k!=null){
+                    dp[i][j] = dp[j][k]+1; 
+                    max = Math.max(max,dp[i][j]);
+                }else{
+                    dp[i][j] = 2;
+                }
+            }
+        }
+        
+        return (max>2)?max:0;
+    }
+
+-------------------------------------------------------------------------------------
+64. Score of parenthesis
+
+M1) Using Stack
+->
+cur record the score at the current layer level.
+
+If we meet '(',
+we push the current score to stack,
+enter the next inner layer level,
+and reset cur = 0.
+
+If we meet ')',
+the cur score will be doubled and will be at least 1.
+We exit the current layer level,
+and set cur += stack.pop() + cur
+
+Complexity: O(N) time and O(N) space
+
+    public int scoreOfParentheses(String S) {
+        Stack<Integer> stack = new Stack<>();
+        int cur = 0;
+        for (char c : S.toCharArray()) {
+            if (c == '(') {
+                stack.push(cur);
+                cur = 0;
+            } else {
+                cur = stack.pop() + Math.max(cur * 2, 1);
+            }
+        }
+        return cur;
+    }
+
+ M2) S(1)
+->
+
+ A deeper understanding of the idea above. (also for people who found approach 2 hard to get)
+
+It just occurs to me the input can be treated as a tree. Every () is a tree node. ()() can be treated as two sibling nodes while (()) can be treated as a parent and a child node. Each leaf node has value 1 while non-leaf node has double the value of all of its direct children's value. All we have to do is to calculate the root node value via post-order traverse. And this is exactly what the approach 1 did as it always get the value of deeper layers before gets its' own value! For example, the S = '(()(()()))' can be treated as the tree below.
+
+                            (10)            layer 0
+                            ／ \
+                          (1)  (4)          layer 1
+                               /  \
+                             (1)  (1)       layer 2
+Basically, the approach 2 is using the same idea. As you can see, the value of the root node is the sum of each leaf node value to the power of it's depth.
+There are three leaf nodes in the tree. One leaf in layer 1 and two leafs in layer 2. So the final answer is 2^1 + 2^2 + 2^2 = 10.
+By the way, approach 2 runs faster than approach 1 theoretically as it dose not calculate the intermediate nodes value.
+
+/---------Another Explanation------------------/
+When you see parentheses in problem forlumation you should think about stack and indeed, there is stack solution for this problem. This solution will be optimal in time, but in place we can do better! Let us look at the following string:
+(((()))(()(()))) and try tu understand what will be the score of such string.
+First of all it can be written as 2 * ((()))(()(())), which can be written as 2*((())) + 2*(()(())) = 2*2*(()) + 2*2*() + 2*2*(()) = 2*2*2 + 2*2 + 2*2*2 = 20 and it helps us to notice that what acutally matters is how many () we meet in our string, and how deep they are located. So, let us traverse through our string, keep bal: balance, or depth of current place, that is how many brackets we need to close to get correct expression, and also if we see (), we update ans += 1<< bal.
+
+Code: 
+public int scoreOfParentheses(String S) {
+    int score = 0;
+    int depth = 0;
+
+    for (int i = 0; i < s.length(); i++) {
+        if (s.charAt(i) == '(') {
+            depth++;
+        } else {
+            depth--;
+        }
+
+        if (s.charAt(i) == ')' && s.charAt(i - 1) == '(') {
+            score += Math.pow(2, depth);
+        }
+    }
+
+    return score;
+}
+-------------------------------------------------------------------------------------
+65. Queue Reconstuction by Height (LC-406)
+M1) O(n^2)
+-> using comparator and linkedlist
+
+public int[][] reconstructQueue(int[][] people) {
+        Arrays.sort(people,new Comparator<>(){
+           @Override
+            public int compare(int[]a,int[]b){
+                if(a[0]==b[0]){
+                    return a[1]-b[1]; 
+                }else{
+                    return b[0]-a[0];
+                }
+            } 
+        });
+        
+        
+        LinkedList<int[]>list = new LinkedList<>();
+        
+        for(int[]a:people){
+            list.add(a[1],a);
+        }
+        int i = 0;
+        int[][]res = new int[people.length][2];
+        
+        for(int[]v:list){
+            res[i++] = v;
+        }
+        
+        return res;
+    }
+
+
+M2) O(nlogn) using modified mergeSort
+-> https://leetcode.com/problems/queue-reconstruction-by-height/discuss/143403/O(nlogn)-modified-merge-sort-solution-with-detailed-explanation
+M3) Using Binary Index Tree
+-------------------------------------------------------------------------------------
+66. Longest Arithmetic Progression path in a given Binary Tree
+-> https://www.geeksforgeeks.org/longest-arithmetic-progression-path-in-given-binary-tree/
+
+-> Approach: The catch here is that a tree node can only support two AP’s, one with the left child and the other one with the right child. Now, to solve this problem, follow the below steps:
+
+Create a variable ans to store the length of the longest path.
+Start a depth-first search from the root node, and for each node, find the maximum length path of AP’s till left child and right child.
+Now find the difference between the current node and its left child, say leftDiff and the difference between the current node and its right child, say rightDiff.
+Now find the longest path with difference leftDiff in the left child, say maxLen1 and longest path with difference rightDiff in the right child, say maxLen2.
+If leftDiff = (-1)*rightDiff, then both the branches of the current node form an AP, so change ans to the maximum out of the previous value of ans and maxLen1+maxLen2+1.
+Else,  change ans to the maximum out of the previous value of ans, (maxLen1+1) and (maxLen2+1), because only one of the two paths can be selected.
+Now return maxLen1 and maxLen2 along with the difference of the AP from the current node to the parent node.
+Print ans after the function stops.
+
+    static class pair{
+        int diff;
+        int maxlen;
+        public pair(int d,int m){
+            this.diff = d;
+            this.maxlen = m;
+        }
+    }
+
+    static int ans = 0;
+    
+    public static pair[] maxApPath(Node node){
+        pair[]lp = {new pair(Integer.MAX_VALUE,0),new pair(Integer.MAX_VALUE,0)};
+        pair[]rp = {new pair(Integer.MAX_VALUE,0),new pair(Integer.MAX_VALUE,0)};
+
+
+        int leftDiff = Integer.MAX_VALUE;
+        int rightDiff = Integer.MAX_VALUE;
+
+        if(node.left!=null){
+            lp = maxApPath(node.left);
+            leftDiff = node.data - node.left.data;
+        }
+        
+        if(node.right!=null){
+            rp = maxApPath(node.right);
+            rightDiff = node.data - node.right.data;
+        }
+
+        int leftMaxLen = 0;
+        int rightMaxLen = 0;
+
+//it may be possible that node's left has same difference in its left as well as right, so we take maxAplen from both of the lengths.
+        // node's left's left 
+        if(lp[0].diff==leftDiff || lp[0].diff==Integer.MAX_VALUE){
+            leftMaxLen = lp[0].maxlen;
+        }
+
+        //node's left's right
+        if(lp[1].diff==leftDiff || lp[1].diff==Integer.MAX_VALUE){
+            leftMaxLen = Math.max(leftMaxLen,lp[1].maxlen);
+        }
+
+
+        if(rp[0].diff==rightDiff || rp[0].diff==Integer.MAX_VALUE){
+            rightMaxLen = rp[0].maxlen;
+        }
+
+        if(rp[1].diff==rightDiff || rp[1].diff==Integer.MAX_VALUE){
+            rightMaxLen = Math.max(rightMaxLen,rp[1].maxlen);
+        }
+
+        //below line means curr node can be part of both left and right ap
+        if(leftDiff==(-1)*rightDiff){
+            ans = Math.max(ans,leftMaxLen + rightMaxLen + 1);
+        }else{
+            ans = Math.max(ans,Math.max(leftMaxLen+1,rightMaxLen+1));
+        }
+
+        return new pair[]{new pair(leftDiff,leftMaxLen+1),new pair(rightDiff,rightMaxLen+1)};
+    }
+
+-------------------------------------------------------------------------------------
+67. Minimum Cost Tree from Leaves (LC-1130)
+M1) Partition Dp
+->O(N^3)
+
+//     {minSum,maxLeaf}
+    public int[] maxCountTree(int[]arr,int si,int ei,int[][][]dp){
+        if(si==ei){
+            return new int[]{0,arr[si]};
+        }
+        
+        if(dp[si][ei][0]!=0)return dp[si][ei];
+    
+        int ans = Integer.MAX_VALUE;
+        int maxLeaf = 0;
+        
+        for(int k=si;k<ei;k++){
+            int[] left = maxCountTree(arr,si,k,dp);
+            int[] right = maxCountTree(arr,k+1,ei,dp);
+            
+            maxLeaf = Math.max(maxLeaf,Math.max(left[1],right[1]));
+            
+            int overAll = left[1]*right[1] + left[0] + right[0];
+            ans = Math.min(ans,overAll);
+        }
+        return dp[si][ei]=new int[]{ans,maxLeaf};
+    }
+M2) Using Monotonic Stack O(N)
+
+/*
+When we build a node in the tree, we compared the two numbers a and b.
+In this process,
+the smaller one is removed and we won't use it anymore,
+and the bigger one actually stays.
+
+The problem can translated as following:
+Given an array A, choose two neighbors in the array a and b,
+we can remove the smaller one min(a,b) and the cost is a * b.
+What is the minimum cost to remove the whole array until only one left?
+
+To remove a number a, it needs a cost a * b, where b >= a.
+So a has to be removed by a bigger number.
+We want minimize this cost, so we need to minimize b.
+
+b has two candidates, the first bigger number on the left,
+the first bigger number on the right.
+
+The cost to remove a is a * min(left, right).
+*/    
+    public int mctFromLeafValues(int[] arr) {  
+        // if we take out stack's top (call it mid) then the current stack's top is next greater element in left,
+        // and curr array's element which is greater than the mid is the next greater element in right.
+        
+        int res=0;
+        Stack<Integer>st = new Stack<>();
+        st.push(Integer.MAX_VALUE);
+        
+        for(int a:arr){
+            while(st.peek()<=a){
+                int mid = st.pop();
+                res+= mid * Math.min(st.peek(),a);
+            }
+            st.push(a);
+        }
+        
+        while(st.size()>2){
+            res+=(st.pop()*st.peek());
+        }
+        
+        return res;
+    }    
+-------------------------------------------------------------------------------------
+68. Minimum Weighted Subgraph With the Required Paths (LC-2203)
+-> Use Dijkstra here (3 times)
+Intuition:  We ony get minimum weight subgraph when the two paths from src1 and src2 will coincide at one node, and the remaining part to dest will be the same for both paths.
+So, we find the shortest path from src1 to all other nodes. and same for src2.
+we then find shortest path from dest to all other nodes, this can be done by reversing the edges of the graph.
+
+-> src1 to ith node + src2 to ith node + ith node to dest node
+here we just find that common node such that it leads to minWeighted Graph.
+
+Finally the min ans will be =>  ans = Math.min(ans,da[i]+db[i]+dd[i]); 
+we do this for all i and in the loop we also check that their of them is at Long.MAX_VALUE at any index and if it is then continue;
+-> because above condition checks that the path exists from these nodes to the other.
+
+M2) 1-Time Dijkstra -> https://leetcode.com/problems/minimum-weighted-subgraph-with-the-required-paths/discuss/1844479/Simultaneous-Dijkstra-beats-100-(only-1-dijkstra)
+-------------------------------------------------------------------------------------
+69. Parition Lables (LC-763)
+->
+
+ public List<Integer> partitionLabels(String S) {
+          if(S == null || S.length() == 0){
+            return null;
+        }
+        List<Integer> list = new ArrayList<>();
+        int[] map = new int[26];  // record the last index of the each char
+
+        for(int i = 0; i < S.length(); i++){
+            map[S.charAt(i)-'a'] = i;
+        }
+        // record the end index of the current sub string
+        int last = 0;
+        int start = 0;
+        for(int i = 0; i < S.length(); i++){
+            last = Math.max(last, map[S.charAt(i)-'a']);
+            if(last == i){  //it means the max end has been reached in the curr substring hence it can be a partition
+                list.add(last - start + 1);
+                start = last + 1;
+            }
+        }
+        return list;
+    }
+-------------------------------------------------------------------------------------
+70. Longest String Chain (LC-1048)
+
+public int longestStrChain(String[] words) {
+        HashMap<String,Integer>dp = new HashMap<>();
+        Arrays.sort(words,(a,b)->(a.length()-b.length()));
+        
+        int ans=0;
+        
+        for(String word:words){
+            int best = 0;
+            
+            for(int i=0;i<word.length();i++){
+                String prev = word.substring(0,i) + word.substring(i+1);
+                best = Math.max(best,dp.getOrDefault(prev,0)+1);
+            }
+            dp.put(word,best);
+            ans = Math.max(ans,best);
+        }
+        return ans;
+    }
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------

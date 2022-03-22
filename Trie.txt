@@ -338,6 +338,19 @@ static class Node {
         return count+1; //+1 for empty string
   }
 -----------------------------------------------------------------------------
+XOR category=>
+->  In this type of problems we generally put all the number in the Trie in form of their Binary representation.
+-> The comparison to find the max num by xor is that we try to set the current bit in the final answer in order to get max number.
+
+for eg x = 8 => 01000
+Numbers are
+-> 9(01001)  8(01000)  7(00111)  5(00101)  4(00100)
+=> n is the number which will be formed from the array of numbers.
+
+-> x   : 0 1 0 0 0  
+-> n   : 0 0 1 1 1      <- since for the first bit to set we couldn't find any opposite (here 1) so that its xor becomes 1 and set this bit so we continued.
+-> ans : 0 1 1 1 1 = 15
+
 5. Maximum Xor of two number in an array 
 T: O(32*N)
 
@@ -400,6 +413,7 @@ class Trie {
 }
 public class Solution 
 {
+// insert all the values from array 1 and now for every element of array 2 find its max xor. and last find the overall max xor.
 
 	public static int maxXOR(int n, int m, ArrayList<Integer> arr1, ArrayList<Integer> arr2) 
 	{
@@ -487,7 +501,7 @@ then we just upto that limit and so on. in the trie
              ArrayList<Integer> temp = new ArrayList<Integer>(); 
              temp.add(queries.get(i).get(1)); 
              temp.add(queries.get(i).get(0)); 
-             temp.add(i); 
+             temp.add(i);   //for query number to locate it in the result array.
              offlineQueries.add(temp); 
          }
          Collections.sort(offlineQueries, new Comparator<ArrayList<Integer>> () {
@@ -500,7 +514,7 @@ then we just upto that limit and so on. in the trie
          int n = arr.size(); 
          Trie trie = new Trie(); 
          ArrayList<Integer> ans = new ArrayList<Integer>(m); 
-         for(int i = 0;i<m;i++) ans.add(-1); 
+         for(int i = 0;i<m;i++) ans.add(-1); // so that it becomes an array.
          for(int i = 0;i<m;i++) {
              while(ind<n && arr.get(ind) <= offlineQueries.get(i).get(0)) {
                  trie.insert(arr.get(ind)); 

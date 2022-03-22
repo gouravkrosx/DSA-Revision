@@ -1238,6 +1238,9 @@ public String longestPalindrome(String s) {
 		dp[idx] = ans;
 		return ans;
 	}
+#) Very Similar problem
+-> Wiggle Subsequence (LC-376)	
+-> A wiggle sequence is a sequence where the differences between successive numbers strictly alternate between positive and negative. 
 ------------------------------------------------------------------------------------------------
 29. GoldMine Problem
 static int maxGold(int n, int m, int arr[][])

@@ -438,6 +438,28 @@ static List<String> wordBreak(int n, List<String> dict, String s)
             }
         }
     }
+ Word Break II (LC-140)
+ 
+  public List<String> wordBreak(String s, List<String> wordDict) {
+        
+        List<String>ans = new ArrayList<>();
+                
+         WordBreak(s,wordDict,0,"",ans);
+        return ans;
+    }
+    public void WordBreak(String str,List<String>set,int start,String res,List<String>ans){
+        if(start>=str.length()){
+            ans.add(res.substring(0,res.length()-1));
+            return;
+        }
+        
+        for(int end=start+1;end<=str.length();end++){
+            String s = str.substring(start,end);
+            if(set.contains(s)){
+                WordBreak(str,set,end,res+s+" ",ans);
+            }
+        }
+    }   
 --------------------------------------------------------------------------------------------
 10. Partition in K subsets (non empty)-> pepcoding->https://www.youtube.com/watch?v=TvvGj1FtHIk&t=6s
 Approach-> can we take a (existing non empty set) +(new set /(first non occupy set)) <- two options 
