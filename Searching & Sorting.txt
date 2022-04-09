@@ -55,7 +55,7 @@ public int search(int[] arr, int target) {
 -> in case of duplicates elements
 
  public boolean search(int[] arr, int target) {
-                int l = 0;
+        int l = 0;
 		int r = arr.length - 1;
 		while (l <= r) {
 			int mid = (l + r) / 2;
@@ -462,7 +462,7 @@ public static void BishuNSoldier() {
 			int l = 0, r = n - 1;
 			while (l <= r) {
 				int mid = (l + r) / 2;
-				if (p >= powofS[mid]) {
+				if (p >= powofS[mid]) {  // i think it should be preSum[mid] instead of powofS[mid]
 					l = mid + 1; // -a
 				} else {
 					idx = mid; // -b

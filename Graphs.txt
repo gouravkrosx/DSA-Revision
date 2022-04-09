@@ -1847,7 +1847,6 @@ static int timer = 1;
         
         for(int an:adj.get(node)){
             if(vis[an]==0){
-                vis[an]=1;
                 Dfs(an,source,adj,list,vis);
             }
         }

@@ -1,5 +1,7 @@
 Important Concetps
 
+-> All DP problems according to its type -> https://leetcode.com/discuss/study-guide/1000929/Solved-all-dynamic-programming-(dp)-problems-in-7-months
+
 1) Whenever there will be relation like dp[i-1], dp[i-2] there can always be space optimization like
 curr = accoding to question
 prev2=prev;
@@ -711,23 +713,41 @@ Iterative->
 public int lengthOfLIS(int[] nums) {
         int n=nums.length;
         int[]dp=new int[n];
+        int[]hash=new int[n]; // it will store the prev index of LIS
         
         int omax=0;
+        int lastmaxind = 0;
         
         for(int i=0;i<n;i++){
             int max=0;
+            hash[i]=i;
             for(int j=0;j<i;j++){
                 if(nums[i]>nums[j]){
                     if(dp[j]>max){
                         max=dp[j];
+                        hash[i]=j;
                     }
                 }
             }
             dp[i]=1+max;
             if(dp[i]>omax){
                 omax=dp[i];
+                lastmaxind=i;
             }
         }
+
+// in order to print the LIS
+
+	ArrayList<Integer>lis = new ArrayList<>();
+	lis.add(nums[lastmaxind]);
+
+        while(hash[lastmaxind]!=lastmaxind){
+        	lastmaxind = hash[lastmaxind];
+        	lis.add(nums[lastmaxind]);
+        }
+
+        Collections.reverse(lis);
+
         return omax;        
     }
 
@@ -828,7 +848,28 @@ public static int LISOptimised(int[] nums) {
 		}
 		return ans + 1;
 	}
+-> Striver's Approach
 
+  public int lengthOfLIS(int[] nums) {
+
+		ArrayList<Integer> temp = new ArrayList<>();
+
+		temp.add(nums[0]);
+		int len = 1;
+
+		for (int i = 1; i < nums.length; i++) {
+			if (nums[i] > temp.get(temp.size() - 1)) {
+				len++;
+				temp.add(nums[i]);
+			} else {
+				int[] arr = temp.stream().mapToInt(id -> id).toArray();
+				int idx = LowerBound(arr, 0, temp.size(), nums[i]);
+				temp.set(idx, nums[i]);
+			}
+		}
+
+		return len; // or temp.size();
+	}
 ------------------------------------------------------------------------------------------------
 21. Unbounded Knapsack 
     public static int unboundedKnapsack(int[] wt, int[] price, int W) {
@@ -1294,7 +1335,7 @@ public static int DistinctSubsequences(String s) {
 		dp[0]=1; //empty seq
 		for(int i=1;i<dp.length;i++) {
 			
-            		dp[i]=2*dp[i-1]%MOD;
+    		dp[i]=2*dp[i-1]%MOD;
 			char ch=s.charAt(i-1);
             
 			if(map.containsKey(ch)) {
@@ -1305,9 +1346,9 @@ public static int DistinctSubsequences(String s) {
             			map.put(ch,i);
 		}
 
-       		 if(dp[s.length()]<0){
-           		 dp[s.length()]=(dp[s.length()]+MOD)%MOD;
-      		  }
+   		 if(dp[s.length()]<0){
+       		 dp[s.length()]=(dp[s.length()]+MOD)%MOD;
+  		  }
 		return (int) (dp[s.length()]-1);// because we only need non-empyt seq
 	}
 ------------------------------------------------------------------------------------------------
@@ -2500,9 +2541,48 @@ ans = bgruoote (len=8 which is minimum)
 ------------------------------------------------------------------------------------------------
 65. Word Wrap
 ------------------------------------------------------------------------------------------------
+66. Largest Divisible subset 
+-> Based on LIS
+ public List<Integer> largestDivisibleSubset(int[] nums) {
+        List<Integer> ans =new ArrayList<>();
+        int n=nums.length;
+        
+        Arrays.sort(nums);
+        
+        int[]count=new int[n]; //count[i] will store the maximum length of divisible subset upto ith index
+        int[]prev=new int[n]; //it will store the prev index that was taken to make the
+                            // largest divisible subset upto ith index;
+        
+        int max=Integer.MIN_VALUE;
+        int index=0;
+        
+        for(int i=0;i<n;i++){
+            count[i]=1;
+            prev[i]=-1; 
+            
+            for(int j=i-1;j>=0;j--){
+                if(nums[i]%nums[j]==0){
+                    if(count[j]+1>count[i]){
+                        count[i]=count[j]+1;
+                        prev[i]=j;
+                    }
+                }
+            }
+            if(max<count[i]){
+                index=i;
+                max=count[i];
+            }
+        }
+        
+        while(index!=-1){
+            ans.add(0,nums[index]);
+            index=prev[index];
+        }
+        return ans;
+    }
 
 ------------------------------------------------------------------------------------------------
-
+67.
 ------------------------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------------------------

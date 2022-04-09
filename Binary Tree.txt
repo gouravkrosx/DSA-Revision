@@ -483,6 +483,26 @@ private TreeNode constructPreIn(int[] pre, int plo, int phi, int[] in, int ilo, 
 		nn.right = constructPreIn(pre, plo + nel + 1, phi, in, si + 1, ihi);
 		return nn;
 	}
+-> Using postorder and inorder traversal
+private Node constructPostIn(int[] post, int plo, int phi, int[] in, int ilo, int ihi) {
+		if (plo > phi || ilo > ihi) {
+			return null;
+		}
+
+		Node nn = new Node();
+		nn.data = post[phi];
+		int si = -1;
+		for (int i = ilo; i <= ihi; i++) {
+			if (in[i] == nn.data) {
+				si = i;
+				break;
+			}
+		}
+		int nel = si - ilo;
+		nn.left = constructPostIn(post, plo, plo + nel - 1, in, ilo, si - 1);
+		nn.right = constructPostIn(post, plo + nel, phi - 1, in, si + 1, ihi);
+		return nn;
+	}
 -----------------------------------------------------------------------------------	
 14. Symmetric Tree
  public boolean isSymmetric(TreeNode left,TreeNode right){

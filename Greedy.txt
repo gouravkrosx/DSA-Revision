@@ -777,6 +777,119 @@ public static void main(String args[]) {
         return sum;
     }
 ---------------------------------------------------------------------------------
+29. Broken Calculator (LC-991)
+
+// Proof of Greedy: https://leetcode.com/problems/broken-calculator/discuss/236565/Detailed-Proof-Of-Correctness-Greedy-Algorithm
+        
+    int brokenCalc(int x, int y){
+
+    int count=0;
+    while(y!=x)
+    {
+        if(x>=y) return ((x-y) + count);
+        
+        /* If y is even, the last move was multiplication, else decrement */
+        if(y%2==0) y=y/2 ;
+        else y++;
+        
+        // One operation used
+        count ++;
+    }
+    
+    return count;
+}
+---------------------------------------------------------------------------------
+30. Boats to Save people (LC-881)
+
+M1) Using Sorting
+->
+we sorted the people by their weight......then there are two cases:
+
+CASE-I : "minimum weight" man can't sit with "maximum weight" man
+it implies that "maximum weight" man can't sit with any other man
+hence "maximum weight" man sits alone so decrement only high end pointer.
+
+CASE-II : "minimum weight" man can sit with "maximum weight" man
+it implies that "minimum weight" man can sit with any other man
+since we want to maximize the amount of weight carried by a single boat we sit "minimum weight" man and "maximum weight" man together.
+so increment low end pointer and decrement high end pointer.
+
+public int numRescueBoats(int[] people, int limit) {
+       Arrays.sort(people);
+       int boats=0;
+       int i=0,j=people.length-1;
+        while(i<=j)
+        {
+            if(people[i]+people[j]<=limit)
+            {
+                i++;
+                j--;
+            } 
+            else
+                j--;
+            boats++;
+        }
+        return boats;
+    }
+
+M2) Using Bucket
+public int numRescueBoats(int[] people, int limit) {
+        int[] buckets = new int[limit+1];
+        for(int p: people) buckets[p]++;
+        int start = 0;
+        int end = buckets.length - 1;
+        int solution = 0;
+        while(start <= end) {
+            //make sure the start always point to a valid number
+            while(start <= end && buckets[start] <= 0) start++;
+            //make sure end always point to valid number
+            while(start <= end && buckets[end] <= 0) end--;
+            //no one else left on the ship, hence break.
+            if(buckets[start] <= 0 && buckets[end] <= 0) break;
+            solution++;
+            if(start + end <= limit) buckets[start]--; // both start and end can carry on the boat
+            buckets[end]--;
+        }
+        return solution;
+    }
+---------------------------------------------------------------------------------
+31. Police & Thieves (GFG)
+->
+ static int catchThieves(char arr[], int n, int k) 
+    { 
+        List<Integer>thief = new ArrayList<>();
+        List<Integer>police = new ArrayList<>();
+        
+        for(int i=0;i<n;i++){
+            if(arr[i]=='P'){
+                police.add(i);
+            }else{
+                thief.add(i);
+            }
+        }
+        
+        int i=0;
+        int j=0;
+        
+        int ans=0;
+        while(i<police.size() && j<thief.size()){
+            int pi = police.get(i);
+            int ti = thief.get(j);
+            if(Math.abs(pi-ti)<=k){
+                ans++;
+                i++;
+                j++;
+            }else if(pi<ti)i++;
+            else j++;
+        }
+        return ans;
+    } 
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 

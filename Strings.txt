@@ -98,7 +98,9 @@ public static void ValidShuffle(){
 	}
 } 
 -----------------------------------------------------------------------------------
-4. Count and say (recursive solution)  public String countAndSay(int n) {
+4. Count and say (recursive solution)  
+
+public String countAndSay(int n) {
     if(n==1) return "1";
     String ans = "1";
     for(int i=2; i<=n; i++){
