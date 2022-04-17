@@ -485,6 +485,18 @@ public static TreeNode<Integer> flatten(TreeNode<Integer> root) {
    		 prev=node;
         FlattenBST(node.right,prev);    
     }
+-> Easy way
+public TreeNode increasingBST(TreeNode root) {
+        return increasingBST(root, null);
+    }
+
+    public TreeNode increasingBST(TreeNode root, TreeNode tail) {
+        if (root == null) return tail;
+        TreeNode res = increasingBST(root.left, root);
+        root.left = null;
+        root.right = increasingBST(root.right, tail);
+        return res;
+    }    
 -------------------------------------------------------------------------------------------------
 17. Check if Bst contains Dead End or not (DeadEnd means, we are not able to insert any element after that node)
 public static boolean IsDeadEnd(Node node,int min,int max){

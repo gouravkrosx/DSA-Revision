@@ -1192,6 +1192,10 @@ public boolean isSubtree(TreeNode root, TreeNode subRoot) {
 -----------------------------------------------------------------------------------
 33. Flatten Binary Tree to linkedList
 w/Morris Traversal->https://i.imgur.com/sqnrz9m.gif
+
+*** Preorder traversal should be same.
+
+
 public void flatten(TreeNode root) {
         TreeNode curr = root;
         while (curr != null) {
