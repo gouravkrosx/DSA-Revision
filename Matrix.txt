@@ -392,6 +392,52 @@ public int[] findDiagonalOrder(int[][] matrix) {
         return res;
     }
 ------------------------------------------------------------------------------------
+12. Game of Life (LC-289)
+
+M1) Use of Extra Space
+
+M2)
+-> To do this in constant space, use the fact the all the cells on the board are 0 or 1 and are ints which have 32 bits data out of which only 1 bit is being used to represent 0 or 1
+-> So let the current state be there in the first bit (from right, i.e. LSB) and the next state in the second bit.
+-> After updating all the cells, right shift them by 1 bit, thereby representing the new state
+
+ public void gameOfLife(int[][] board) {
+        int m = board.length;
+        int n = board[0].length;
+        int[][]arr = new int[m][n];
+        
+        for(int i = 0;i<m;i++){
+            for(int j=0;j<n;j++){
+                int alive = collect(board,i,j,m,n);
+    
+                // Dead cell with 3 live neighbors becomes alive
+            if (board[i][j] == 0 && alive == 3) // board[i][j] = 00
+                board[i][j] = 2; // board[i][j] = 10
+            // Live cell with 2 or 3 live neighbors lives on
+            else if (board[i][j] == 1 && (alive == 2 || alive == 3)) // board[i][j] = 01
+                board[i][j] = 3; // board[i][j] = 11              
+            }
+        }
+        
+        for(int i=0;i<m;i++){
+            for(int j=0;j<n;j++){
+                board[i][j]=(board[i][j]>>1);
+            }
+        }
+    }
+    public int collect(int[][]board,int r,int c,int m,int n){
+        int cnt=0;
+        int[][]dir = {{0,1},{1,1},{1,0},{1,-1},{0,-1},{-1,-1},{-1,0},{-1,1}};
+        
+        for(int i=0;i<dir.length;i++){
+            int x = r + dir[i][0];
+            int y = c + dir[i][1];
+            
+            if(x<0|| x>=m || y<0 || y>=n)continue;
+            if((board[x][y]&1)==1)cnt++;
+        }
+        return cnt;
+    }
 
 ------------------------------------------------------------------------------------
 

@@ -497,6 +497,8 @@ public static void PartitionInKsubsets(int i, int n, int k, int nos, ArrayList<A
 
 --------------------------------------------------------------------------------------------
 11. Equal Sum subsets partition(k)
+-> O(k*2^n)
+
 public static void main(String[] args) throws java.lang.Exception {
 
 		int n = scn.nextInt();
@@ -571,6 +573,46 @@ public static void main(String[] args) throws java.lang.Exception {
 			}
 		}
 	}
+
+-> Easy Method
+ public boolean canPartitionKSubsets(int[] nums, int k) {
+        int total = 0;
+        for(int el: nums){
+            total+=el;
+        }
+
+        if(total%k !=0){
+            return false;
+        }
+
+        if (nums.length < k) return false;
+
+        int subsetSum = total/k;
+        boolean[] visited = new boolean[nums.length];
+        return canPartition(nums, visited, 0, k, 0, subsetSum);
+
+    }
+
+    private boolean canPartition(int[] nums, boolean[] visited, int start, int k, int curSum, int subsetSum) {
+        if (k == 0) return true;
+        if (curSum > subsetSum) return false;
+        if (curSum == subsetSum)  {
+            return canPartition(nums, visited, 0, k - 1, 0, subsetSum);
+        }
+
+        for (int i = start; i < nums.length; i++) {
+            if (visited[i]) continue;
+            visited[i] = true;
+            if (canPartition(nums, visited, i + 1, k, curSum + nums[i], subsetSum)) return true;
+            visited[i] = false;
+        }
+
+        return false;
+    }
+
+ M2) Using BitMask 
+ ->
+
 --------------------------------------------------------------------------------------------
 12. Remove Invalid Parentheses->(Leetcode 301)
 Intuition-> We remove every single parenthesis then check is it valid if valid then add it into ans

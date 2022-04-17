@@ -963,6 +963,8 @@ public TreeNode[] splitBST(TreeNode root, int V) {
     }
 -------------------------------------------------------------------------------------
 34. Given a binary search tree and a range [L, R], delete all elements which are not in the range.
+(Trim a Binary Search Tree- (LC-669))
+
 O(N)
  private static Node removeOutsideRange(Node root,
                                            int min, int max)
@@ -1598,7 +1600,7 @@ public String removeKdigits(String num, int k) {
 		return sb.toString();
     }
 -------------------------------------------------------------------------------------
-50. Minimize Deviation in Array
+50. Minimize Deviation in Array (LC-1675)
 
 -> Time Complexity :- BigO(NlogNlogM) where N is the highest value in the array
 -> Space Complexity :- BigO(N)
@@ -1868,7 +1870,14 @@ M1) House robber Approach
     }   
 -------------------------------------------------------------------------------------
 58. Count all Valid Pickup and Delivery options (LC-1359)
-Explanation https://leetcode.com/problems/count-all-valid-pickup-and-delivery-options/discuss/516951/C%2B%2BJava-Simple-Math-Formula-with-Explanation
+Explanation: https://leetcode.com/problems/count-all-valid-pickup-and-delivery-options/discuss/516951/C%2B%2BJava-Simple-Math-Formula-with-Explanation
+
+Place P2 D2 to 1 result from case n=1: (__ P1 __ D1 __), there are 3 spaces to place to
+
+The result will be:
+(P2 D2 P1 D1) (P2 P1 D2 D1) (P2 P1 D1 D2)
+(P1 P2 D2 D1) (P1 P2 D1 D2)
+(P1 D1 P2 D2)
 
 -> Mathematical problem
  public int countOrders(int n) {
@@ -1886,7 +1895,7 @@ Explanation https://leetcode.com/problems/count-all-valid-pickup-and-delivery-op
 -------------------------------------------------------------------------------------
 59. Longest Arithmetic Subsequence (LC-1027)
 
-->
+-> Similar problem in this file problem-13 but with a given difference
 
 public int longestArithSeqLength(int[] nums) {
         
@@ -2029,6 +2038,37 @@ O(1) space is possible if we sort pos inplace.
 
 -------------------------------------------------------------------------------------
 64. Score of parenthesis
+
+-> My Approach
+ public int scoreOfParentheses(String s) {
+        Stack<String>st = new Stack<>();
+        
+        char[]crr = s.toCharArray();
+        for(int i=0;i<crr.length;i++){
+            if(crr[i]=='('){
+                st.push("(");
+            }else{
+                if(st.peek()=="("){
+                    st.pop();
+                    st.push("1");
+                    continue;
+                }
+                
+                int num = 0;
+                while(!st.isEmpty() && st.peek()!="("){
+                    num+=Integer.parseInt(st.pop());
+                }
+                st.pop();
+                st.push(2*num+"");
+            }
+        }
+        int res = 0;
+        
+        while(!st.isEmpty()){
+            res+=Integer.parseInt(st.pop());
+        }
+        return res;
+    }
 
 M1) Using Stack
 ->
@@ -2405,7 +2445,7 @@ M1)
         long[]limit = new long[16];
         limit[1] = 9;
         limit[2] = 9;
-        // just verify this using _ _ _ _ _ and you will get to know the intuition
+        // just verify this using _ _ _ _ _ (means by putting just like in permutation)and you will get to know the intuition
         for(int i=3;i<16;i++){
             long t = 9;
             for(int j = 2;j<=(i+1)/2;j++){
@@ -2480,29 +2520,7 @@ b) Or only one number has odd frequency
     largest[l - front - 1] = (char)(i + 48);
 -> If Even frequency digit occurs then do above thing, but if odd frequency digit occur then for 1 occurence do [ arr[len/2]=num ], and for rest occurences just do like above.
 -------------------------------------------------------------------------------------
-74. Minimum Deviation in Array (LC-1675)
--> public int minimumDeviation(int[] nums) {
-      PriorityQueue<Integer> pq = new PriorityQueue<>(Comparator.reverseOrder());
-     
-        int min = Integer.MAX_VALUE;
-        for(int i:nums){
-            if(i%2!=0)i=i*2;
-            min = Math.min(i,min);
-            pq.add(i);
-        }
-        
-        int diff = Integer.MAX_VALUE;
-        while(pq.peek()%2==0){
-            int max = pq.poll();
-            diff = Math.min(diff,max-min);
-            min = Math.min(min,max/2);
-            pq.add(max/2);
-        }
-        return Math.min(diff,pq.peek()-min);
-    }
-
--------------------------------------------------------------------------------------
-75. Minimum Number of Removals to Make Mountain Array (LC-1671)
+74. Minimum Number of Removals to Make Mountain Array (LC-1671)
 -> Same as Longest Bitonic subsequence
 ans => n-lbs(arr);
 
@@ -2583,8 +2601,193 @@ Similar problem
         return max;
     }
 -------------------------------------------------------------------------------------
+75. Subarray with k different integers (LC-992)
 
+public int subarraysWithKDistinct(int[] nums, int k) {
+        return atmost(nums,k) - atmost(nums,k-1);
+    }
+    public int atmost(int[]nums,int k){
+        HashMap<Integer,Integer>map = new HashMap<>();
+        int i=0,j=0;
+        
+        int result=0;
+        while(j<nums.length){
+            int val = nums[j];
+            map.put(val,map.getOrDefault(val,0)+1);
+            j++;
+            while(map.size()>k && i<j){
+                int temp = map.get(nums[i]);
+                if(temp==1){
+                    map.remove(nums[i]);
+                }else{
+                    map.put(nums[i],map.get(nums[i])-1);
+                }
+                i++;
+            }
+            result += j-i+1;
+        }
+        return result;
+    }
 -------------------------------------------------------------------------------------
+76. Substring with atleast k distinct characters
+-> 
+ static void atleastkDistinctChars(String s, int k){
+    
+    // Stores the size of the string
+    int n = s.length();
+  
+    // Initialize a HashMap
+    Map<Character, Integer> mp = new HashMap<>();
+  
+    // Stores the start and end
+    // indices of sliding window
+    int begin = 0, end = 0;
+  
+    // Stores the required result
+    int ans = 0;
+  
+    // Iterate while the end
+    // pointer is less than n
+    while (end < n) {
+  
+        // Include the character at
+        // the end of the window
+        char c = s.charAt(end);
+        mp.put(c,mp.getOrDefault(c,0)+1);
+  
+        // Increment end pointer by 1
+        end++;
+  
+        // Iterate until count of distinct
+        // characters becomes less than K
+        while (mp.size() >= k) {
+  
+            // Remove the character from
+            // the beginning of window
+            char pre = s.charAt(begin);
+            mp.put(pre,mp.getOrDefault(pre,0)-1);
+  
+            // If its frequency is 0,
+            // remove it from the map
+            if (mp.get(pre)==0){
+                mp.remove(pre);
+            }
+  
+            // Update the answer
+            ans += s.length() - end + 1;
+            begin++;
+        }
+    }
+  
+    // Print the result
+    System.out.println(ans);
+}
 -------------------------------------------------------------------------------------
+77. Longest Substring with at least k repeating characters. (LC-395)
+-> Sliding window (must read the intuition)
+
+Basically iterate through the number of possible unique letters 1 to 26. Lets call our target amount of unique letters u. We search all windows of letters where the number of unique letters <= u. This is the number of any unique letters, not the number of unique letters that occur k or more times.
+We count the number of current unique letters, and the number of letters that have a count of k or more using a sliding window.
+
+We expand, if our number of unique letters is less than or equal to u, we need to add a letter, so we increment the right pointer, and add the count of the right letter by 1. If the count is equal to 1 we know this is a new letter so we increment unique, and if it is equal to k we increment k or more since it just became k or more. Note that the reason we choose this route if it's equal is that we need to keep expanding the letters if its at the target u because we can still have a chance at getting more kOrMore letters and u==unique. For example, aaabb if we stop at "a" since unique == u (1=1) we won't ever get to "aaa" which is the answer.
+
+We shorten, if our number of unique letters is more than u , we need to remove a letter, so we decrement the left pointer, and decrease the count of the left letter by 1. If the count is equal to 0 we decrement the number of unique letters since all instances of this letter are gone, if it's equal to k-1 it is now not k or more so we decrement kOrMore.
+
+This interval is a valid candidate if the number of unique letters is u and all the unique letters have kOrMore counts (unique==kOrMore). So we take the maximum of valid candidates.
+
+Code:
+ public int longestSubstring(String s, int k) {
+       
+       int n = s.length();
+       int max = 0;
+       int[] cnt = new int[26];
+        
+        for(int u=1;u<=26;u++){
+            
+            Arrays.fill(cnt,0);
+            int unique = 0;
+            int kOrMore = 0;
+            int left = 0;
+            int right = 0;
+            
+            while(right<n){
+                if(unique<=u){
+                    char ch = s.charAt(right);
+                    cnt[ch-'a']++;
+                    if(cnt[ch-'a']==1)unique++;
+                    
+                    if(cnt[ch-'a']==k)kOrMore++;
+                    right++;
+                }else{
+                    char ch = s.charAt(left);
+                    if(cnt[ch-'a']==1)unique--;
+                    
+                    if(cnt[ch-'a']==k)kOrMore--;
+                    
+                    cnt[ch-'a']--;
+                    left++;
+                }
+                if(unique==u && unique==kOrMore){
+                    max = Math.max(max,right-left);
+                }
+            }
+        }
+        return max;
+    }
 -------------------------------------------------------------------------------------
+78. Longest k unique/distinct character substring
+->
+ public int longestkSubstr(String s, int k) {
+        HashMap < Character, Integer > map = new HashMap < > ();
+        int n = s.length();
+
+        int j = 0;
+        int maxLength = 0;
+
+        for (int i = 0; i < n; i++) {
+            char ch = s.charAt(i);
+            map.put(ch, map.getOrDefault(ch, 0) + 1);
+
+            while (map.size() > k) {
+                char start = s.charAt(j);
+                map.put(start, map.get(start) - 1);
+                if (map.get(start) == 0) {
+                    map.remove(start);
+                }
+                j++;
+            }
+
+            if (map.size() == k) {
+                maxLength = Math.max(maxLength, i - j + 1);
+            }
+        }
+
+        return maxLength == 0 ? -1 : maxLength;
+    }
+-------------------------------------------------------------------------------------
+79. Longest Substring with atmost K distinct characters.
+
+public int lengthOfLongestSubstringKDistinct(String s, int k) {
+        Map<Character, Integer> map = new HashMap<>();
+        int len = 0;
+        int maxLen = 0;
+        int start = 0;
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            map.put(c, map.getOrDefault(c,0) + 1);
+            len++;
+
+            while (map.size() > k) {
+                char sChar = s.charAt(start);
+                map.put(sChar, map.get(sChar) - 1);
+                if (map.get(sChar) == 0) {
+                    map.remove(sChar);
+                }
+                len--;
+                start++;
+            }
+            maxLen = Math.max(maxLen, len);
+        }
+        return maxLen;
+    }
 -------------------------------------------------------------------------------------

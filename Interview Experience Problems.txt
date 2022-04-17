@@ -1568,7 +1568,48 @@ public boolean backspaceCompare(String s, String t) {
         return true;
     }
 ---------------------------------------------------------->
+45) Step-By-Step Directions From a Binary Tree Node to Another (LC-2096)
+-> Asked in Amazon
 
+ public String getDirections(TreeNode root, int startValue, int destValue) {
+        TreeNode ancestor = lowestCommonAncestor(root, startValue, destValue);
+        List<String> toStart = new ArrayList<>();
+        getDirection(ancestor, startValue, toStart);
+        List<String> toDest = new ArrayList<>();
+        getDirection(ancestor, destValue, toDest);
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < toStart.size(); i++) sb.append("U");
+        for (String s : toDest) sb.append(s);
+        return sb.toString();
+    }
+    
+    private TreeNode lowestCommonAncestor(TreeNode root, int p, int q) {
+        if (root == null || p == root.val || q == root.val) return root; 
+        TreeNode left = lowestCommonAncestor(root.left, p, q);
+        TreeNode right = lowestCommonAncestor(root.right, p, q);
+        if (left != null && right != null) return root; 
+        else return left == null ? right : left;
+    }
+    
+    private boolean getDirection(TreeNode ancestor, int value, List<String> steps) {
+        if (ancestor == null) return false;
+        if (ancestor.val == value) return true;
+        steps.add("L");
+        if (getDirection(ancestor.left, value, steps)) return true;
+        steps.remove(steps.size() - 1);
+        steps.add("R");
+        if (getDirection(ancestor.right, value, steps)) return true;
+        steps.remove(steps.size() - 1);
+        return false;
+    }
+---------------------------------------------------------->
+---------------------------------------------------------->
+---------------------------------------------------------->
+---------------------------------------------------------->
+---------------------------------------------------------->
+---------------------------------------------------------->
+---------------------------------------------------------->
+---------------------------------------------------------->
 
 *) Must do at last day
 ---------------------------------------------------------->
@@ -1589,10 +1630,6 @@ Do these questions at last
 ---------------------------------------------------------->
 #) Count total set bits in all number from 1 to n
 -> https://www.geeksforgeeks.org/count-total-set-bits-in-all-numbers-from-1-to-n-set-2/
----------------------------------------------------------->
-#)
--> https://www.techiedelight.com/shortest-common-supersequence-finding-scs/
--> https://www.techiedelight.com/shortest-common-supersequence-introduction-scs-length/
 ---------------------------------------------------------->
 #) https://www.geeksforgeeks.org/find-pairs-b-array-b-k/
 ---------------------------------------------------------->
