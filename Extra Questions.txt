@@ -2791,3 +2791,164 @@ public int lengthOfLongestSubstringKDistinct(String s, int k) {
         return maxLen;
     }
 -------------------------------------------------------------------------------------
+80. Smallest String With Swaps (LC-1202)
+
+This problem you will only understand better when you dry run the below testcase
+s = "dcabbruqioxp"
+pairs = [[0,3],[1,2],[5,8],[6,0],[7,7],[9,10],[2,4]]
+
+ans -> "babdciuqroxp"
+
+-> You will get to know that for the above test case
+Different connected components acc to indexes will be
+
+-> after sorting
+0,3,6 -> d, b, u => after sorting b,d,u
+1,2,4
+5,8
+7
+9,10
+11
+
+-> Intuition:
+1. So the basic idea is treat indexes as nodes and pairs as edges.
+2. Make undirected/bidirectional graph.
+3. Find all connected components using dfs/bfs
+4. For each connected component you will find just collect all the indexes and characters as well, and later sort them to get smaller
+lexicographical string.
+5. All the connected components will be independent of each other.(means the changes we do in the char array of that string with these indexes suppose 0,3,6 <- it will not remove any character, only there will happen swaps among them to find the smaller string).
+6. Hence each component we can treat as a string and we sort the order
+7. In each connected component we find that we can swap any node with any other node this gives us hint that we should find the smaller order among them, hence we can sort them to find the smaller order hence smaller lexico string.
+
+Time: E + VLogV
+    
+    public String smallestStringWithSwaps(String s, List<List<Integer>> pairs) {
+    
+        
+        List<Integer>[]graph = new List[s.length()];
+        
+        for(int i=0;i<graph.length;i++)graph[i] = new ArrayList<>();
+        
+        for(int i=0;i<pairs.size();i++){
+            graph[pairs.get(i).get(0)].add(pairs.get(i).get(1));
+            graph[pairs.get(i).get(1)].add(pairs.get(i).get(0));
+        }
+    
+        char[] srr = s.toCharArray();
+        
+        boolean[]vis = new boolean[s.length()];
+        
+        for(int i=0;i<srr.length;i++){
+            if(!vis[i]){
+                List<Integer>ind = new ArrayList<>();
+                List<Character>cr = new ArrayList<>();
+               
+                DFS(graph,srr,i,ind,cr,vis);
+                
+                Collections.sort(ind);
+                Collections.sort(cr);
+                
+                for(int j=0;j<ind.size();j++){
+                    srr[ind.get(j)]=cr.get(j);
+                }
+            }
+        }    
+        
+        return new String(srr);
+    }
+    
+    public void DFS(List<Integer>[]graph, char[]srr, int start, List<Integer>ind, List<Character>cr, boolean[]vis){
+        vis[start]=true;
+        
+        ind.add(start);
+        cr.add(srr[start]);
+        
+        for(int child:graph[start]){
+            if(!vis[child]){
+                DFS(graph,srr,child,ind,cr,vis);
+            }
+        }
+    }
+
+---------------------------------------------------------------------------------------------    
+81. Evaluate Division (LC-399)
+
+M1) Using DFS
+
+
+    public double[] calcEquation(List<List<String>> equations, double[] values, List<List<String>> queries) {
+        
+        Map<String,Map<String,Double>>graph = buildGraph(equations,values);
+        
+        int n = queries.size();
+        double[]res = new double[n];
+        
+        for(int i=0;i<n;i++){
+            res[i] = getAnswer(graph, queries.get(i).get(0), queries.get(i).get(1), new HashSet<>());
+        }
+        return res;
+    }
+    
+    public Map<String,Map<String,Double>> buildGraph(List<List<String>>equations, double[]values){
+        
+        Map<String,Map<String,Double>> graph = new HashMap<>();
+        
+        int n = values.length;
+        
+        for(int i=0;i<n;i++){
+            
+            double w_ab = values[i];
+            double w_ba = 1.0/values[i];
+            
+            String a = equations.get(i).get(0);
+            String b = equations.get(i).get(1);
+            
+            graph.computeIfAbsent(a,x->new HashMap<>()).put(b,w_ab);
+            graph.computeIfAbsent(b,x->new HashMap<>()).put(a,w_ba);
+        }
+        
+        return graph; 
+    }
+    
+    public double getAnswer(Map<String,Map<String,Double>>graph, String src, String des, Set<String>vis){
+        
+        if(!graph.containsKey(src))return -1.0;
+        
+        if(graph.get(src).containsKey(des))return graph.get(src).get(des);
+        
+        vis.add(src);
+        
+        for(Map.Entry<String,Double> ent : graph.get(src).entrySet()){
+            if(!vis.contains(ent.getKey())){
+                vis.add(ent.getKey());
+                double product = getAnswer(graph,ent.getKey(),des,vis);
+                
+                if(product!=-1.0){
+                    return product * ent.getValue();
+                }
+            }
+        }
+        
+        return -1.0;
+    }
+
+M2) Using Union & Find
+---------------------------------------------------------------------------------------------    
+
+---------------------------------------------------------------------------------------------    
+
+---------------------------------------------------------------------------------------------    
+
+---------------------------------------------------------------------------------------------    
+
+---------------------------------------------------------------------------------------------    
+
+---------------------------------------------------------------------------------------------    
+
+---------------------------------------------------------------------------------------------    
+
+---------------------------------------------------------------------------------------------    
+
+---------------------------------------------------------------------------------------------    
+
+---------------------------------------------------------------------------------------------    
