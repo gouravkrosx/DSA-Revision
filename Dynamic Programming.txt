@@ -282,7 +282,10 @@ while(i>0 && j>0){
 ->BLog because we did some further optimization in this question  
 https://leetcode.com/problems/palindrome-partitioning-ii/discuss/1267844/JAVA-or-Recursion-%2B-Memoization-or-Optimized-Matrix-Chain-Multiplication-Approach-with-Code-(MCM)
 
-// we are cutting prefixes here
+// we are cutting prefixes here (Front partition)
+
+-> We can create another dp table in which dp[I][j] will tell whether substring s(I,j) is palindrome or not hence check function's time complexity reduces to O(1) and overall time complexity to O(n^2)
+
 
 public int PalindromicpartitionscutTD(String str, int si, int ei, int[][] strg) {
 		if (strg[si][ei] != -1) {
@@ -1742,6 +1745,39 @@ Logic-> what is the max size of square that can be made if we set a point as top
 		}
 		return ans*ans;
 	}
+
+-> Similar question
+(Count Squares submatrices with all ones - (LC-1277))
+->	 public int countSquares(int[][] matrix) {
+        int m = matrix.length;
+		int n = matrix[0].length;
+		int[][] dp = new int[m][n];
+
+		
+        for(int i=0;i<m;i++){
+            for(int j=0;j<n;j++){
+                if(matrix[i][j]==0){
+                    dp[i][j] = 0;
+                }else{
+                    if(i==0 || j==0){
+                        dp[i][j]=1;
+                    }else{
+                        dp[i][j] = 1 + Math.min(dp[i-1][j],Math.min(dp[i-1][j-1],dp[i][j-1]));
+                    }
+                }
+            }
+        }
+        
+        int sum = 0;
+        
+        for(int i=0;i<m;i++){
+            for(int j=0;j<n;j++){
+                sum+=dp[i][j];
+            }
+        }
+        return sum;
+    }
+
 ------------------------------------------------------------------------------------------------
 42. Min / Max Path Sum In Matrix 
 -> Same as gold mine problem
@@ -2225,6 +2261,72 @@ public int countParenth(char[] symb, char[] oper) {
         }
           return dpt[0][n-1]; 
     }
+-> Striver's method
+
+static int mod = 1000000007;
+    public static int evaluateExp(String exp) {
+		int n = exp.length();
+		long[][][]dp = new long[n][n][2];
+		for(long[][]dpp:dp){
+			for(long[]dppp:dpp){
+				Arrays.fill(dppp,-1);
+			}
+		}
+		int isTrue = 1; 
+		// basically it represents what is required and since finally we required true 
+ 		// so we are passing that only.
+        return (int)booleanEvaluation(0,n-1,isTrue,exp.toCharArray(),dp);
+    }
+	
+	// here we are applying cuts on operator that's why idx+=2;
+	public static long booleanEvaluation(int i, int j, int isTrue, char[]exp, long[][][]dp){
+		if(i>j)return 0l;
+		
+		if(i==j){
+			if(isTrue==1){
+				return (exp[i]=='T')?1l:0l;
+			}else{
+				return (exp[i]=='F')?1l:0l;
+			}
+		}
+		if(dp[i][j][isTrue]!=-1)return dp[i][j][isTrue];
+		
+		long ways=0;
+		for(int idx=i+1;idx<=j-1;idx+=2){
+			long lt = booleanEvaluation(i,idx-1,1,exp,dp); //(isTrue==1)means we need true from left.
+			long lf = booleanEvaluation(i,idx-1,0,exp,dp);
+			long rt = booleanEvaluation(idx+1,j,1,exp,dp);
+			long rf = booleanEvaluation(idx+1,j,0,exp,dp);
+			
+			if(exp[idx]=='&'){
+				if(isTrue==1){
+					ways = ways + (lt*rt);
+					ways = ways%mod;
+				}else{
+					ways = ways + lf*rt + lt*rf + lf*rf; 
+					ways = ways%mod;
+				}
+			}else if(exp[idx]=='|'){
+				if(isTrue==1){
+					ways = ways + lt*rt+ lf*rt + lt*rf;
+					ways = ways%mod;
+				}else{
+					ways = ways + lf*rf;
+					ways = ways%mod;
+				}
+			}else{
+				if(isTrue==1){
+					ways = ways + lf*rt + lt*rf;
+					ways = ways%mod;
+				}else{
+					ways = ways + lt*rt + lf*rf;
+					ways = ways%mod;
+				}
+			}
+		}
+		
+		return dp[i][j][isTrue] = ways;
+	}    
 ------------------------------------------------------------------------------------------------
 56. Optimal Binary Search Tree 
 #Keypoints->
@@ -2658,7 +2760,29 @@ public int minCost(int n, int[] cuts) {
         return dp[i][j] = min;
     }
 ------------------------------------------------------------------------------------------------
+68. Partition Array for Maximum Sum (LC_1043)
+-> 
 
+ //front partition problem
+    public int maxSumAfterPartitioning(int[]arr,int idx,int k,int[]dp){
+        if(idx==arr.length)return 0;
+        
+        if(dp[idx]!=-1)return dp[idx];
+        
+        int maxAns = Integer.MIN_VALUE;
+        int len = 0;
+        int max = Integer.MIN_VALUE;
+        
+        for(int j=idx;j<Math.min(arr.length,idx+k);j++){
+            len++;
+            max = Math.max(max,arr[j]);
+            
+            int sum = len*max + maxSumAfterPartitioning(arr,j+1,k,dp);
+            
+            maxAns = Math.max(maxAns,sum);
+        }
+        return dp[idx] = maxAns;
+    }
 ------------------------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------------------------

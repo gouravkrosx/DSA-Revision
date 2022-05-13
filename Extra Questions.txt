@@ -2934,6 +2934,41 @@ M1) Using DFS
 
 M2) Using Union & Find Method
 ---------------------------------------------------------------------------------------------    
+82. Shortest Unsorted Continous Subarray (LC-581)
+-> 
+  public int findUnsortedSubarray(int[] nums) {
+        int n = nums.length;
+        
+        if(n==0 || n==1)return 0;
+        
+        int beg = -1;
+        int end = -2; //taking this value so that in case of sorted array the final answer will return 0;
+        
+    //iterate from beginning of array, find the last element which is smaller than the last seen max from 
+    //its left side and mark it as end
+        int max = Integer.MIN_VALUE;
+        
+        for(int i=0;i<n;i++){
+            max = Math.max(max,nums[i]);
+            if(max>nums[i]){
+                end = i;
+            }
+        }
+        
+    //iterate from end of array, find the last element which is bigger than the last seen min from 
+    //its right side and mark it as begin
+
+        int min = Integer.MAX_VALUE;
+        
+        for(int i=n-1;i>=0;i--){
+            min = Math.min(min,nums[i]);
+            if(nums[i]>min){
+                beg = i;
+            }
+        }
+        
+        return end-beg+1;
+    }
 
 ---------------------------------------------------------------------------------------------    
 

@@ -411,6 +411,7 @@ Similar problem ->
 ---------------------------------------------------------->
 13. Populating Next Right Pointers in Each Node (LeetCode 116)
 -> Asked in (Amazon)
+-> In this question the tree is perfect binary tree.
 
 M1) We can use Level order traversal using Queue and for a given level just place next pointer for each node.
 -> O(N) , S(N)
@@ -457,6 +458,37 @@ M3) Just traverse and make linkedlist at each level (just dry run the code to un
         return root;
     }
 
+##) Populating Next Right Pointers in Each Node-ii (LC-117)    
+
+S(1)
+
+public Node connect(Node root) {
+        Node real_root = root;
+        
+        Node temp = new Node(0);
+        Node pre = temp;
+        
+        while(root!=null){
+            if(root.left!=null){
+                pre.next = root.left;
+                pre = pre.next;
+            }
+            
+            if(root.right!=null){
+                pre.next = root.right;
+                pre = pre.next;
+            }
+            root = root.next;
+            
+            if(root==null){
+                pre = temp;
+                root = temp.next;
+                temp.next=null;  // to avoid TLE (because of loop in the last case, just dry run to understand.)
+            }
+        }
+        
+        return real_root;
+    }
 ---------------------------------------------------------->
 14. Find height of a special binary tree whose leaf nodes are connected in a circular doubly linkedlist
 -> Asked in (Amazon)

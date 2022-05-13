@@ -821,6 +821,41 @@ Ans= "3412"
         return ans;
     }
 --------------------------------------------------------------------------------------------
+17. Letter Combinations of a phone number (LC-17)
+->  public List<String> letterCombinations(String digits) {
+        if(digits.length()==0)return new ArrayList<>();
+        List<String>ans = new ArrayList<>();
+        
+        letterCombinations(digits.toCharArray(),0,"",ans);
+        return ans;
+    }
+    
+    public void letterCombinations(char[]digits,int idx,String s,List<String>ans){
+        if(idx==digits.length){
+            ans.add(s);
+            return;
+        }
+        
+        char[]crr = getCode(digits[idx]);
+        
+        for(int i=0;i<crr.length;i++){
+            letterCombinations(digits,idx+1,s+crr[i],ans);
+        }
+    }
+    
+    public char[] getCode(char ch){
+       switch (ch) {
+			case '2' : return new char[] {'a','b','c'};
+			case '3' : return new char[] {'d','e','f'};
+			case '4' : return new char[] {'g','h','i'};
+			case '5' : return new char[] {'j','k','l'};
+			case '6' : return new char[] {'m','n','o'};
+			case '7' : return new char[] {'p','q','r','s'};
+			case '8' : return new char[] {'t','u','v'};
+			case '9' : return new char[] {'w','x','y','z'};	
+		}
+		return null;
+    }
 --------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------
