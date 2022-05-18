@@ -1123,7 +1123,7 @@ Intuition-> Color every node with each color
     }
 --------------------------------------------------------------------------------------
 18. Find Bridges in graph.
-
+-> Below algo is also known as tarjan's Algorithm
 ->O(N+E), S(2N)
 
 //Bridge in Graph -> Those edges are called bridges in graph on whose removal the graph is broken into 2 or more no. of components.
