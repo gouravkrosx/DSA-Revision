@@ -1605,6 +1605,12 @@ public String removeKdigits(String num, int k) {
 -> Time Complexity :- BigO(NlogNlogM) where N is the highest value in the array
 -> Space Complexity :- BigO(N)
 
+Intuition: Here we need to increase the min and decrease the max.
+-> if min was odd it got increased to its double value. if it was even then its already at its maximum.
+-> Now we want to decrease the max value, it have become odd after dividing by 2. 
+-> At some point when we get our peak(highest) value and if it is not even that we will stop dividing because at this point we have decreased max values
+at their lowest point.
+
 public int minimumDeviation(int[] nums) {
         // First create a priority Queue
         // and implemented a custom comperator, which help us in making this priority queue act like a max heap
@@ -1803,13 +1809,14 @@ instead of (cur>=grid[newX][newY]) -> here we will use (cur>=Math.abs(grid[newX]
         quantity[0][0]=poured;
         
         for(int i=0;i<query_row;i++){
-            for(int j=0;j<query_glass;j++){
+            for(int j=0;j<=query_glass;j++){
                 double rem = Math.max(quantity[i][j]-1,0.0);
                 quantity[i+1][j] += rem/2.0;
                 quantity[i+1][j+1] += rem/2.0;
             }
         }
-        return Math.min(quantity[query_row][query_glass],1.0);
+        return Math.min(quantity[query_row][query_glass],1.0); //because it champagne did not reach to last then it will give, 
+        // and if it reaches at last but value is more than 1 then it pours down from the glass and ultimately volume of the wine becomes 1 only.
     }
 -------------------------------------------------------------------------------------
 57. Delete and Earn 
@@ -2970,7 +2977,23 @@ M2) Using Union & Find Method
         return end-beg+1;
     }
 
----------------------------------------------------------------------------------------------    
+---------------------------------------------------------------------------------------------
+83. Missing number (LC-268)
+-> in O(N), S(1)  
+
+ public int missingNumber(int[] nums) {
+        // solution-1 : n*(n+1)/2 - sum of array <= but it can give overflow in case of n being big number
+       
+       //solution-2 : xor approach a^b^b = a, so we will try to xor every number in the array and with its index also.
+       
+       
+       int xor=0, i=0;
+       
+       for(i=0;i<nums.length;i++){
+           xor = xor ^ i ^ nums[i];
+       }
+       return xor ^ i; //here i become the last number as we know that numbers are in range from [0-n]
+    }    
 
 ---------------------------------------------------------------------------------------------    
 

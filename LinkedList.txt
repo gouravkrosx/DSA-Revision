@@ -26,6 +26,8 @@ public void RPI() {
 
 -> if tail is not there
 
+Best-1)
+
 public ListNode reverseList(ListNode head) {
         if(head==null){
             return null;
@@ -49,7 +51,9 @@ public ListNode reverseList(ListNode head) {
         
     return  head;
     }
--> Best Recursive Method
+
+Best-2)
+
 static Node reverse(Node head) {
         if (head == null || head.next == null) return head;
 
@@ -1077,7 +1081,7 @@ static int countTriplets(Node head, int x) {
 		NthNode.next = null;
 	}
 --------------------------------------------------------------------------------------------------------
-28. Swapping Nodes in LinkedList
+28. Swap Nodes in pairs (LC-24)
 
 M1) Separate even list and odd list and join them alternatively <- 2 traversals
 

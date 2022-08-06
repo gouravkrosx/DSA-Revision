@@ -885,12 +885,110 @@ public int numRescueBoats(int[] people, int limit) {
         return ans;
     } 
 ---------------------------------------------------------------------------------
+32. Minimum Deletions to Make Character Frequencies Unique (LC-1647)
+
+M1) Sorting
+// Example:  freq = [50, 50, 49, 6, 5]
+// So for the second 50, exp = 49; And for 49, exp = 48;
+// And for 6, exp = 47, but 47 > 6 let's re-adjust exp = 6.
+
+    public int minDeletions(String s) {
+        int[] freq = new int[26];
+        for (char c : s.toCharArray()) {
+            freq[c - 'a']++;
+        }
+        Arrays.sort(freq);
+        int exp = freq[25];
+        int res = 0;
+        for (int i = 25; i >= 0; i--) {
+            if (freq[i] == 0) break;
+            if (freq[i] > exp) {
+                res += freq[i] - exp;
+            } else {
+                exp = freq[i];
+            }
+            if (exp > 0) exp--; // Lowest exp is zero, cannot be negative
+        }
+        return res;
+    }
+
+M2) HashSet
+
+ public int minDeletions(String s) {
+        int[] charCount = new int[26];
+        
+        for(char ch : s.toCharArray()){
+            charCount[ ch - 'a'] ++;
+        }
+        
+        HashSet<Integer> set = new HashSet<>();
+        int deletion = 0;
+        
+        for(int val : charCount){
+            while(val !=0 && set.contains(val)){
+                val--;
+                deletion++;
+            }
+            set.add(val);          
+        }
+       
+        return deletion;
+    }
 ---------------------------------------------------------------------------------
+33. Minimum Increment to Make Array Unique (LC-945)
+-> Similar to above
+
+  public int minIncrementForUnique(int[] A) {
+        Arrays.sort(A);
+        int res = 0, need = 0;
+        for (int a : A) {
+            res += Math.max(need - a, 0);
+            need = Math.max(a, need) + 1; //the current number need to be at least prev + 1.
+        }
+        return res;
+    }
 ---------------------------------------------------------------------------------
+34. Candy (LC-135)
+
+M1) O(N) Space
+
+    public int candy(int[] ratings) {
+        int sum=0;
+        int[] a=new int[ratings.length];
+        for(int i=0;i<a.length;i++)
+        {
+            a[i]=1;
+        }
+        for(int i=0;i<ratings.length-1;i++)
+        {
+            if(ratings[i+1]>ratings[i])
+            {
+                a[i+1]=a[i]+1;
+            }
+        }
+        for(int i=ratings.length-1;i>0;i--)
+        {
+            if(ratings[i-1]>ratings[i])
+            {
+                if(a[i-1]<(a[i]+1))
+                {
+                    a[i-1]=a[i]+1;
+                }
+            }
+        }
+        for(int i=0;i<a.length;i++)
+        {
+            sum+=a[i];
+        }
+        return sum;
+    }
+
+M2) O(1) Space
+->  With Proof:    
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 
-	
+

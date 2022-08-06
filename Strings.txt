@@ -199,7 +199,7 @@ private static void PrintSubsequences(String q, String ans) {
 Collections.sort(res);
 System.out.println(res.toString().replace("[","").replace("]","").replace(",",""));
 	private static void Permutations(int cs, int ts, HashMap<Character, Integer> fmap, String ans) {
-		if (cs==ts) {  //cs->current spot, ts->total spot
+		if (cs==ts) {  //cs->current spot, ts->total spot (length of string)
 		  res.add(ans);
 			return;
 		}
@@ -967,6 +967,89 @@ r=0,str=2d character array but with variable length of column, sen =empty senten
     public long nextHash(long pow,long hash,char left, char right){
         return ((hash - (left-'a'+1) * pow) * 31 + (right - 'a' + 1));
     }
+
+-----------------------------------------------------------------------------------
+31. Maximum Product of word lengths (LC-318)
+ public int maxProduct(String[] words) {
+        int len = words.length;
+        
+        int[]value = new int[len];
+        
+        //firsly finding hash for each string
+        for(int i=0;i<len;i++){
+           
+            String str = words[i];
+            value[i]=0;
+            
+            for(int j=0;j<str.length();j++){
+                value[i] |= 1 << (str.charAt(j)-'a');  // - (i)
+            }
+        }
+        
+        // for (i)=>
+        // a 1->1
+        // b 2->10
+        // c 4->100
+        // ab 3->11
+        // ac 5->101
+        // abc 7->111
+        // az 33554433->10000000000000000000000001
+        int maxP = 0;
+         
+        // if hash(a) & hash(b)==0 that means they do not have any common character.
+        for(int i=0;i<len;i++){
+            for(int j=i+1;j<len;j++){
+                if((value[i]&value[j])==0 && maxP < words[i].length() * words[j].length()){
+                    maxP = Math.max(maxP,words[i].length()*words[j].length());
+                }
+            }
+        }
+        return maxP;
+    }
+-----------------------------------------------------------------------------------
+32. Check If a String Contains All Binary Codes of Size K (LC-1461)
+
+M1)
+  public boolean hasAllCodes(String s, int k) {
+        if(s.length()-k<0)return false;
+        
+        HashSet<String> set = new HashSet<>();
+        StringBuilder str = new StringBuilder();
+        
+        //sliding window
+        for(int i=0; i<k; i++){
+            str.append(s.charAt(i));
+        }
+        set.add(str.toString());
+        for(int i=k; i<s.length(); i++){
+            str.deleteCharAt(0);
+            str.append(s.charAt(i));
+            set.add(str.toString());  
+        }
+        return set.size()==Math.pow(2,k);   
+    } 
+
+M2) 
+-> public boolean hasAllCodes(String s, int k) {
+    if(s.length() < k) return false;
+
+    Set<Integer> set = new HashSet<>();
+    int val = 0, totalSize = (1 << k);
+
+    for(int i = 0; i < k; i++)//preparing window 
+        val = val * 2 + s.charAt(i) - '0';//calculate first k characters
+
+    set.add(val);//add value to set
+
+    for(int i = k; i < s.length() && set.size() < totalSize; i++){//slide window
+        val = val * 2 +  s.charAt(i) - '0';//add current character value
+        val -= (s.charAt(i - k) - '0') * (1 << k);//remove the starting character value
+        set.add(val);
+    }
+    return set.size() == totalSize;
+}
+TC: O(N) where N is length of the String
+SC: O(2 ^ k)        
 -----------------------------------------------------------------------------------
 #. Why strings are immutable in Java?
 -> An immutable object is an object whose internal state remains constant after it has been entirely created. This means that once the object has been assigned to a variable, we can neither update the reference nor mutate the internal state by any means.

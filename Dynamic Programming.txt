@@ -264,7 +264,7 @@ O(m+n)
 int idx = len-1;
 int i=n, j=m;
 while(i>0 && j>0){
-    if(s[i-1]==t[i-1]){
+    if(s[i-1]==t[j-1]){
 	ans[idx]=s[i-1];
 	idx--;
 	i--,j--;	
@@ -842,50 +842,42 @@ That's the intuition behind this complexity.
 	}
 -------------------------
 Easiest Approach-> NlogN
-public static int LISOptimised(int[] nums) {
-		int n = nums.length;
-		int dp[] = new int[n + 1];
-		dp[0] = Integer.MIN_VALUE;
-
-		for (int i = 1; i <= n; i++) {
-			dp[i] = Integer.MAX_VALUE;
-		}
-
-		for (int i = 0; i < n; i++) {
-			int idx = UpperBound(dp, 0, n, nums[i]);
-			if (idx >= dp.length)
-				continue;
-
-			//nums[i]>dp[idx-1] checked for strictly increasing seq.
-
-]			if (nums[i] > dp[idx - 1] && nums[i] < dp[idx]) {  //though nums[i] always<dp[i] 
-				dp[idx] = nums[i];		//because we found upper bound	
-			}
-		}
-		int ans = 0;
-		for (int i = n; i > 0; i--) {
-			if (dp[i] != Integer.MAX_VALUE) {
-				ans = i;
-				break;
-			}
-		}
-
-		return ans;
-	}
-
-	public static int UpperBound(int[] arr, int lo, int hi, int val) {
-		int ans = 0;
-		while (lo <= hi) {
-			int mid = lo + (hi - lo) / 2;
-			if (arr[mid] <= val) {
-				lo = mid + 1;
-				ans = mid;
-			} else {
-				hi = mid - 1;
-			}
-		}
-		return ans + 1;
-	}
+ public int lengthOfLIS(int[] nums) {
+        int n = nums.length;
+        
+        int[]lis = new int[n+1];
+        
+        Arrays.fill(lis,Integer.MAX_VALUE);
+        lis[0] = Integer.MIN_VALUE;
+        
+        
+        int ans=0;
+        for(int i=0;i<n;i++){
+            int val = nums[i];
+            int idx = lowerBound(lis,nums[i]);
+            ans = Math.max(idx,ans);
+            if(lis[idx]>=val){
+                lis[idx]=val;
+            }
+        }
+        
+        return ans;
+    }
+     public int lowerBound(int[]dp, int val){
+        int l=0, h=dp.length-1;
+        int res = 0;
+        
+        while(l<=h){
+            int mid = (l+h)>>1;
+            if(dp[mid]<val){
+                res=mid;
+                l=mid+1;
+            }else{
+                h=mid-1;
+            }
+        }
+        return res+1;
+    }
 -> Striver's Approach
 
   public int lengthOfLIS(int[] nums) {
@@ -2112,6 +2104,31 @@ At last sum the both transactions (from both traversals) and find the max SUm.
         }
         return op;        
     }
+
+ -> Recursively
+ public int maxProfit(int[] prices) {
+        return BuyNSellStockAtMost2(0,2,prices,0, new Integer[prices.length][2][3]);
+        
+    }
+    public int BuyNSellStockAtMost2(int idx,int cap, int[]prices,int own,Integer[][][]dp){
+        if(cap==0)return 0;
+        
+        if(idx==prices.length)return 0;
+        
+        if(dp[idx][own][cap]!=null){
+            return dp[idx][own][cap];
+        }
+        
+        if(own==1){
+            int op1 = prices[idx]+BuyNSellStockAtMost2(idx+1,cap-1,prices,0,dp); //sell
+            int op2 = BuyNSellStockAtMost2(idx+1,cap,prices,1,dp); //not sell
+            return dp[idx][own][cap]=Math.max(op1,op2);
+        }else{
+            int op1 = -(prices[idx])+BuyNSellStockAtMost2(idx+1,cap,prices,1,dp); //buy
+            int op2 = BuyNSellStockAtMost2(idx+1,cap,prices,0,dp); //not buy
+            return dp[idx][own][cap]=Math.max(op1,op2);
+        }
+    }   
 ------------------------------------------------------------------------------------------------
 52. Buy And Sell Stocks (K transactions allowed)
 Logic->
@@ -2147,7 +2164,8 @@ so we need to maximize dp[i]-price[i]; ans at last add price[curr]
         }
         return dp[k][n-1];
     }
-
+-> Recursively 
+In above code just put k as capacity.
 ------------------------------------------------------------------------------------------------
 53. Mobile numeric keypad
 Logic-> if we can press n keys then dp[i] stores that if n keys are pressed and if last key(nth key) pressed is "i" then
@@ -2784,9 +2802,122 @@ public int minCost(int n, int[] cuts) {
         return dp[idx] = maxAns;
     }
 ------------------------------------------------------------------------------------------------
+69. Russian Doll Envelopes (LC-354)
 
+-> LIS Approach -> https://leetcode.com/problems/russian-doll-envelopes/discuss/2071477/Java-PythonBest-Explanation-with-Pictures
+
+=> Sort according to width but if width is same then dec order of height
+why dec order of height?
+1. In order to fit one envelop into another we need (w1<w2 && h1<h2).
+2. So, if you sort acc to width then you just have height to compare for LIS, and if you sort the height
+in inc order then same width will be counted more than one, but it should not.
+for eg [[3,5],[6,7],[6,10],[7,11],[8,4]]
+-> in above case if i apply lis on height then [6,7] and [6,10] both will be counted but only one should be counted.
+That is the reason if w1==w2 then sort in dec order of height.
+
+env[i] = [wi,hi] (width, height)
+public int maxEnvelopes(int[][] env) {
+        
+        Arrays.sort(env,(a,b)->(a[0]==b[0])?b[1]-a[1]:a[0]-b[0]);
+        
+        int n = env.length;
+        
+        int[]lis = new int[n+1];
+        
+        Arrays.fill(lis,Integer.MAX_VALUE);
+        lis[0] = Integer.MIN_VALUE;
+        
+        
+        int ans=0;
+        for(int i=0;i<n;i++){
+            int val = env[i][1];
+            int idx = lowerBound(lis,env[i][1]);
+            ans = Math.max(idx,ans);
+            if(lis[idx]>=val){
+                lis[idx]=val;
+            }
+        }
+        
+        return ans;
+    }
+    public int lowerBound(int[]dp, int val){
+        int l=0, h=dp.length-1;
+        int res = 0;
+        
+        while(l<=h){
+            int mid = (l+h)>>1;
+            if(dp[mid]<val){
+                res=mid;
+                l=mid+1;
+            }else{
+                h=mid-1;
+            }
+        }
+        return res+1;
+    }
 ------------------------------------------------------------------------------------------------
+70. Paint House III (LC-1473)
 
+ public int minCost(int[] houses, int[][] cost, int m, int n, int target) {
+        int[][][]dp = new int[m+1][m+1][target+1];
+        
+        
+        for(int[][]a:dp){
+            for(int[]b:a){
+                Arrays.fill(b,-2);
+            }
+        }
+        
+        return minCost(houses,cost,0,0,target,m,n,dp);
+    }
+    public int minCost(int[]houses,int[][]cost,int idx, int lastColor, int nbr_cnt, int len, int colors, int[][][]dp){
+        
+        if(nbr_cnt<0){
+            return -1;
+        }
+        
+        if(idx==len){
+            if(nbr_cnt==0)return 0;
+            return -1;
+        }
+        
+        if(dp[idx][lastColor][nbr_cnt]!=-2)return dp[idx][lastColor][nbr_cnt];
+        
+        
+        
+        if(houses[idx]!=0){
+           if(houses[idx]!=lastColor){
+               return dp[idx][lastColor][nbr_cnt] = minCost(houses,cost,idx+1,houses[idx],nbr_cnt-1,len,colors,dp); 
+           }else{
+               return dp[idx][lastColor][nbr_cnt] = minCost(houses,cost,idx+1,houses[idx],nbr_cnt,len,colors,dp);
+           }
+        }
+        
+        int ans = Integer.MAX_VALUE;
+        boolean possible = false;
+        
+        for(int color = 0;color<colors;color++){
+            int temp = 0;
+            
+            if(lastColor==color+1){
+                temp = minCost(houses,cost,idx+1,color+1,nbr_cnt,len,colors,dp);
+            }else{
+                temp = minCost(houses,cost,idx+1,color+1,nbr_cnt-1,len,colors,dp);
+            }
+            
+            if(temp!=-1){
+                possible=true;
+                ans = Math.min(ans,temp + cost[idx][color]);
+            }
+        }
+        
+        if(possible){
+            dp[idx][lastColor][nbr_cnt] = ans;
+        }else{
+            dp[idx][lastColor][nbr_cnt] = -1;
+        }
+        return dp[idx][lastColor][nbr_cnt];
+    }
 ------------------------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------------------------

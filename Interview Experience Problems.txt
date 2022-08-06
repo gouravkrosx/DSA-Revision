@@ -1635,12 +1635,204 @@ public boolean backspaceCompare(String s, String t) {
         return false;
     }
 ---------------------------------------------------------->
+46. Delete leaf nodes with value as x (https://www.geeksforgeeks.org/delete-leaf-nodes-value-x/)
+-> Similar to problem (29) in this file.
+
+static Node deleteLeaves(Node root, int x)
+{
+    if (root == null)
+        return null;
+    root.left = deleteLeaves(root.left, x);
+    root.right = deleteLeaves(root.right, x);
+ 
+    if (root.data == x && root.left == null && root.right == null) {
+ 
+        return null;
+    }
+    return root;
+}
+
 ---------------------------------------------------------->
+47. Sequential Digits (LC-1291)
+->
+  public List<Integer> sequentialDigits(int low, int high) {
+        List<Integer> res = new ArrayList<>();
+        
+        for(int startDigit = 1; startDigit<=9; startDigit++) {
+            int increment = startDigit;
+            int val = startDigit;
+            
+            while(increment <= 9) {
+                if(val <= high && val >= low) {
+                    res.add(val);
+                }
+                increment++;
+                val = val * 10 + increment; 
+            }
+        }
+        System.out.println(res);
+        Collections.sort(res);
+        return res; 
+    }
 ---------------------------------------------------------->
+48. Boggle (Find all possible words in a board of characters) 
+-> https://www.geeksforgeeks.org/boggle-find-possible-words-board-characters/
+
+M1)
+
+M2) Using Trie
 ---------------------------------------------------------->
+48. Maximum K-digit number possible from subsequences of two given arrays
+https://www.geeksforgeeks.org/maximum-k-digit-number-possible-from-subsequences-of-two-given-arrays/
 ---------------------------------------------------------->
+49. Flip Binary Tree (https://www.geeksforgeeks.org/flip-binary-tree/)
+
+=> we are not interested in going right in this question, dry run to understand better, take image reference in gfg link.
+
+-> public static Node flipBinaryTree(Node root)
+    {
+        if (root == null)
+            return root;
+        if (root.left == null && root.right ==null)
+            return root;
+ 
+        //  recursively call the same method
+        Node flippedRoot=flipBinaryTree(root.left);
+ 
+        //  rearranging main root Node after returning
+        // from recursive call
+        root.left.left=root.right;
+        root.left.right=root;
+        root.left=root.right=null;
+        return flippedRoot;
+    }
 ---------------------------------------------------------->
+50. Split given Array in minimum number of subarrays such that rearranging the order of subarrays sorts the array  
+
+static int numberOfSubarrays(int arr[], int n)
+{
+
+    // Stores the minimum number of
+    // subarrays
+    int cnt = 1;
+
+    // Stores all the elements in the
+    // array with their indices
+    pair[] v = new pair[n];
+
+    // Copy array elements in vector
+    for (int i = 0; i < n; i++) {
+        v[i] = new pair(0,0);
+        v[i].first = arr[i];
+        v[i].second = i;
+    }
+
+    // Sort the vector v
+    Arrays.sort(v,(a,b)->a.first-b.first);
+  
+    for(int i=0;i<v.length;i++){
+        System.out.print(v[i].first+"-"+v[i].second+" ");
+    }
+          System.out.println();
+
+    // Iterate through vector v
+    for (int i = 1; i < n; i++) {
+
+        // If the (i)th and (i-1)th element
+        // can be grouped in same subarray
+        if (v[i].second == v[i - 1].second + 1) {
+            continue;
+        }
+        else {
+            cnt++;
+        }
+    }
+
+    // Return resultant count
+    return cnt;
+}
 ---------------------------------------------------------->
+52. Path length having maximum number of bends (Similar to problem 21 in this file)
+-> 
+    static int maxBends;
+    static int len;
+    private static final char LEFT = 'l';
+    private static final char RIGHT = 'r';
+
+  // Helper function to call findMaxBendsUtil()
+    static int findMaxBends(Node node) {
+        if (node == null)
+            return 0;
+        len = 0;
+        maxBends = -1;
+        int bends = 0;
+
+        // Call for left subtree of the root
+        if (node.left != null)
+            findMaxBendsUtil(node.left, LEFT,
+                bends, 1);
+
+        // Call for right subtree of the root
+        if (node.right != null)
+            findMaxBendsUtil(node.right, RIGHT, bends,
+                1);
+
+        // Include the root node as well in the path length
+        len++;
+        return len;
+    }
+
+    static void findMaxBendsUtil(Node node,
+        char dir, int bends,
+        int lenSoFar) {
+
+        // Base Case
+        if (node == null)
+            return;
+
+        // Leaf node
+        if (node.left == null && node.right == null) {
+            if (bends > maxBends) {
+                maxBends = bends;
+                len = lenSoFar;
+            }
+        }
+
+        // Recurring for both left and right child
+        else {
+            if (dir == LEFT) {
+                findMaxBendsUtil(node.left, dir,
+                    bends,
+                    lenSoFar + 1);
+                findMaxBendsUtil(node.right, RIGHT,
+                    bends + 1,
+                    lenSoFar + 1);
+            } else {
+                findMaxBendsUtil(node.right, dir,
+                    bends,
+                    lenSoFar + 1);
+                findMaxBendsUtil(node.left, LEFT,
+                    bends + 1,
+                    lenSoFar + 1);
+            }
+        }
+    }
+
+----------------------------------------------------------->
+53. Next Greater Frequency Element
+-> https://www.geeksforgeeks.org/next-greater-frequency-element/
+
+-> Just like next greater element but compare frequency of element instead the actual number.
+----------------------------------------------------------->
+----------------------------------------------------------->
+----------------------------------------------------------->
+----------------------------------------------------------->
+----------------------------------------------------------->
+----------------------------------------------------------->
+----------------------------------------------------------->
+----------------------------------------------------------->
+----------------------------------------------------------->
+
 ---------------------------------------------------------->
 
 *) Must do at last day

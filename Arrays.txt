@@ -1,7 +1,20 @@
 SOLUTIONS OF THESE QUESTIONS ARE EITHER ON GFG OR ON LEETCODE.
 ---------------------------------------ARRAYS-----------------------------------------
 
-1. Kth smallest element array in O(N) S(1)
+1. Kth smallest element array in { AvgTime: O(N),  S(1) } 
+
+Time Complexity Analysis:
+
+Discard half each time->
+
+The average time complexity is n + n/2 + n/4 + ... + 8 + 4 + 2 + 1.
+It is a geometric progression of form an=a1*r^(n-1) where a1 is 1 and r is 2.
+The total count of the progression is log2n (log base 2 of 2*n).
+Formula for sum = { a * (1 - r^n)/(1 - r) }
+
+The sum is 1*(1 - 2^log2n)/(1 - 2) = 1*(1 - 2n)/(1 - 2) = 2n - 1.
+So the time complexity is O(2n - 1) which can be considered as O(n).
+
 #Always Dry run to understand better for this question and refer to GFG article
 and for kth Largest we can pass (arr.length-k+1)instead of k
    public static int kthSmallest(int[] arr, int l, int r, int k) 
@@ -90,7 +103,43 @@ public void sortColors(int[]nums){
         }
         return maxSoFar;
         
-    }	
+    }
+
+-> Maximum Sum Circular Subarray (LC-918)
+Intuition: So there can be two cases
+
+x-> part of maximum sum subarray, abcd are just other numbers.
+i) abcdxxxxabcd 
+ii) xxxxabcdxxxx 
+
+So, with the circular array, there are only two ways the sum can be found. The first is that the max sum is found by iterating through the array in the forward direction once. The second is that the sum requires wrapping around the array. The forward direction is easy - that's the max sum for the non-circular problem.
+
+For the wrap around case, the sequence for the max sum must contain every value in the array except for those that are in the minimum subarray. So to compute that, sum the entire array and subtract off the sum of the min sequence.
+
+public int maxSubarraySumCircular(int[] nums) {
+      
+        int currMax = nums[0];
+        int overAllMax = nums[0];
+        int currMin = nums[0];
+        int overAllMin = nums[0];
+        int total = nums[0];
+        
+        for(int i=1;i<nums.length;i++){
+            total += nums[i];
+            
+            currMax = Math.max(currMax+nums[i],nums[i]);
+            currMin = Math.min(currMin+nums[i],nums[i]);
+            
+            overAllMax = Math.max(overAllMax,currMax);
+            overAllMin = Math.min(overAllMin,currMin);
+        }
+        
+        if(overAllMax<0){
+            return overAllMax;
+        }else{
+            return Math.max(overAllMax,total-overAllMin);
+        }
+    }    	
 ----------------------------------------------
 4. Minimize the heights
 
@@ -276,7 +325,7 @@ public void merge(int arr1[], int arr2[], int n, int m) {
 --------------------------------------------------------------------------------
 9. Next Permutation 
 1 3 5 4 2
--> 1  4 2 3 5
+-> 1 4 2 3 5
 Approach->
 i)traverse from reverse and find the break point where arr[i]<arr[i+1] ==>for eg here it is 3 at IDX=1,
 ii) again traverse from reverse and find the idx where arr[i]>arr[idx]; here it is element '4' at index=4,
@@ -1142,4 +1191,95 @@ public int removeDuplicates(int[] nums) {
         }
         return i+1;
     }
+----------------------------------------------------------------------------------------
+34. Maximum Points You Can Obtain from Cards (LC-1423)
+
+M1) Basically taking elements from first and last and shifting the no of elements taken from both according to k and atlast take max.
+
+public int maxScore(int[] arr, int k) {
+    int n = arr.length;
+    
+    int sum = 0;
+    for(int i=0; i<k; i++){
+        sum+=arr[i];
+    }
+    int max = sum; 
+    for(int i=0; i<k; i++){
+        sum = sum - arr[k-i-1] + arr[n-i-1];
+        max = Math.max(max, sum);
+    }
+    return max;
+}
+
+M2) Min Subarray sum of size (n-k) (similar to maximum sum circular subarray)
+->
+ public int maxScore(int[] card, int k) {
+        int n = card.length;
+        
+        
+        int tsum=0;
+        
+        for(int val:card)tsum+=val;
+        
+        int slen = n-k;
+        int sum=0;
+        
+        int min = Integer.MAX_VALUE;
+        
+        
+        for(int i=0;i<slen;i++){
+            sum+=card[i];
+        }
+        
+        min = Math.min(min,sum);
+        
+        int j=0;
+        for(int i=slen;i<n;i++){
+            sum-=card[j];
+            sum+=card[i];
+            j++;
+            min = Math.min(sum,min);
+        }
+       return tsum-min;
+    }
+
+----------------------------------------------------------------------------------------
+35. Minimum Moves to Equal Array Elements II (LC-462)
+
+#) Usually when a problem gives you vibe of mean just think about median also.
+
+Median over mean=>
+Little proof for the problem:
+
+I have a simpler proof. The meet point must be somewhere between current min and max. No matter which point you pick, the total running length for min and max is the same, i.e. abs(min_point-meet_point)+abs(max_point-meet_point) = SOME_CONSTANT.
+
+So, we can effectively reduce the problem size from n to n-2 by discarding min and max points. Do you see it? That is the definition of median, isn't it?
+
+Let's have an example. suppose we have an array, [1,2,3,4,5,6,7]. The meet point must lie between 1 and 7. For any value in this range, the total running length for 1 and 7 is the same. So, array => [2,3,4,5,6]...
+
+
+M1) Using Quick select(basically kth smallest element where k = ((size + 1)/2) )
+after that you will get the median and then for every i do { sum+=Math.abs(nums[i]-median); }
+
+M2) Sorting
+
+public int minMoves2(int[] nums) {
+        Arrays.sort(nums);
+        int i = 0, j = nums.length-1;
+        int count = 0;
+        while(i < j){
+            count += nums[j]-nums[i];
+            i++;
+            j--;
+        }
+        return count;
+    }
+
+M2) Sorting + through median  
+-> { sum+=Math.abs(nums[i]-median); }   
+
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------

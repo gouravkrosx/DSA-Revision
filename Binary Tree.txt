@@ -18,6 +18,42 @@ private List<List<Integer>> levelArrayList(List<List<Integer>> list, TreeNode no
 		return list;
 	}
 #In Reverse Level Order Traversal  just use Collections.reverse(list); and then return
+->
+void reverseLevelOrder(Node node)
+    {
+        Stack<Node> S = new Stack();
+        Queue<Node> Q = new LinkedList();
+        Q.add(node);
+  
+        // Do something like normal level order traversal order.Following
+        // are the differences with normal level order traversal
+        // 1) Instead of printing a node, we push the node to stack
+        // 2) Right subtree is visited before left subtree
+        while (Q.isEmpty() == false)
+        {
+            /* Dequeue node and make it root */
+            node = Q.peek();
+            Q.remove();
+            S.push(node);
+  
+            /* Enqueue right child */
+            if (node.right != null)
+                // NOTE: RIGHT CHILD IS ENQUEUED BEFORE LEFT
+                Q.add(node.right);
+                 
+            /* Enqueue left child */
+            if (node.left != null)
+                Q.add(node.left);
+        }
+  
+        // Now pop all items from stack one by one and print them
+        while (S.empty() == false)
+        {
+            node = S.peek();
+            System.out.print(node.data + " ");
+            S.pop();
+        }
+    }
 -----------------------------------------------------------------------------------
 2. Height of a Binary Tree
  public int maxDepth(TreeNode node) {
@@ -1756,6 +1792,49 @@ public boolean isCousins(TreeNode root, int x, int y) {
         return false;
     }
 ----------------------------------------------------------------------------------------------------------------
+45. Distribute Coins in Binary Tree (LC-979)
+
+M1) 
+  class Solution {
+    int moves = 0;
+    public int distributeCoins(TreeNode root) {
+        getNumAndCoins(root);
+        return moves;
+    }
+    
+    /*
+     * return [number_of_nodes_in_subtree, number_of_total_coins_in_subtree]
+     */
+    private int[] getNumAndCoins(TreeNode node) {
+        if (node == null) return new int[] {0, 0};
+        int[] left = getNumAndCoins(node.left);
+        int[] right = getNumAndCoins(node.right);
+        moves += Math.abs(left[0] - left[1]) + Math.abs(right[0] - right[1]);
+        return new int[] {left[0] + right[0] + 1, left[1] + right[1] + node.val};
+    }
+}
+
+M2) 
+
+  public int distributeCoins(TreeNode root) {
+        
+ // We traverse childs first (post-order traversal), and return the balance of coins. For example, if we get '+3' from the left child, that means that the left subtree has 3 extra coins to move out. If we get '-1' from the right child, we need to move 1 coin in. So, we increase the number of moves by 4 (3 moves out left + 1 moves in right). We then return the final ballance: r->val (coins in the root) + 3 (left) + (-1) (right) - 1 (keep one coin for the root).
+        
+        int[] moves = new int[]{0};
+        distributeCoins(root, moves);
+        return moves[0];
+    }
+    public int distributeCoins(TreeNode node, int[]moves){
+        if(node==null)return 0;
+        
+        int left = distributeCoins(node.left,moves);
+        int right = distributeCoins(node.right,moves);
+        
+        moves[0] += Math.abs(left) + Math.abs(right);
+        
+        return node.val + left + right - 1; 
+    }
+
 ----------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------

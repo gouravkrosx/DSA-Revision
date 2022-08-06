@@ -588,8 +588,173 @@ class WordDictionary {
 }
 
 -----------------------------------------------------------------------------
+8. Boggle subsequences
+-> https://www.geeksforgeeks.org/boggle-set-2-using-trie/
 
 -----------------------------------------------------------------------------
+9. Prefix and Suffix Search (LC-745) (Hard)
+-> Take "apple" as an example, we will insert add "apple{apple", "pple{apple", "ple{apple", "le{apple", "e{apple", "{apple" into the Trie Tree.
+If the query is: prefix = "app", suffix = "le", we can find it by querying our trie for
+"le { app".
+We use '{' because in ASCii Table, '{' is next to 'z', so we just need to create new TrieNode[27] instead of 26. Also, compared with tradition Trie, we add the attribute weight in class TrieNode.
 
+class TrieNode {
+    TrieNode[] children;
+    int weight;
+    public TrieNode() {
+        children = new TrieNode[27]; // 'a' - 'z' and '{'. 'z' and '{' are neighbours in ASCII table
+        weight = 0;
+    }
+}
+
+public class WordFilter {
+    TrieNode root;
+    public WordFilter(String[] words) {
+        root = new TrieNode();
+        for (int weight = 0; weight < words.length; weight++) {
+            String word = words[weight] + "{";
+            for (int i = 0; i < word.length(); i++) {
+                TrieNode cur = root;
+                cur.weight = weight;
+    // add "apple{apple", "pple{apple", "ple{apple", "le{apple", "e{apple", "{apple" into the Trie Tree
+                for (int j = i; j < 2 * word.length() - 1; j++) {
+                    int k = word.charAt(j % word.length()) - 'a';
+                    if (cur.children[k] == null)
+                        cur.children[k] = new TrieNode();
+                    cur = cur.children[k];
+                    cur.weight = weight;
+                }
+            }
+        }
+    }
+    public int f(String prefix, String suffix) {
+        TrieNode cur = root;
+        for (char c: (suffix + '{' + prefix).toCharArray()) {
+            if (cur.children[c - 'a'] == null) {
+                return -1;
+            }
+            cur = cur.children[c - 'a'];
+        }
+        return cur.weight;
+    }
+}
+
+-----------------------------------------------------------------------------
+10. Search Suggestions System (LC-1268)
+
+ //Rather than applying sort, just iterate over the 26 chars of alphabets.
+    
+    // TC : O(n * m + O(3) - to add 3 words + 26 * s * avg) 
+    // where n is the products.length and m is the avg length of each product[i]
+    // and s is the length of searhWord
+    // SC : O(n * m)
+    public List<List<String>> suggestedProducts(String[] products, String searchWord) {
+        Trie obj = new Trie();
+        for(String w : products)
+            obj.addWord(w);
+        
+        List<List<String>> R = new ArrayList<>();
+        Node curr = obj.root;
+        for(char ch : searchWord.toCharArray()) {
+
+            if(curr!=null)
+            {
+                curr = curr.children.get(ch);
+                List<String> t = obj.search(curr, new ArrayList<String>());
+                R.add(t);
+            }
+            // no suggestions
+            else R.add(new ArrayList<String>());
+        }
+        return R;
+    }
+}
+
+class Node {
+    HashMap<Character, Node> children;
+    boolean isEnd;
+    String word;
+    
+    Node() {
+        this.children = new HashMap<>();
+        this.isEnd = false;
+    }
+}
+
+class Trie {
+    
+    public Node root;
+    
+    Trie() {
+        this.root = new Node();
+    }
+    
+    public void addWord(String w) {
+        Node curr = this.root;
+        for(char ch : w.toCharArray()) {
+            if(!curr.children.containsKey(ch))
+                curr.children.put(ch, new Node());
+            curr = curr.children.get(ch);
+        }
+        curr.isEnd = true;
+        curr.word = w;
+    }
+    
+    public List<String> search(Node curr, List<String> T) {
+        if(T.size() == 3 || curr == null) {
+            return T;
+        }
+        
+        if(curr.isEnd) {
+            T.add(curr.word);
+        }
+        
+        for(char ch='a';ch<='z';ch++) {
+            if(curr.children.containsKey(ch)) {
+                search(curr.children.get(ch), T);
+            }
+        }
+        return T;
+    }
+-----------------------------------------------------------------------------
+11. Short Encoding of Words (LC-820)
+-> time: O(NK), space: O(NK)
+Let's get the deacription clear:
+Given string list L1, construct a another string list L2, making every word in L1 be a suffix of a word in L2.
+Return the minimum possible total length of words in L2
+Input L1: ["time","me","bell"]
+L2: ["time","bell"]
+
+So the idea of trie is really straightforward. It will be even more obvious if it is sufix.
+What we should do here is insert all reversed words to a trie.
+
+class Solution {
+
+class TrieNode {
+    HashMap<Character, TrieNode> next = new HashMap<>();
+    int depth;
+}
+    public int minimumLengthEncoding(String[] words) {
+        TrieNode root = new TrieNode();
+        List<TrieNode> leaves = new  ArrayList<TrieNode>();
+        for (String w : new HashSet<>(Arrays.asList(words))) {
+            TrieNode cur = root;
+            for (int i = w.length() - 1; i >= 0; --i) {
+                char j = w.charAt(i);
+                if (!cur.next.containsKey(j)) cur.next.put(j, new TrieNode());
+                cur = cur.next.get(j);
+            }
+            cur.depth = w.length() + 1;
+            leaves.add(cur);
+        }
+        int res = 0;
+        for (TrieNode leaf : leaves) if (leaf.next.isEmpty()) res += leaf.depth;
+        return res;
+    }
+}
+
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
 
 
