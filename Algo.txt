@@ -1,1 +1,90 @@
 
+Sorting through the vast world of algorithms can feel like trying to organize a library during an earthquake. To make it manageable, I’ve broken these down into the "must-know" categories for interviews and real-world engineering.
+
+---
+
+## 1. Sorting Algorithms
+
+These are the bread and butter of technical interviews. You should know their time complexities ( vs ) and space requirements.
+
+* **Comparison-Based:**
+* **Quick Sort:** Usually the fastest in practice; uses a "pivot."
+* **Merge Sort:** Stable and reliable; excellent for linked lists and external sorting.
+* **Heap Sort:** Uses a binary heap data structure; guaranteed .
+* **Insertion Sort:** Efficient for small datasets or nearly sorted arrays.
+
+
+* **Non-Comparison Based (Linear Time):**
+* **Counting Sort:** Great when the range of input values is small.
+* **Radix Sort:** Processes numbers digit by digit.
+* **Bucket Sort:** Distributes elements into "buckets" for localized sorting.
+
+
+
+---
+
+## 2. Graph Algorithms
+
+Graphs are everywhere (social networks, maps, recommendation engines). Interviewers love these because they test your ability to handle complex relationships.
+
+* **Traversal:**
+* **Breadth-First Search (BFS):** Finds the shortest path in unweighted graphs.
+* **Depth-First Search (DFS):** Used for topological sorting and finding cycles.
+
+
+* **Shortest Path:**
+* **Dijkstra’s Algorithm:** Finds the shortest path from a source to all nodes (weighted, non-negative).
+* **Bellman-Ford:** Handles negative weights (and detects negative cycles).
+* **Floyd-Warshall:** Finds shortest paths between *all* pairs of nodes.
+
+
+* **Minimum Spanning Tree (MST):**
+* **Prim’s Algorithm:** Grows the MST from a starting node.
+* **Kruskal’s Algorithm:** Connects the cheapest edges (uses Union-Find).
+
+
+
+---
+
+## 3. Searching and Pattern Matching
+
+* **Binary Search:** The ultimate "divide and conquer" for sorted arrays.
+* **Two Pointers:** Used for finding pairs or subarrays (e.g., 3Sum problem).
+* **Sliding Window:** Essential for string or array problems involving "contiguous" segments.
+* **KMP (Knuth-Morris-Pratt):** Efficient string pattern matching.
+
+---
+
+## 4. Tree Algorithms
+
+Since trees are a special type of graph, they have their own flavor of logic.
+
+* **Binary Search Tree (BST) Operations:** Insertion, Deletion, and Searching.
+* **Tree Traversals:** In-order (gives sorted order in BST), Pre-order, and Post-order.
+* **Lowest Common Ancestor (LCA):** Finding the first shared parent of two nodes.
+* **Trie (Prefix Tree) Operations:** Crucial for autocomplete and dictionary features.
+
+---
+
+## 5. Dynamic Programming (DP) & Greedy
+
+These are more "strategies" than specific algorithms, but they appear frequently as specific patterns:
+
+* **Knapsack Problem (0/1 and Fractional):** Choosing items for maximum value.
+* **Longest Common Subsequence (LCS):** Comparing two strings.
+* **Kadane’s Algorithm:** Finding the maximum subarray sum in .
+* **Huffman Coding:** A greedy approach used in data compression.
+
+---
+
+## Summary Table: Time Complexities
+
+| Algorithm | Average Time | Worst Case | Best for... |
+| --- | --- | --- | --- |
+| **Quick Sort** |  |  | General purpose/In-place |
+| **Merge Sort** |  |  | Large datasets/Stability |
+| **Binary Search** |  |  | Sorted lookup |
+| **Dijkstra's** |  |  | Shortest path (weighted) |
+
+---
+---------------------------------------------------------------
